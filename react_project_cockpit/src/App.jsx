@@ -3,6 +3,13 @@ import { initialProjects, initialActivities, calculateProjectProgress, flattenTa
 import ProjectCard from './components/projects/ProjectCard.jsx';
 import ProjectDetailsPage from './components/projects/ProjectDetailsPage.jsx';
 import UrgentNotificationDrawer from './components/notifications/UrgentNotificationDrawer.jsx';
+import EmailReminderModal from './components/modals/EmailReminderModal.jsx';
+import { 
+  getPersonEmail, 
+  getDailyReminderStatus, 
+  markDailyReminderSent, 
+  logReminderDispatch 
+} from './services/reminderEmailService.js';
 import { ERPNextService } from './services/erpnextApi.js';
 
 export default function App() {
@@ -39,7 +46,7 @@ export default function App() {
   // Pagination: Initially show first 10 projects
   const [visibleCount, setVisibleCount] = useState(10);
 
-  // Global Filters
+  // Global Filters & Modals
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
@@ -48,6 +55,9 @@ export default function App() {
   const [targetProjectForNewTask, setTargetProjectForNewTask] = useState('PROJ-0001');
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isUrgentDrawerOpen, setIsUrgentDrawerOpen] = useState(false);
+  
+  // Email Reminder Modal State
+  const [emailModalData, setEmailModalData] = useState(null); // { task, assigneeName }
 
   // Dark mode sync
   useEffect(() => {
@@ -71,7 +81,7 @@ export default function App() {
 
   const showToast = (msg, type = 'success') => {
     setNotification({ msg, type });
-    setTimeout(() => setNotification(null), 4500);
+    setTimeout(() => setNotification(null), 5000);
   };
 
   // Helper: Open Dedicated Project Details Page
@@ -82,7 +92,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Calculate all active urgent tasks across all projects
+  // Calculate all active urgent tasks across all projects that are Open or Working
   const urgentTasks = useMemo(() => {
     const list = [];
     projects.forEach(p => {
@@ -101,20 +111,60 @@ export default function App() {
     return list;
   }, [projects]);
 
-  // Unique assignees with urgent tasks
+  // Unique assignees with urgent tasks & their emails
   const uniqueUrgentAssignees = useMemo(() => {
-    const set = new Set();
+    const map = new Map();
     urgentTasks.forEach(t => {
       const name = typeof t.assignee === 'object' ? t.assignee?.name : t.assignee || 'Unassigned';
-      set.add(name);
+      if (!map.has(name)) {
+        map.set(name, {
+          name,
+          email: getPersonEmail(name),
+          taskCount: 1
+        });
+      } else {
+        map.get(name).taskCount += 1;
+      }
     });
-    return Array.from(set);
+    return Array.from(map.values());
   }, [urgentTasks]);
+
+  // Daily 1x Automated Reminder Trigger
+  const handleRunDailyReminders = () => {
+    if (urgentTasks.length === 0) {
+      showToast('✅ No active Open or Working urgent tasks. Daily reminder emails are idle.', 'success');
+      return;
+    }
+
+    const recipientsSummary = uniqueUrgentAssignees.map(a => `${a.name} (${a.email})`).join(', ');
+    markDailyReminderSent();
+
+    logReminderDispatch({
+      type: 'DAILY_BATCH',
+      recipients: uniqueUrgentAssignees,
+      taskCount: urgentTasks.length,
+      status: 'SENT'
+    });
+
+    showToast(`📧 Daily 1x Reminder Mail Batch Dispatched to: ${recipientsSummary}!`, 'warning');
+
+    const newAct = {
+      id: `ACT-${Date.now()}`,
+      user: "Daily Reminder Engine",
+      action: `dispatched 1x daily reminder email batch`,
+      target: `${urgentTasks.length} urgent tasks to [${recipientsSummary}]`,
+      time: "Just now",
+      avatar: "📧"
+    };
+    setActivities(prev => [newAct, ...prev]);
+  };
 
   // Dispatch notification to a specific assigned person
   const handleNotifyPerson = (assigneeName, task, isCopyOnly = false, isBulkForPerson = false) => {
+    const email = getPersonEmail(assigneeName);
+
     if (isCopyOnly) {
-      showToast(`📋 Copied urgent alert message for ${assigneeName} to clipboard!`, 'success');
+      showToast(`📋 Copied urgent reminder message for ${assigneeName} (${email}) to clipboard!`, 'success');
       return;
     }
 
@@ -122,22 +172,22 @@ export default function App() {
     const projLabel = task.projectId ? ` (${task.projectId})` : '';
 
     if (isBulkForPerson) {
-      showToast(`🚨 Urgent ping sent to @${assigneeName} for all assigned urgent tasks!`, 'warning');
+      showToast(`🚨 Urgent reminder dispatched to ${assigneeName} (${email}) for all pending tasks!`, 'warning');
       const newAct = {
         id: `ACT-${Date.now()}`,
         user: "System Watchdog",
-        action: `sent urgent priority notification to @${assigneeName}`,
+        action: `sent urgent reminder to ${assigneeName} (${email})`,
         target: `${assigneeName}'s urgent tasks`,
         time: "Just now",
         avatar: "🚨"
       };
       setActivities(prev => [newAct, ...prev]);
     } else {
-      showToast(`🚨 Urgent alert dispatched to @${assigneeName} for "${taskLabel}"${projLabel}!`, 'warning');
+      showToast(`🚨 Urgent reminder sent to ${assigneeName} (${email}) for "${taskLabel}"${projLabel}!`, 'warning');
       const newAct = {
         id: `ACT-${Date.now()}`,
         user: "System Watchdog",
-        action: `dispatched urgent alert to @${assigneeName}`,
+        action: `dispatched urgent alert to ${assigneeName} (${email})`,
         target: `Task: ${taskLabel}`,
         time: "Just now",
         avatar: "⚡"
@@ -146,32 +196,55 @@ export default function App() {
     }
   };
 
-  // Dispatch broadcast notification to all assignees
-  const handleNotifyAll = () => {
-    if (urgentTasks.length === 0) return;
-    const names = uniqueUrgentAssignees.join(', ');
-    showToast(`📢 Urgent notifications broadcasted to ${uniqueUrgentAssignees.length} assignees (${names})!`, 'warning');
+  // Open Email Reminder Preview & Dispatch Modal
+  const handleOpenEmailReminder = (task, assigneeName) => {
+    setEmailModalData({
+      task,
+      assigneeName: assigneeName || (typeof task.assignee === 'object' ? task.assignee?.name : task.assignee || 'Unassigned')
+    });
+  };
+
+  // When email is successfully sent from modal
+  const handleEmailSentSuccess = (assigneeName, email, task) => {
+    logReminderDispatch({
+      type: 'SINGLE_TASK_REMINDER',
+      recipient: assigneeName,
+      email: email,
+      taskId: task.id,
+      taskName: task.name || task.subject,
+      projectId: task.projectId,
+      status: 'SENT'
+    });
+
+    showToast(`✅ Urgent reminder email successfully dispatched to ${assigneeName} (${email})!`, 'success');
 
     const newAct = {
       id: `ACT-${Date.now()}`,
-      user: "Executive Lead",
-      action: `broadcasted urgent task alerts to all assignees`,
-      target: `${urgentTasks.length} urgent tasks (${names})`,
+      user: "Mailer Engine",
+      action: `sent reminder email to ${assigneeName} (${email})`,
+      target: task.name || task.subject,
       time: "Just now",
-      avatar: "📢"
+      avatar: "📧"
     };
     setActivities(prev => [newAct, ...prev]);
   };
 
   // Task Status Change in Tree / Details
   const handleTaskStatusChange = (projectId, taskId, newStatus) => {
+    let taskName = '';
+    let assigneeName = '';
+    let isUrgentTask = false;
+
     setProjects(prevProjects => {
       return prevProjects.map(proj => {
         if (proj.id !== projectId) return proj;
 
         function updateNode(node) {
           if (node.id === taskId) {
-            const newProg = newStatus === 'Completed' ? 100 : (newStatus === 'In Progress' ? 50 : 0);
+            taskName = node.name || node.subject;
+            assigneeName = typeof node.assignee === 'object' ? node.assignee?.name : node.assignee || 'Unassigned';
+            isUrgentTask = node.priority === 'Urgent';
+            const newProg = newStatus === 'Completed' ? 100 : (newStatus === 'In Progress' || newStatus === 'Working' ? 50 : 0);
             return { ...node, status: newStatus, progress: newProg };
           }
           if (node.children && node.children.length > 0) {
@@ -203,7 +276,21 @@ export default function App() {
       });
     });
 
-    showToast(`Task status updated to "${newStatus}". Overall progress recalculated!`);
+    if (newStatus === 'Completed' && isUrgentTask) {
+      const email = getPersonEmail(assigneeName);
+      showToast(`🎉 "${taskName}" marked as Completed! Daily reminder emails to ${assigneeName} (${email}) have automatically STOPPED.`, 'success');
+      const newAct = {
+        id: `ACT-${Date.now()}`,
+        user: assigneeName,
+        action: `completed urgent task • reminder emails stopped`,
+        target: taskName,
+        time: "Just now",
+        avatar: "🛑"
+      };
+      setActivities(prev => [newAct, ...prev]);
+    } else {
+      showToast(`Task status updated to "${newStatus}". Overall progress recalculated!`);
+    }
   };
 
   // Task Priority Change
@@ -235,7 +322,8 @@ export default function App() {
     });
 
     if (newPriority === 'Urgent') {
-      showToast(`🔥 Priority escalated to URGENT for "${taskName}"! Notification sent to @${assignee}.`, 'warning');
+      const email = getPersonEmail(assignee);
+      showToast(`🔥 Priority escalated to URGENT for "${taskName}"! Daily reminder scheduled for ${assignee} (${email}).`, 'warning');
     } else {
       showToast(`Task priority updated to ${newPriority}.`);
     }
@@ -245,6 +333,7 @@ export default function App() {
   const handleAddTask = (newTaskData) => {
     const pId = newTaskData.projectId || selectedProjectId;
     const assigneeName = newTaskData.assignee || 'Unassigned';
+    const email = getPersonEmail(assigneeName);
     const newTask = {
       id: `TASK-${Date.now().toString().slice(-4)}`,
       name: newTaskData.name || newTaskData.subject,
@@ -253,7 +342,7 @@ export default function App() {
       priority: newTaskData.priority || 'Medium',
       progress: newTaskData.status === 'Completed' ? 100 : 0,
       dueDate: newTaskData.dueDate || new Date().toISOString().split('T')[0],
-      assignee: { name: assigneeName, avatar: assigneeName.slice(0, 2).toUpperCase() },
+      assignee: { name: assigneeName, email: email, avatar: assigneeName.slice(0, 2).toUpperCase() },
       children: []
     };
 
@@ -275,11 +364,11 @@ export default function App() {
     setIsNewTaskModalOpen(false);
 
     if (newTaskData.priority === 'Urgent') {
-      showToast(`🚨 Urgent task created! Instant notification sent to @${assigneeName}.`, 'warning');
+      showToast(`🚨 Urgent task created! Daily reminder active for ${assigneeName} (${email}).`, 'warning');
       const newAct = {
         id: `ACT-${Date.now()}`,
         user: "System",
-        action: `created urgent task & alerted @${assigneeName}`,
+        action: `created urgent task & activated daily reminder for ${assigneeName} (${email})`,
         target: newTask.name,
         time: "Just now",
         avatar: "🚨"
@@ -307,7 +396,7 @@ export default function App() {
       budget: Number(newProjData.budget) || 50000,
       actualCost: 0,
       percentCompleted: 0,
-      assignedUsers: [{ name: newProjData.owner || 'Admin', avatar: 'AD', role: 'Lead', color: 'from-indigo-500 to-purple-600' }],
+      assignedUsers: [{ name: newProjData.owner || 'Admin', email: getPersonEmail(newProjData.owner), avatar: 'AD', role: 'Lead', color: 'from-indigo-500 to-purple-600' }],
       tasks: []
     };
 
@@ -332,7 +421,7 @@ export default function App() {
     });
   }, [projects, searchTerm, statusFilter, priorityFilter]);
 
-  // Paginated Projects (First 10, then +10 on Load More)
+  // Paginated Projects
   const visibleProjects = useMemo(() => {
     return filteredProjects.slice(0, visibleCount);
   }, [filteredProjects, visibleCount]);
@@ -379,15 +468,27 @@ export default function App() {
         </div>
       )}
 
-      {/* Urgent Notifications Drawer */}
+      {/* Urgent Notifications & Daily Reminders Drawer */}
       <UrgentNotificationDrawer
         isOpen={isUrgentDrawerOpen}
         onClose={() => setIsUrgentDrawerOpen(false)}
         urgentTasks={urgentTasks}
         onNotifyPerson={handleNotifyPerson}
-        onNotifyAll={handleNotifyAll}
+        onSendEmailReminder={handleOpenEmailReminder}
+        onRunDailyReminders={handleRunDailyReminders}
         onNavigateToProject={handleOpenProjectDetails}
       />
+
+      {/* Individual Email Reminder Modal */}
+      {emailModalData && (
+        <EmailReminderModal
+          isOpen={!!emailModalData}
+          onClose={() => setEmailModalData(null)}
+          task={emailModalData.task}
+          assigneeName={emailModalData.assigneeName}
+          onSendSuccess={handleEmailSentSuccess}
+        />
+      )}
 
       {/* Top Main Navigation Bar */}
       <nav className="sticky top-0 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-xs">
@@ -409,7 +510,7 @@ export default function App() {
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-                  Modern Project & Multi-Level Task Management Dashboard
+                  Modern Project Management & Daily Urgent Task Reminder System
                 </p>
               </div>
             </div>
@@ -417,6 +518,16 @@ export default function App() {
             {/* Global Actions & Urgent Notifications Bell */}
             <div className="flex items-center gap-2 sm:gap-3">
               
+              {/* Daily 1x Reminder Mail Action */}
+              <button
+                onClick={handleRunDailyReminders}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 text-white text-xs font-black rounded-xl shadow-xs transition-all cursor-pointer"
+                title="Send Daily 1x Reminder Mail to Sushmita, Niranjan, Tanuja"
+              >
+                <span>📧</span>
+                <span>Send Daily Reminder Mail</span>
+              </button>
+
               {/* Urgent Notifications Bell Button */}
               <button
                 onClick={() => setIsUrgentDrawerOpen(true)}
@@ -425,7 +536,7 @@ export default function App() {
                     ? 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-400 hover:bg-rose-100 ring-2 ring-rose-500/30'
                     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
                 }`}
-                title="Urgent Task Notifications Center"
+                title="Urgent Task Reminders Center"
               >
                 <span className="text-base">🔔</span>
                 {urgentTasks.length > 0 && (
@@ -485,6 +596,7 @@ export default function App() {
               setIsNewTaskModalOpen(true);
             }}
             onNotifyAssignee={handleNotifyPerson}
+            onSendEmailReminder={handleOpenEmailReminder}
             apiConfig={apiConfig}
           />
         ) : (
@@ -494,24 +606,28 @@ export default function App() {
         /* ============================================================ */
           <div className="space-y-6">
             
-            {/* 🚨 URGENT TASKS NOTIFICATION BANNER */}
+            {/* 🚨 URGENT TASKS DAILY REMINDER BANNER */}
             {urgentTasks.length > 0 && (
               <div className="bg-gradient-to-r from-rose-500/15 via-amber-500/10 to-transparent dark:from-rose-950/40 dark:via-amber-950/20 border border-rose-300 dark:border-rose-800 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 animate-fade-in">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center text-lg shadow-md shadow-rose-600/30 animate-pulse">
-                    🚨
+                    📧
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm sm:text-base font-black text-rose-950 dark:text-rose-200">
-                        {urgentTasks.length} Urgent Tasks Pending Action
+                        {urgentTasks.length} Active Open/Working Urgent Tasks
                       </h3>
                       <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-rose-600 text-white">
-                        Action Required
+                        Daily 1x Mail Active
                       </span>
                     </div>
                     <p className="text-xs text-rose-800 dark:text-rose-300 mt-0.5">
-                      Assigned to <strong className="font-bold">{uniqueUrgentAssignees.join(', ')}</strong>. Send direct notifications to ensure priority execution.
+                      Assigned to: <strong className="font-bold">{uniqueUrgentAssignees.map(a => `${a.name} (${a.email})`).join(', ')}</strong>.
+                    </p>
+                    <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold mt-0.5 flex items-center gap-1">
+                      <span>🛡️</span>
+                      <span>Reminders automatically stop as soon as tasks are completed.</span>
                     </p>
                   </div>
                 </div>
@@ -522,15 +638,15 @@ export default function App() {
                     className="px-3.5 py-2 bg-white dark:bg-slate-800 border border-rose-300 dark:border-rose-700 hover:bg-rose-50 text-rose-700 dark:text-rose-300 text-xs font-black rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>🔔</span>
-                    <span>Review & Notify</span>
+                    <span>Review Reminders</span>
                   </button>
 
                   <button
-                    onClick={handleNotifyAll}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5 cursor-pointer"
+                    onClick={handleRunDailyReminders}
+                    className="px-4 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
-                    <span>📢</span>
-                    <span>Notify All Assignees</span>
+                    <span>🚀</span>
+                    <span>Send Daily 1x Mails</span>
                   </button>
                 </div>
               </div>
@@ -595,19 +711,19 @@ export default function App() {
 
               <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs">
                 <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                  <span>Urgent Bottlenecks</span>
-                  <span className="text-base">🔥</span>
+                  <span>Urgent Reminders</span>
+                  <span className="text-base">📧</span>
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className={`text-2xl sm:text-3xl font-black font-display ${urgentTasks.length > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}>
                     {urgentTasks.length}
                   </span>
                   <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400">
-                    Urgent Tasks
+                    Active Open/Working
                   </span>
                 </div>
                 <div className="mt-1 text-[11px] text-slate-500">
-                  {uniqueUrgentAssignees.length} Assignees Pending Notification
+                  {uniqueUrgentAssignees.length} Assignees Receiving 1x Daily Mail
                 </div>
               </div>
 
@@ -676,7 +792,7 @@ export default function App() {
               <span>Click any project card to open dedicated Project Details</span>
             </div>
 
-            {/* Projects Grid (Responsive 1-col mobile, 2-col tablet, 3-col desktop) */}
+            {/* Projects Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {visibleProjects.map(proj => (
                 <ProjectCard
@@ -774,7 +890,7 @@ export default function App() {
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
                     <option value="High">High</option>
-                    <option value="Urgent">🔥 Urgent (Sends notification to assignee)</option>
+                    <option value="Urgent">🔥 Urgent (Activates 1x Daily Reminder Mail)</option>
                   </select>
                 </div>
               </div>
@@ -783,14 +899,20 @@ export default function App() {
                 <div>
                   <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Initial Status</label>
                   <select name="status" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700">
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
+                    <option value="Not Started">Not Started (Open)</option>
+                    <option value="In Progress">In Progress (Working)</option>
                     <option value="Completed">Completed</option>
                   </select>
                 </div>
                 <div>
                   <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Assignee Person</label>
-                  <input name="assignee" defaultValue="Niranjan Singh" placeholder="e.g. Niranjan Singh" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700" />
+                  <select name="assignee" defaultValue="Niranjan Singh" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 font-bold">
+                    <option value="Sushmita">Sushmita (sushmita.b@anantdv.com)</option>
+                    <option value="Niranjan Singh">Niranjan Singh (niranjan.ks@anantdv.com)</option>
+                    <option value="Tanuja">Tanuja (tanuja.d@anantdv.com)</option>
+                    <option value="Dipanwita">Dipanwita (dipanwita@anantdv.com)</option>
+                    <option value="Alex Chen">Alex Chen (alex.c@anantdv.com)</option>
+                  </select>
                 </div>
               </div>
 
@@ -853,7 +975,12 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Project Owner</label>
-                  <input name="owner" placeholder="e.g. Niranjan Singh" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700" />
+                  <select name="owner" defaultValue="Niranjan Singh" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 font-bold">
+                    <option value="Sushmita">Sushmita (sushmita.b@anantdv.com)</option>
+                    <option value="Niranjan Singh">Niranjan Singh (niranjan.ks@anantdv.com)</option>
+                    <option value="Tanuja">Tanuja (tanuja.d@anantdv.com)</option>
+                    <option value="Dipanwita">Dipanwita (dipanwita@anantdv.com)</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Budget ($)</label>

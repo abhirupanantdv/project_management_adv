@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORY_CONFIG, flattenTasks } from '../../data/initialData.js';
+import { getPersonEmail } from '../../services/reminderEmailService.js';
 
 export default function ProjectDetailsPage({
   project,
@@ -7,7 +8,8 @@ export default function ProjectDetailsPage({
   onTaskStatusChange,
   onTaskPriorityChange,
   onAddTaskClick,
-  onNotifyAssignee
+  onNotifyAssignee,
+  onSendEmailReminder
 }) {
   const [taskLayoutMode, setTaskLayoutMode] = useState('grid'); // 'grid' (default) | 'list'
   const [collapsedCategories, setCollapsedCategories] = useState({});
@@ -36,8 +38,8 @@ export default function ProjectDetailsPage({
   const workingTasksCount = allTasks.filter(t => t.status === 'Working' || t.status === 'In Progress').length;
   const openTasksCount = totalTasksCount - completedTasksCount - workingTasksCount;
 
-  // Urgent tasks in this project
-  const projectUrgentTasks = useMemo(() => {
+  // Active Open / Working Urgent tasks in this project
+  const projectActiveUrgentTasks = useMemo(() => {
     return allTasks.filter(t => t.priority === 'Urgent' && t.status !== 'Completed');
   }, [allTasks]);
 
@@ -95,10 +97,10 @@ export default function ProjectDetailsPage({
   const assignedUsers = project.assignedUsers && project.assignedUsers.length > 0
     ? project.assignedUsers
     : [
-        { name: "Niranjan Singh", avatar: "NS" },
-        { name: "Dipanwita", avatar: "DP" },
-        { name: "Tanuja", avatar: "TD" },
-        { name: "Sushmita", avatar: "SB" }
+        { name: "Niranjan Singh", avatar: "NS", email: "niranjan.ks@anantdv.com" },
+        { name: "Dipanwita", avatar: "DP", email: "dipanwita@anantdv.com" },
+        { name: "Tanuja", avatar: "TD", email: "tanuja.d@anantdv.com" },
+        { name: "Sushmita", avatar: "SB", email: "sushmita.b@anantdv.com" }
       ];
 
   const handleNotifyTaskAssignee = (task) => {
@@ -110,20 +112,10 @@ export default function ProjectDetailsPage({
     }
   };
 
-  const handleNotifyAllProjectUrgent = () => {
-    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const newMap = { ...notifiedTaskMap };
-    projectUrgentTasks.forEach(t => { newMap[t.id] = timeStr; });
-    setNotifiedTaskMap(newMap);
-
-    const names = [...new Set(projectUrgentTasks.map(t => typeof t.assignee === 'object' ? t.assignee?.name : t.assignee || 'Unassigned'))];
-    if (onNotifyAssignee) {
-      onNotifyAssignee(names.join(', '), {
-        id: 'ALL-URGENT',
-        name: `${projectUrgentTasks.length} Urgent Tasks`,
-        projectId: project.id,
-        projectName: project.name
-      }, false, true);
+  const handleOpenEmailModalForTask = (task) => {
+    const assigneeName = typeof task.assignee === 'object' ? task.assignee?.name : task.assignee || 'Unassigned';
+    if (onSendEmailReminder) {
+      onSendEmailReminder(task, assigneeName);
     }
   };
 
@@ -160,10 +152,10 @@ export default function ProjectDetailsPage({
       </div>
 
       {/* ============================================================ */}
-      {/* 🚨 PROJECT URGENT TASK ALERT BANNER                          */}
+      {/* 🚨 PROJECT URGENT TASK ALERT & EMAIL REMINDER BANNER         */}
       {/* ============================================================ */}
-      {projectUrgentTasks.length > 0 && (
-        <div className="bg-gradient-to-r from-rose-500/15 via-rose-500/5 to-amber-500/10 dark:from-rose-950/40 dark:via-rose-950/20 dark:to-amber-950/30 border border-rose-300 dark:border-rose-800/80 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+      {projectActiveUrgentTasks.length > 0 && (
+        <div className="bg-gradient-to-r from-rose-500/15 via-amber-500/10 to-transparent dark:from-rose-950/40 dark:via-amber-950/20 border border-rose-300 dark:border-rose-800/80 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center text-lg shadow-md shadow-rose-600/30 animate-bounce">
               🚨
@@ -171,25 +163,34 @@ export default function ProjectDetailsPage({
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="text-xs sm:text-sm font-black text-rose-950 dark:text-rose-200">
-                  {projectUrgentTasks.length} Urgent {projectUrgentTasks.length === 1 ? 'Task Requires' : 'Tasks Require'} Attention in This Project
+                  {projectActiveUrgentTasks.length} Urgent Open/Working {projectActiveUrgentTasks.length === 1 ? 'Task Requires' : 'Tasks Require'} Attention
                 </h4>
                 <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-rose-600 text-white">
-                  High Priority
+                  Daily Reminder Active
                 </span>
               </div>
               <p className="text-xs text-rose-800 dark:text-rose-300 mt-0.5">
-                Assigned to: <strong className="font-bold">{[...new Set(projectUrgentTasks.map(t => typeof t.assignee === 'object' ? t.assignee?.name : t.assignee || 'Unassigned'))].join(', ')}</strong>
+                Assigned to: <strong className="font-bold">{[...new Set(projectActiveUrgentTasks.map(t => {
+                  const name = typeof t.assignee === 'object' ? t.assignee?.name : t.assignee || 'Unassigned';
+                  return `${name} (${getPersonEmail(name)})`;
+                }))].join(', ')}</strong>
               </p>
+              <div className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold mt-1 flex items-center gap-1">
+                <span>🛡️</span>
+                <span>Rule: Daily reminder mail will automatically STOP once tasks are completed.</span>
+              </div>
             </div>
           </div>
 
-          <button
-            onClick={handleNotifyAllProjectUrgent}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md shadow-rose-600/30 transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
-          >
-            <span>⚡</span>
-            <span>Notify All Project Assignees</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => handleOpenEmailModalForTask(projectActiveUrgentTasks[0])}
+              className="px-4 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md shadow-rose-600/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>📧</span>
+              <span>Send Reminder Mail</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -211,7 +212,7 @@ export default function ProjectDetailsPage({
               </div>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-              Project Lead: <strong className="text-slate-700 dark:text-slate-300">{project.owner || 'Admin'}</strong> • Due Date: <strong className="text-slate-700 dark:text-slate-300">{project.dueDate || 'N/A'}</strong>
+              Project Lead: <strong className="text-slate-700 dark:text-slate-300">{project.owner || 'Admin'} ({getPersonEmail(project.owner)})</strong> • Due Date: <strong className="text-slate-700 dark:text-slate-300">{project.dueDate || 'N/A'}</strong>
             </p>
           </div>
 
@@ -224,7 +225,7 @@ export default function ProjectDetailsPage({
               {assignedUsers.map((u, i) => (
                 <div
                   key={i}
-                  title={u.name}
+                  title={`${u.name} (${getPersonEmail(u.name)})`}
                   className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[9px] font-bold text-white bg-indigo-600 ring-2 ring-white dark:ring-slate-900 shadow-2xs"
                 >
                   {u.avatar || u.name?.slice(0, 2).toUpperCase()}
@@ -310,12 +311,12 @@ export default function ProjectDetailsPage({
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Task Color Legend: 🟢 <strong className="text-emerald-700 dark:text-emerald-400">Completed (Light Green)</strong> • 🟡 <strong className="text-amber-700 dark:text-amber-400">Working (Yellow)</strong> • 🔴 <strong className="text-rose-700 dark:text-rose-400">Open (Light Red)</strong>
+              Task Color Legend: 🟢 <strong className="text-emerald-700 dark:text-emerald-400">Completed (Reminders Stopped)</strong> • 🟡 <strong className="text-amber-700 dark:text-amber-400">Working (Daily Reminder Active)</strong> • 🔴 <strong className="text-rose-700 dark:text-rose-400">Open (Daily Reminder Active)</strong>
             </p>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* View Mode Toggle: Grid View (Default) vs Row List View */}
+            {/* View Mode Toggle */}
             <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
               <button
                 onClick={() => setTaskLayoutMode('grid')}
@@ -417,6 +418,7 @@ export default function ProjectDetailsPage({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                         {cat.tasks.map(task => {
                           const assigneeName = typeof task.assignee === 'object' ? task.assignee?.name : task.assignee || 'Unassigned';
+                          const assigneeEmail = getPersonEmail(assigneeName);
                           const isCompleted = task.status === 'Completed';
                           const isWorking = task.status === 'Working' || task.status === 'In Progress';
                           const isOpen = !isCompleted && !isWorking;
@@ -467,20 +469,33 @@ export default function ProjectDetailsPage({
                                 <span>{task.name || task.subject}</span>
                               </h4>
 
-                              {/* Metadata: Assignee & Due Date */}
+                              {/* Metadata: Assignee, Email & Due Date */}
                               <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-200/50 dark:border-slate-800">
-                                <span className="flex items-center gap-1 font-medium truncate max-w-[140px]">
-                                  <span>👤</span>
-                                  <strong className="text-slate-800 dark:text-slate-200 truncate">{assigneeName}</strong>
-                                </span>
-                                <span className="flex items-center gap-1 font-mono">
+                                <div className="truncate max-w-[170px] leading-tight">
+                                  <span className="font-bold text-slate-800 dark:text-slate-200 block truncate">👤 {assigneeName}</span>
+                                  <span className="font-mono text-[10px] text-indigo-600 dark:text-indigo-400 block truncate">{assigneeEmail}</span>
+                                </div>
+                                <span className="flex items-center gap-1 font-mono shrink-0">
                                   <span>📅</span>
                                   <strong className="text-slate-800 dark:text-slate-200">{task.dueDate || 'N/A'}</strong>
                                 </span>
                               </div>
 
+                              {/* Status badge & reminder stop notice */}
+                              <div className="flex items-center justify-between text-[11px]">
+                                {isCompleted ? (
+                                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    ✅ Reminders Stopped
+                                  </span>
+                                ) : isUrgent ? (
+                                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-rose-100 text-rose-800 border border-rose-300">
+                                    ⏰ Daily 1x Reminder Active
+                                  </span>
+                                ) : null}
+                              </div>
+
                               {/* Action Footer */}
-                              <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                              <div className="flex items-center justify-between pt-1 gap-1.5 flex-wrap">
                                 <div>
                                   {isCompleted && (
                                     <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">
@@ -500,15 +515,15 @@ export default function ProjectDetailsPage({
                                 </div>
 
                                 <div className="flex items-center gap-1.5">
-                                  {/* Urgent Notify Person Button */}
+                                  {/* Send Reminder Email button on Open/Working urgent tasks */}
                                   {isUrgent && !isCompleted && (
                                     <button
-                                      onClick={() => handleNotifyTaskAssignee(task)}
-                                      className="px-2.5 py-1 text-[11px] font-black rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white transition shadow-sm flex items-center gap-1 cursor-pointer"
-                                      title={`Dispatch urgent notification to ${assigneeName}`}
+                                      onClick={() => handleOpenEmailModalForTask(task)}
+                                      className="px-2 py-1 text-[11px] font-bold rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white transition shadow-xs flex items-center gap-1 cursor-pointer"
+                                      title={`Send reminder mail to ${assigneeEmail}`}
                                     >
-                                      <span>⚡</span>
-                                      <span>{wasNotified ? 'Notified ✓' : `Notify ${assigneeName.split(' ')[0]}`}</span>
+                                      <span>📧</span>
+                                      <span>Mail</span>
                                     </button>
                                   )}
 
@@ -525,6 +540,7 @@ export default function ProjectDetailsPage({
                                     <button
                                       onClick={() => onTaskStatusChange(project.id, task.id, 'Completed')}
                                       className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-2xs"
+                                      title="Mark Completed - Reminder emails will automatically stop"
                                     >
                                       Done ✓
                                     </button>
@@ -541,6 +557,7 @@ export default function ProjectDetailsPage({
                                       <button
                                         onClick={() => onTaskStatusChange(project.id, task.id, 'Completed')}
                                         className="px-2 py-1 text-[11px] font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-2xs"
+                                        title="Mark Completed - Reminder emails will automatically stop"
                                       >
                                         Done ✓
                                       </button>
@@ -561,11 +578,11 @@ export default function ProjectDetailsPage({
                       <div className="space-y-2.5">
                         {cat.tasks.map(task => {
                           const assigneeName = typeof task.assignee === 'object' ? task.assignee?.name : task.assignee || 'Unassigned';
+                          const assigneeEmail = getPersonEmail(assigneeName);
                           const isCompleted = task.status === 'Completed';
                           const isWorking = task.status === 'Working' || task.status === 'In Progress';
                           const isOpen = !isCompleted && !isWorking;
                           const isUrgent = task.priority === 'Urgent';
-                          const wasNotified = notifiedTaskMap[task.id];
 
                           const rowBg = isCompleted
                             ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
@@ -605,6 +622,7 @@ export default function ProjectDetailsPage({
                                   <span className="flex items-center gap-1 font-medium">
                                     <span>👤 Assignee:</span>
                                     <strong className="text-slate-800 dark:text-slate-200">{assigneeName}</strong>
+                                    <span className="font-mono text-indigo-600 dark:text-indigo-400 text-[10px]">({assigneeEmail})</span>
                                   </span>
                                   <span>•</span>
                                   <span className="flex items-center gap-1 font-medium">
@@ -618,18 +636,23 @@ export default function ProjectDetailsPage({
                                     {task.priority === 'Medium' && '● Medium'}
                                     {task.priority === 'Low' && '▽ Low'}
                                   </span>
+                                  {isCompleted && (
+                                    <span className="text-[10px] text-emerald-600 font-bold">
+                                      (Daily reminders stopped)
+                                    </span>
+                                  )}
                                 </div>
                               </div>
 
                               <div className="flex items-center gap-2 shrink-0 self-end sm:self-center flex-wrap">
-                                {/* Urgent Notify Person Button */}
+                                {/* Send reminder mail button */}
                                 {isUrgent && !isCompleted && (
                                   <button
-                                    onClick={() => handleNotifyTaskAssignee(task)}
-                                    className="px-2.5 py-1 text-[11px] font-black rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white transition shadow-sm flex items-center gap-1 cursor-pointer"
+                                    onClick={() => handleOpenEmailModalForTask(task)}
+                                    className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white transition shadow-sm flex items-center gap-1 cursor-pointer"
                                   >
-                                    <span>⚡</span>
-                                    <span>{wasNotified ? 'Notified ✓' : `Notify ${assigneeName.split(' ')[0]}`}</span>
+                                    <span>📧</span>
+                                    <span>Send Reminder Mail</span>
                                   </button>
                                 )}
 
