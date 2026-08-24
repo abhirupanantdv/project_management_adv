@@ -8,17 +8,17 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// In-memory SMTP Configuration (can be updated via API from the UI)
+// Hostinger Email SMTP Configuration (Default preset)
 let smtpConfig = {
-  host: process.env.SMTP_HOST || 'smtp.office365.com',
-  port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: false, // true for 465, false for other ports
+  host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+  port: parseInt(process.env.SMTP_PORT || '465', 10),
+  secure: process.env.SMTP_SECURE !== 'false', // true for 465 SSL, false for 587
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || ''
   },
   fromName: 'Anantdv Project Cockpit',
-  fromEmail: process.env.SMTP_FROM || 'no-reply@anantdv.com'
+  fromEmail: process.env.SMTP_FROM || ''
 };
 
 // Dispatch logs
@@ -28,9 +28,9 @@ function createTransporter(customConfig = null) {
   const cfg = customConfig || smtpConfig;
   if (cfg.auth && cfg.auth.user && cfg.auth.pass) {
     return nodemailer.createTransport({
-      host: cfg.host,
-      port: cfg.port,
-      secure: cfg.secure || cfg.port === 465,
+      host: cfg.host || 'smtp.hostinger.com',
+      port: cfg.port || 465,
+      secure: cfg.port === 465 || cfg.secure,
       auth: {
         user: cfg.auth.user,
         pass: cfg.auth.pass
@@ -40,8 +40,6 @@ function createTransporter(customConfig = null) {
       }
     });
   }
-
-  // Fallback: Test account / sendmail preview
   return null;
 }
 
@@ -51,37 +49,41 @@ app.get('/api/mail-status', (req, res) => {
     configured: Boolean(smtpConfig.auth.user && smtpConfig.auth.pass),
     host: smtpConfig.host,
     port: smtpConfig.port,
-    fromEmail: smtpConfig.fromEmail,
+    secure: smtpConfig.secure,
+    fromEmail: smtpConfig.fromEmail || smtpConfig.auth.user,
     historyCount: dispatchHistory.length,
     recentDispatches: dispatchHistory.slice(-10)
   });
 });
 
-// 2. Save SMTP Configuration
+// 2. Save Hostinger / Custom SMTP Configuration
 app.post('/api/config-smtp', async (req, res) => {
   const { host, port, user, pass, fromEmail, fromName, secure } = req.body;
   
+  const parsedPort = parseInt(port || '465', 10);
+  const isSecure = parsedPort === 465 || secure === true;
+
   smtpConfig = {
-    host: host || 'smtp.office365.com',
-    port: parseInt(port || '587', 10),
-    secure: Boolean(secure),
+    host: host || 'smtp.hostinger.com',
+    port: parsedPort,
+    secure: isSecure,
     auth: {
       user: user || '',
       pass: pass || ''
     },
     fromName: fromName || 'Anantdv Project Cockpit',
-    fromEmail: fromEmail || user || 'no-reply@anantdv.com'
+    fromEmail: fromEmail || user || ''
   };
 
   try {
     const transporter = createTransporter();
     if (transporter) {
       await transporter.verify();
-      return res.json({ success: true, message: 'SMTP credentials verified successfully!' });
+      return res.json({ success: true, message: 'Hostinger SMTP connection verified and authenticated successfully!' });
     }
-    return res.json({ success: true, message: 'SMTP settings saved (credentials pending verification).' });
+    return res.json({ success: true, message: 'Hostinger SMTP settings updated.' });
   } catch (err) {
-    return res.status(400).json({ success: false, error: err.message });
+    return res.status(400).json({ success: false, error: `Hostinger SMTP Error: ${err.message}` });
   }
 });
 
@@ -108,8 +110,9 @@ app.post('/api/send-email', async (req, res) => {
     const transporter = createTransporter();
 
     if (transporter) {
+      const senderAddress = smtpConfig.fromEmail || smtpConfig.auth.user;
       const info = await transporter.sendMail({
-        from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail || smtpConfig.auth.user}>`,
+        from: `"${smtpConfig.fromName}" <${senderAddress}>`,
         to,
         subject,
         text: text || '',
@@ -123,20 +126,19 @@ app.post('/api/send-email', async (req, res) => {
       return res.json({
         success: true,
         delivered: true,
-        message: `Real email successfully delivered to ${to}!`,
+        message: `Real email successfully delivered to ${to} via Hostinger SMTP (${smtpConfig.host})!`,
         messageId: info.messageId
       });
     } else {
-      // SMTP not configured yet -> Log dispatch & explain to user
-      logEntry.status = 'QUEUED_READY';
-      logEntry.note = 'SMTP credentials needed for direct inbox delivery, or use mailto: launcher';
+      logEntry.status = 'AWAITING_CREDENTIALS';
       dispatchHistory.unshift(logEntry);
 
       return res.json({
         success: true,
         delivered: false,
         requiresSmtp: true,
-        message: `Reminder generated for ${to}. To deliver straight to their inbox, enter your SMTP/Office 365 credentials or click "Open Mail App".`
+        hostingerWebmail: 'https://mail.hostinger.com/',
+        message: `Hostinger SMTP credentials needed. Open https://mail.hostinger.com/ or enter your email password in SMTP Settings.`
       });
     }
   } catch (err) {
@@ -146,14 +148,14 @@ app.post('/api/send-email', async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      error: `Failed to deliver email to ${to}: ${err.message}`
+      error: `Hostinger SMTP delivery failed: ${err.message}`
     });
   }
 });
 
-// 4. Send Daily Batch Reminder to All Assignees
+// 4. Send Daily Batch Reminder
 app.post('/api/daily-batch', async (req, res) => {
-  const { recipients } = req.body; // Array of { name, email, tasks }
+  const { recipients } = req.body;
 
   if (!Array.isArray(recipients) || recipients.length === 0) {
     return res.status(400).json({ success: false, error: 'Recipients array is required.' });
@@ -174,12 +176,13 @@ app.post('/api/daily-batch', async (req, res) => {
 
     if (transporter) {
       try {
+        const senderAddress = smtpConfig.fromEmail || smtpConfig.auth.user;
         const info = await transporter.sendMail({
-          from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail || smtpConfig.auth.user}>`,
+          from: `"${smtpConfig.fromName}" <${senderAddress}>`,
           to: r.email,
           subject: logItem.subject,
-          text: `Hi ${r.name},\n\nYou have ${r.tasks?.length || 1} open/working urgent tasks requiring attention today.\n\nOpen Cockpit: http://localhost:3000/`,
-          html: `<p>Hi <strong>${r.name}</strong>,</p><p>You have <strong>${r.tasks?.length || 1}</strong> open/working urgent tasks requiring attention today.</p><p><a href="http://localhost:3000/">Open Project Cockpit →</a></p>`
+          text: `Hi ${r.name},\n\nYou have ${r.tasks?.length || 1} active urgent tasks in Open/Working status.\n\nOpen Cockpit: http://localhost:3000/`,
+          html: `<p>Hi <strong>${r.name}</strong>,</p><p>You have <strong>${r.tasks?.length || 1}</strong> active urgent tasks in Open/Working status requiring attention today.</p><p><a href="http://localhost:3000/">Open Project Cockpit →</a></p>`
         });
         logItem.status = 'DELIVERED';
         logItem.messageId = info.messageId;
@@ -188,7 +191,7 @@ app.post('/api/daily-batch', async (req, res) => {
         logItem.error = e.message;
       }
     } else {
-      logItem.status = 'QUEUED_READY';
+      logItem.status = 'AWAITING_CREDENTIALS';
     }
 
     dispatchHistory.unshift(logItem);
@@ -204,5 +207,5 @@ app.post('/api/daily-batch', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Mailer Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Hostinger Mailer Server running on http://localhost:${PORT}`);
 });
