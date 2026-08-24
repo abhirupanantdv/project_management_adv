@@ -6,10 +6,12 @@ export default function ProjectDetailsPage({
   onBack,
   onTaskStatusChange,
   onTaskPriorityChange,
-  onAddTaskClick
+  onAddTaskClick,
+  onNotifyAssignee
 }) {
   const [taskLayoutMode, setTaskLayoutMode] = useState('grid'); // 'grid' (default) | 'list'
   const [collapsedCategories, setCollapsedCategories] = useState({});
+  const [notifiedTaskMap, setNotifiedTaskMap] = useState({});
 
   if (!project) {
     return (
@@ -33,6 +35,11 @@ export default function ProjectDetailsPage({
   const completedTasksCount = allTasks.filter(t => t.status === 'Completed').length;
   const workingTasksCount = allTasks.filter(t => t.status === 'Working' || t.status === 'In Progress').length;
   const openTasksCount = totalTasksCount - completedTasksCount - workingTasksCount;
+
+  // Urgent tasks in this project
+  const projectUrgentTasks = useMemo(() => {
+    return allTasks.filter(t => t.priority === 'Urgent' && t.status !== 'Completed');
+  }, [allTasks]);
 
   const overallPercent = totalTasksCount > 0 
     ? Math.round((completedTasksCount / totalTasksCount) * 100) 
@@ -79,7 +86,7 @@ export default function ProjectDetailsPage({
 
   // Priority Styles
   const priorityStyles = {
-    'Urgent': 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800',
+    'Urgent': 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800 font-extrabold animate-pulse',
     'High': 'bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
     'Medium': 'bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800',
     'Low': 'bg-slate-50 text-slate-600 border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
@@ -93,6 +100,32 @@ export default function ProjectDetailsPage({
         { name: "Tanuja", avatar: "TD" },
         { name: "Sushmita", avatar: "SB" }
       ];
+
+  const handleNotifyTaskAssignee = (task) => {
+    const assigneeName = typeof task.assignee === 'object' ? task.assignee?.name : task.assignee || 'Unassigned';
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setNotifiedTaskMap(prev => ({ ...prev, [task.id]: timeStr }));
+    if (onNotifyAssignee) {
+      onNotifyAssignee(assigneeName, { ...task, projectId: project.id, projectName: project.name });
+    }
+  };
+
+  const handleNotifyAllProjectUrgent = () => {
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const newMap = { ...notifiedTaskMap };
+    projectUrgentTasks.forEach(t => { newMap[t.id] = timeStr; });
+    setNotifiedTaskMap(newMap);
+
+    const names = [...new Set(projectUrgentTasks.map(t => typeof t.assignee === 'object' ? t.assignee?.name : t.assignee || 'Unassigned'))];
+    if (onNotifyAssignee) {
+      onNotifyAssignee(names.join(', '), {
+        id: 'ALL-URGENT',
+        name: `${projectUrgentTasks.length} Urgent Tasks`,
+        projectId: project.id,
+        projectName: project.name
+      }, false, true);
+    }
+  };
 
   return (
     <div className="space-y-5 animate-fade-in font-sans">
@@ -125,6 +158,40 @@ export default function ProjectDetailsPage({
           <span>Add Task</span>
         </button>
       </div>
+
+      {/* ============================================================ */}
+      {/* 🚨 PROJECT URGENT TASK ALERT BANNER                          */}
+      {/* ============================================================ */}
+      {projectUrgentTasks.length > 0 && (
+        <div className="bg-gradient-to-r from-rose-500/15 via-rose-500/5 to-amber-500/10 dark:from-rose-950/40 dark:via-rose-950/20 dark:to-amber-950/30 border border-rose-300 dark:border-rose-800/80 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center text-lg shadow-md shadow-rose-600/30 animate-bounce">
+              🚨
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-xs sm:text-sm font-black text-rose-950 dark:text-rose-200">
+                  {projectUrgentTasks.length} Urgent {projectUrgentTasks.length === 1 ? 'Task Requires' : 'Tasks Require'} Attention in This Project
+                </h4>
+                <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-rose-600 text-white">
+                  High Priority
+                </span>
+              </div>
+              <p className="text-xs text-rose-800 dark:text-rose-300 mt-0.5">
+                Assigned to: <strong className="font-bold">{[...new Set(projectUrgentTasks.map(t => typeof t.assignee === 'object' ? t.assignee?.name : t.assignee || 'Unassigned'))].join(', ')}</strong>
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleNotifyAllProjectUrgent}
+            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md shadow-rose-600/30 transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+          >
+            <span>⚡</span>
+            <span>Notify All Project Assignees</span>
+          </button>
+        </div>
+      )}
 
       {/* ============================================================ */}
       {/* 1. OVERALL COMPLETION HEADER & PROGRESS BAR                  */}
@@ -288,7 +355,6 @@ export default function ProjectDetailsPage({
 
         {/* ============================================================ */}
         {/* 4. CATEGORY COLLAPSIBLE SECTIONS WITH TASK COLOR CODING      */}
-        {/* Completed = Green | Working = Yellow | Open = Light Red       */}
         {/* ============================================================ */}
         <div className="space-y-4">
           {categoryData.map(cat => {
@@ -354,9 +420,10 @@ export default function ProjectDetailsPage({
                           const isCompleted = task.status === 'Completed';
                           const isWorking = task.status === 'Working' || task.status === 'In Progress';
                           const isOpen = !isCompleted && !isWorking;
+                          const isUrgent = task.priority === 'Urgent';
+                          const wasNotified = notifiedTaskMap[task.id];
 
                           // Task Card Colors:
-                          // Completed = Light Green | Working = Yellow | Open = Light Red
                           const cardBg = isCompleted
                             ? 'bg-emerald-50/50 dark:bg-emerald-950/25 border-emerald-300 dark:border-emerald-800 ring-1 ring-emerald-400/20 shadow-xs'
                             : isWorking
@@ -372,7 +439,7 @@ export default function ProjectDetailsPage({
                           return (
                             <div
                               key={task.id}
-                              className={`p-4 rounded-xl border transition-all flex flex-col justify-between space-y-3 ${cardBg}`}
+                              className={`p-4 rounded-xl border transition-all flex flex-col justify-between space-y-3 ${cardBg} ${isUrgent && !isCompleted ? 'ring-2 ring-rose-500/40 shadow-md' : ''}`}
                             >
                               {/* Top: ID & Priority */}
                               <div className="flex items-center justify-between gap-2">
@@ -413,7 +480,7 @@ export default function ProjectDetailsPage({
                               </div>
 
                               {/* Action Footer */}
-                              <div className="flex items-center justify-between pt-1">
+                              <div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
                                 <div>
                                   {isCompleted && (
                                     <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">
@@ -433,6 +500,18 @@ export default function ProjectDetailsPage({
                                 </div>
 
                                 <div className="flex items-center gap-1.5">
+                                  {/* Urgent Notify Person Button */}
+                                  {isUrgent && !isCompleted && (
+                                    <button
+                                      onClick={() => handleNotifyTaskAssignee(task)}
+                                      className="px-2.5 py-1 text-[11px] font-black rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white transition shadow-sm flex items-center gap-1 cursor-pointer"
+                                      title={`Dispatch urgent notification to ${assigneeName}`}
+                                    >
+                                      <span>⚡</span>
+                                      <span>{wasNotified ? 'Notified ✓' : `Notify ${assigneeName.split(' ')[0]}`}</span>
+                                    </button>
+                                  )}
+
                                   {isCompleted && (
                                     <button
                                       onClick={() => onTaskStatusChange(project.id, task.id, 'Working')}
@@ -485,6 +564,8 @@ export default function ProjectDetailsPage({
                           const isCompleted = task.status === 'Completed';
                           const isWorking = task.status === 'Working' || task.status === 'In Progress';
                           const isOpen = !isCompleted && !isWorking;
+                          const isUrgent = task.priority === 'Urgent';
+                          const wasNotified = notifiedTaskMap[task.id];
 
                           const rowBg = isCompleted
                             ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
@@ -501,7 +582,7 @@ export default function ProjectDetailsPage({
                           return (
                             <div
                               key={task.id}
-                              className={`p-3.5 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${rowBg}`}
+                              className={`p-3.5 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${rowBg} ${isUrgent && !isCompleted ? 'ring-2 ring-rose-500/30' : ''}`}
                             >
                               <div className="space-y-1.5 flex-1 min-w-0 pr-2">
                                 <div className="flex items-baseline gap-2 flex-wrap">
@@ -540,7 +621,18 @@ export default function ProjectDetailsPage({
                                 </div>
                               </div>
 
-                              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center flex-wrap">
+                                {/* Urgent Notify Person Button */}
+                                {isUrgent && !isCompleted && (
+                                  <button
+                                    onClick={() => handleNotifyTaskAssignee(task)}
+                                    className="px-2.5 py-1 text-[11px] font-black rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white transition shadow-sm flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <span>⚡</span>
+                                    <span>{wasNotified ? 'Notified ✓' : `Notify ${assigneeName.split(' ')[0]}`}</span>
+                                  </button>
+                                )}
+
                                 {isCompleted && (
                                   <>
                                     <span className="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300">

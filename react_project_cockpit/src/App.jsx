@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { initialProjects, initialActivities, calculateProjectProgress, flattenTasks } from './data/initialData.js';
 import ProjectCard from './components/projects/ProjectCard.jsx';
 import ProjectDetailsPage from './components/projects/ProjectDetailsPage.jsx';
+import UrgentNotificationDrawer from './components/notifications/UrgentNotificationDrawer.jsx';
 import { ERPNextService } from './services/erpnextApi.js';
 
 export default function App() {
@@ -46,6 +47,7 @@ export default function App() {
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
   const [targetProjectForNewTask, setTargetProjectForNewTask] = useState('PROJ-0001');
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [isUrgentDrawerOpen, setIsUrgentDrawerOpen] = useState(false);
 
   // Dark mode sync
   useEffect(() => {
@@ -69,14 +71,96 @@ export default function App() {
 
   const showToast = (msg, type = 'success') => {
     setNotification({ msg, type });
-    setTimeout(() => setNotification(null), 3800);
+    setTimeout(() => setNotification(null), 4500);
   };
 
   // Helper: Open Dedicated Project Details Page
   const handleOpenProjectDetails = (projectId) => {
     setSelectedProjectId(projectId);
     setCurrentPage('project_details');
+    setIsUrgentDrawerOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Calculate all active urgent tasks across all projects
+  const urgentTasks = useMemo(() => {
+    const list = [];
+    projects.forEach(p => {
+      const flat = flattenTasks(p.tasks || []);
+      flat.forEach(t => {
+        if (t.priority === 'Urgent' && t.status !== 'Completed') {
+          list.push({
+            ...t,
+            projectId: p.id,
+            projectName: p.name,
+            projectCompany: p.company
+          });
+        }
+      });
+    });
+    return list;
+  }, [projects]);
+
+  // Unique assignees with urgent tasks
+  const uniqueUrgentAssignees = useMemo(() => {
+    const set = new Set();
+    urgentTasks.forEach(t => {
+      const name = typeof t.assignee === 'object' ? t.assignee?.name : t.assignee || 'Unassigned';
+      set.add(name);
+    });
+    return Array.from(set);
+  }, [urgentTasks]);
+
+  // Dispatch notification to a specific assigned person
+  const handleNotifyPerson = (assigneeName, task, isCopyOnly = false, isBulkForPerson = false) => {
+    if (isCopyOnly) {
+      showToast(`📋 Copied urgent alert message for ${assigneeName} to clipboard!`, 'success');
+      return;
+    }
+
+    const taskLabel = task.name || task.subject || 'Urgent Task';
+    const projLabel = task.projectId ? ` (${task.projectId})` : '';
+
+    if (isBulkForPerson) {
+      showToast(`🚨 Urgent ping sent to @${assigneeName} for all assigned urgent tasks!`, 'warning');
+      const newAct = {
+        id: `ACT-${Date.now()}`,
+        user: "System Watchdog",
+        action: `sent urgent priority notification to @${assigneeName}`,
+        target: `${assigneeName}'s urgent tasks`,
+        time: "Just now",
+        avatar: "🚨"
+      };
+      setActivities(prev => [newAct, ...prev]);
+    } else {
+      showToast(`🚨 Urgent alert dispatched to @${assigneeName} for "${taskLabel}"${projLabel}!`, 'warning');
+      const newAct = {
+        id: `ACT-${Date.now()}`,
+        user: "System Watchdog",
+        action: `dispatched urgent alert to @${assigneeName}`,
+        target: `Task: ${taskLabel}`,
+        time: "Just now",
+        avatar: "⚡"
+      };
+      setActivities(prev => [newAct, ...prev]);
+    }
+  };
+
+  // Dispatch broadcast notification to all assignees
+  const handleNotifyAll = () => {
+    if (urgentTasks.length === 0) return;
+    const names = uniqueUrgentAssignees.join(', ');
+    showToast(`📢 Urgent notifications broadcasted to ${uniqueUrgentAssignees.length} assignees (${names})!`, 'warning');
+
+    const newAct = {
+      id: `ACT-${Date.now()}`,
+      user: "Executive Lead",
+      action: `broadcasted urgent task alerts to all assignees`,
+      target: `${urgentTasks.length} urgent tasks (${names})`,
+      time: "Just now",
+      avatar: "📢"
+    };
+    setActivities(prev => [newAct, ...prev]);
   };
 
   // Task Status Change in Tree / Details
@@ -124,12 +208,17 @@ export default function App() {
 
   // Task Priority Change
   const handleTaskPriorityChange = (projectId, taskId, newPriority) => {
+    let taskName = '';
+    let assignee = '';
+
     setProjects(prevProjects => {
       return prevProjects.map(proj => {
         if (proj.id !== projectId) return proj;
 
         function updateNode(node) {
           if (node.id === taskId) {
+            taskName = node.name || node.subject;
+            assignee = typeof node.assignee === 'object' ? node.assignee?.name : node.assignee || 'Unassigned';
             return { ...node, priority: newPriority };
           }
           if (node.children && node.children.length > 0) {
@@ -144,11 +233,18 @@ export default function App() {
         };
       });
     });
+
+    if (newPriority === 'Urgent') {
+      showToast(`🔥 Priority escalated to URGENT for "${taskName}"! Notification sent to @${assignee}.`, 'warning');
+    } else {
+      showToast(`Task priority updated to ${newPriority}.`);
+    }
   };
 
   // Add Task to Project
   const handleAddTask = (newTaskData) => {
     const pId = newTaskData.projectId || selectedProjectId;
+    const assigneeName = newTaskData.assignee || 'Unassigned';
     const newTask = {
       id: `TASK-${Date.now().toString().slice(-4)}`,
       name: newTaskData.name || newTaskData.subject,
@@ -157,7 +253,7 @@ export default function App() {
       priority: newTaskData.priority || 'Medium',
       progress: newTaskData.status === 'Completed' ? 100 : 0,
       dueDate: newTaskData.dueDate || new Date().toISOString().split('T')[0],
-      assignee: { name: newTaskData.assignee || 'Unassigned', avatar: (newTaskData.assignee || 'UN').slice(0, 2).toUpperCase() },
+      assignee: { name: assigneeName, avatar: assigneeName.slice(0, 2).toUpperCase() },
       children: []
     };
 
@@ -177,7 +273,21 @@ export default function App() {
     });
 
     setIsNewTaskModalOpen(false);
-    showToast(`Task created under ${pId}!`);
+
+    if (newTaskData.priority === 'Urgent') {
+      showToast(`🚨 Urgent task created! Instant notification sent to @${assigneeName}.`, 'warning');
+      const newAct = {
+        id: `ACT-${Date.now()}`,
+        user: "System",
+        action: `created urgent task & alerted @${assigneeName}`,
+        target: newTask.name,
+        time: "Just now",
+        avatar: "🚨"
+      };
+      setActivities(prev => [newAct, ...prev]);
+    } else {
+      showToast(`Task created under ${pId}!`);
+    }
   };
 
   // Add Project
@@ -259,15 +369,25 @@ export default function App() {
       {notification && (
         <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl backdrop-blur-md transition-all transform animate-bounce ${
           notification.type === 'error' ? 'bg-rose-600/95 text-white' :
-          notification.type === 'warning' ? 'bg-amber-600/95 text-white' :
+          notification.type === 'warning' ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white ring-2 ring-rose-400' :
           'bg-indigo-600/95 text-white'
         }`}>
           <span className="text-lg">
-            {notification.type === 'error' ? '⚠️' : notification.type === 'warning' ? '⚡' : '✅'}
+            {notification.type === 'error' ? '⚠️' : notification.type === 'warning' ? '🚨' : '✅'}
           </span>
-          <span className="text-xs md:text-sm font-medium tracking-wide">{notification.msg}</span>
+          <span className="text-xs md:text-sm font-bold tracking-wide">{notification.msg}</span>
         </div>
       )}
+
+      {/* Urgent Notifications Drawer */}
+      <UrgentNotificationDrawer
+        isOpen={isUrgentDrawerOpen}
+        onClose={() => setIsUrgentDrawerOpen(false)}
+        urgentTasks={urgentTasks}
+        onNotifyPerson={handleNotifyPerson}
+        onNotifyAll={handleNotifyAll}
+        onNavigateToProject={handleOpenProjectDetails}
+      />
 
       {/* Top Main Navigation Bar */}
       <nav className="sticky top-0 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-xs">
@@ -294,8 +414,27 @@ export default function App() {
               </div>
             </div>
 
-            {/* Global Actions */}
+            {/* Global Actions & Urgent Notifications Bell */}
             <div className="flex items-center gap-2 sm:gap-3">
+              
+              {/* Urgent Notifications Bell Button */}
+              <button
+                onClick={() => setIsUrgentDrawerOpen(true)}
+                className={`relative p-2 rounded-xl border transition-all flex items-center justify-center ${
+                  urgentTasks.length > 0
+                    ? 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-400 hover:bg-rose-100 ring-2 ring-rose-500/30'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                }`}
+                title="Urgent Task Notifications Center"
+              >
+                <span className="text-base">🔔</span>
+                {urgentTasks.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.2 bg-rose-600 text-white text-[10px] font-black rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse">
+                    {urgentTasks.length}
+                  </span>
+                )}
+              </button>
+
               <button
                 onClick={() => setIsNewProjectModalOpen(true)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/20 transition-all"
@@ -345,6 +484,7 @@ export default function App() {
               setTargetProjectForNewTask(pId);
               setIsNewTaskModalOpen(true);
             }}
+            onNotifyAssignee={handleNotifyPerson}
             apiConfig={apiConfig}
           />
         ) : (
@@ -354,6 +494,48 @@ export default function App() {
         /* ============================================================ */
           <div className="space-y-6">
             
+            {/* 🚨 URGENT TASKS NOTIFICATION BANNER */}
+            {urgentTasks.length > 0 && (
+              <div className="bg-gradient-to-r from-rose-500/15 via-amber-500/10 to-transparent dark:from-rose-950/40 dark:via-amber-950/20 border border-rose-300 dark:border-rose-800 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 animate-fade-in">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center text-lg shadow-md shadow-rose-600/30 animate-pulse">
+                    🚨
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm sm:text-base font-black text-rose-950 dark:text-rose-200">
+                        {urgentTasks.length} Urgent Tasks Pending Action
+                      </h3>
+                      <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-rose-600 text-white">
+                        Action Required
+                      </span>
+                    </div>
+                    <p className="text-xs text-rose-800 dark:text-rose-300 mt-0.5">
+                      Assigned to <strong className="font-bold">{uniqueUrgentAssignees.join(', ')}</strong>. Send direct notifications to ensure priority execution.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => setIsUrgentDrawerOpen(true)}
+                    className="px-3.5 py-2 bg-white dark:bg-slate-800 border border-rose-300 dark:border-rose-700 hover:bg-rose-50 text-rose-700 dark:text-rose-300 text-xs font-black rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>🔔</span>
+                    <span>Review & Notify</span>
+                  </button>
+
+                  <button
+                    onClick={handleNotifyAll}
+                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>📢</span>
+                    <span>Notify All Assignees</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Global Executive Metric Banner */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
               
@@ -413,19 +595,19 @@ export default function App() {
 
               <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs">
                 <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                  <span>Active Workload</span>
-                  <span className="text-base">⚡</span>
+                  <span>Urgent Bottlenecks</span>
+                  <span className="text-base">🔥</span>
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-black font-display text-indigo-600 dark:text-indigo-400">
-                    {globalKpis.inProgress}
+                  <span className={`text-2xl sm:text-3xl font-black font-display ${urgentTasks.length > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}>
+                    {urgentTasks.length}
                   </span>
-                  <span className="text-[11px] text-slate-500">
-                    In Delivery Stage
+                  <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400">
+                    Urgent Tasks
                   </span>
                 </div>
                 <div className="mt-1 text-[11px] text-slate-500">
-                  Click any project to inspect tasks
+                  {uniqueUrgentAssignees.length} Assignees Pending Notification
                 </div>
               </div>
 
@@ -476,7 +658,7 @@ export default function App() {
                     className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl px-3 py-2 font-medium"
                   >
                     <option value="All">All Priorities</option>
-                    <option value="Urgent">Urgent</option>
+                    <option value="Urgent">🔥 Urgent Priority</option>
                     <option value="High">High</option>
                     <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
@@ -588,11 +770,11 @@ export default function App() {
                 </div>
                 <div>
                   <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Priority</label>
-                  <select name="priority" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700">
+                  <select name="priority" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 font-bold">
                     <option value="Low">Low</option>
-                    <option value="Medium" selected>Medium</option>
+                    <option value="Medium">Medium</option>
                     <option value="High">High</option>
-                    <option value="Urgent">Urgent</option>
+                    <option value="Urgent">🔥 Urgent (Sends notification to assignee)</option>
                   </select>
                 </div>
               </div>
@@ -607,8 +789,8 @@ export default function App() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Assignee</label>
-                  <input name="assignee" placeholder="e.g. Niranjan Singh" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700" />
+                  <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Assignee Person</label>
+                  <input name="assignee" defaultValue="Niranjan Singh" placeholder="e.g. Niranjan Singh" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700" />
                 </div>
               </div>
 
@@ -661,7 +843,7 @@ export default function App() {
                   <label className="block font-bold text-slate-600 dark:text-slate-400 mb-1">Priority</label>
                   <select name="priority" className="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700">
                     <option value="Low">Low</option>
-                    <option value="Medium" selected>Medium</option>
+                    <option value="Medium">Medium</option>
                     <option value="High">High</option>
                     <option value="Urgent">Urgent</option>
                   </select>

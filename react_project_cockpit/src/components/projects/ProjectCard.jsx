@@ -7,6 +7,7 @@ export default function ProjectCard({
   const percentCompleted = project.percentCompleted || 0;
   const teamCount = project.assignedTeamCount || (project.assignedUsers?.length) || 1;
   const isCompleted = project.status === 'Completed' || percentCompleted === 100;
+  const isUrgent = project.priority === 'Urgent' && !isCompleted;
 
   // Status Styling - Clean Original Enterprise Badges
   const statusBadgeStyles = {
@@ -17,7 +18,7 @@ export default function ProjectCard({
 
   // Priority Styling
   const priorityStyles = {
-    'Urgent': 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800',
+    'Urgent': 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-300 dark:border-rose-800 font-extrabold animate-pulse',
     'High': 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800',
     'Medium': 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800',
     'Low': 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
@@ -26,14 +27,25 @@ export default function ProjectCard({
   return (
     <div
       onClick={() => onOpenProject && onOpenProject(project.id)}
-      className="group bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-lg hover:border-indigo-400 dark:hover:border-indigo-600 transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4"
+      className={`group bg-white dark:bg-slate-900 border rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 ${
+        isUrgent 
+          ? 'border-rose-300 dark:border-rose-800 ring-2 ring-rose-500/20 hover:border-rose-500 hover:ring-rose-500/40' 
+          : 'border-slate-200/90 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600'
+      }`}
     >
       {/* Top Header: ID, Badges */}
       <div>
         <div className="flex items-center justify-between gap-2 mb-2.5">
-          <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-            {project.id}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+              {project.id}
+            </span>
+            {isUrgent && (
+              <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded bg-rose-600 text-white animate-pulse">
+                🔥 Urgent
+              </span>
+            )}
+          </div>
           
           <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusBadgeStyles[project.status] || statusBadgeStyles['In Progress']}`}>
             <span className={`w-2 h-2 rounded-full ${
@@ -45,7 +57,7 @@ export default function ProjectCard({
           </span>
         </div>
 
-        {/* Project Name - Clean Original Style */}
+        {/* Project Name */}
         <h3 className="text-base font-bold font-display text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
           {project.name}
         </h3>
@@ -83,6 +95,8 @@ export default function ProjectCard({
             className={`h-full rounded-full transition-all duration-500 ${
               percentCompleted === 100
                 ? 'bg-emerald-500'
+                : isUrgent
+                ? 'bg-gradient-to-r from-rose-500 to-amber-500'
                 : 'bg-gradient-to-r from-indigo-500 to-purple-600'
             }`}
             style={{ width: `${percentCompleted}%` }}
