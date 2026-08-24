@@ -4,11 +4,13 @@ import ProjectCard from './components/projects/ProjectCard.jsx';
 import ProjectDetailsPage from './components/projects/ProjectDetailsPage.jsx';
 import UrgentNotificationDrawer from './components/notifications/UrgentNotificationDrawer.jsx';
 import EmailReminderModal from './components/modals/EmailReminderModal.jsx';
+import SmtpConfigModal from './components/modals/SmtpConfigModal.jsx';
 import { 
   getPersonEmail, 
   getDailyReminderStatus, 
   markDailyReminderSent, 
-  logReminderDispatch 
+  logReminderDispatch,
+  sendDailyBatchViaBackend
 } from './services/reminderEmailService.js';
 import { ERPNextService } from './services/erpnextApi.js';
 
@@ -55,6 +57,7 @@ export default function App() {
   const [targetProjectForNewTask, setTargetProjectForNewTask] = useState('PROJ-0001');
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isUrgentDrawerOpen, setIsUrgentDrawerOpen] = useState(false);
+  const [isSmtpModalOpen, setIsSmtpModalOpen] = useState(false);
   
   // Email Reminder Modal State
   const [emailModalData, setEmailModalData] = useState(null); // { task, assigneeName }
@@ -120,17 +123,17 @@ export default function App() {
         map.set(name, {
           name,
           email: getPersonEmail(name),
-          taskCount: 1
+          tasks: [t]
         });
       } else {
-        map.get(name).taskCount += 1;
+        map.get(name).tasks.push(t);
       }
     });
     return Array.from(map.values());
   }, [urgentTasks]);
 
   // Daily 1x Automated Reminder Trigger
-  const handleRunDailyReminders = () => {
+  const handleRunDailyReminders = async () => {
     if (urgentTasks.length === 0) {
       showToast('✅ No active Open or Working urgent tasks. Daily reminder emails are idle.', 'success');
       return;
@@ -138,6 +141,9 @@ export default function App() {
 
     const recipientsSummary = uniqueUrgentAssignees.map(a => `${a.name} (${a.email})`).join(', ');
     markDailyReminderSent();
+
+    // Call backend mailer
+    await sendDailyBatchViaBackend(uniqueUrgentAssignees);
 
     logReminderDispatch({
       type: 'DAILY_BATCH',
@@ -216,7 +222,7 @@ export default function App() {
       status: 'SENT'
     });
 
-    showToast(`✅ Urgent reminder email successfully dispatched to ${assigneeName} (${email})!`, 'success');
+    showToast(`✅ Urgent reminder email logged for ${assigneeName} (${email})!`, 'success');
 
     const newAct = {
       id: `ACT-${Date.now()}`,
@@ -487,8 +493,19 @@ export default function App() {
           task={emailModalData.task}
           assigneeName={emailModalData.assigneeName}
           onSendSuccess={handleEmailSentSuccess}
+          onOpenSmtpConfig={() => {
+            setEmailModalData(null);
+            setIsSmtpModalOpen(true);
+          }}
         />
       )}
+
+      {/* SMTP Configuration Modal */}
+      <SmtpConfigModal
+        isOpen={isSmtpModalOpen}
+        onClose={() => setIsSmtpModalOpen(false)}
+        onConfigured={() => showToast('✅ SMTP Server Configured! Real emails will now be sent directly.')}
+      />
 
       {/* Top Main Navigation Bar */}
       <nav className="sticky top-0 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-xs">
@@ -518,6 +535,16 @@ export default function App() {
             {/* Global Actions & Urgent Notifications Bell */}
             <div className="flex items-center gap-2 sm:gap-3">
               
+              {/* SMTP Mail Server Settings Button */}
+              <button
+                onClick={() => setIsSmtpModalOpen(true)}
+                className="p-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300 transition-all text-xs font-bold flex items-center gap-1"
+                title="Configure Real Outgoing SMTP Mail Server"
+              >
+                <span>⚙️</span>
+                <span className="hidden lg:inline">SMTP Settings</span>
+              </button>
+
               {/* Daily 1x Reminder Mail Action */}
               <button
                 onClick={handleRunDailyReminders}

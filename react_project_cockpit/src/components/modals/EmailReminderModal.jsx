@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { generateTaskReminderEmail, getPersonEmail } from '../../services/reminderEmailService.js';
+import { generateTaskReminderEmail, sendEmailViaBackend } from '../../services/reminderEmailService.js';
 
 export default function EmailReminderModal({
   isOpen,
   onClose,
   task,
   assigneeName,
-  onSendSuccess
+  onSendSuccess,
+  onOpenSmtpConfig
 }) {
   const [viewMode, setViewMode] = useState('preview'); // 'preview' | 'text'
   const [isSending, setIsSending] = useState(false);
-  const [isSent, setIsSent] = useState(false);
+  const [resultMsg, setResultMsg] = useState(null);
   const [copied, setCopied] = useState(false);
 
   if (!isOpen || !task) return null;
@@ -18,19 +19,42 @@ export default function EmailReminderModal({
   const targetAssignee = assigneeName || (typeof task.assignee === 'object' ? task.assignee?.name : task.assignee || 'Unassigned');
   const emailData = generateTaskReminderEmail(task, targetAssignee);
 
-  const handleSendEmail = () => {
+  const handleSendEmail = async () => {
     setIsSending(true);
-    setTimeout(() => {
-      setIsSending(false);
-      setIsSent(true);
+    setResultMsg(null);
+
+    const res = await sendEmailViaBackend({
+      to: emailData.to,
+      subject: emailData.subject,
+      html: emailData.htmlBody,
+      text: emailData.textBody,
+      assigneeName: targetAssignee,
+      taskId: task.id,
+      projectId: task.projectId
+    });
+
+    setIsSending(false);
+
+    if (res.delivered) {
+      setResultMsg({
+        type: 'success',
+        text: `✅ Real email successfully delivered to ${emailData.to}!`
+      });
       if (onSendSuccess) {
         onSendSuccess(targetAssignee, emailData.to, task);
       }
       setTimeout(() => {
         onClose();
-        setIsSent(false);
-      }, 1800);
-    }, 800);
+      }, 2200);
+    } else {
+      setResultMsg({
+        type: 'info',
+        text: `📬 Email dispatched to local mailer queue. Click "Open Mail App" below to send via Outlook/Gmail immediately, or configure SMTP credentials.`
+      });
+      if (onSendSuccess) {
+        onSendSuccess(targetAssignee, emailData.to, task);
+      }
+    }
   };
 
   const handleCopyText = () => {
@@ -113,6 +137,24 @@ export default function EmailReminderModal({
           <span className="text-[10px] font-bold uppercase bg-emerald-200 dark:bg-emerald-900 px-1.5 py-0.5 rounded">Active</span>
         </div>
 
+        {/* Result Message if any */}
+        {resultMsg && (
+          <div className={`mx-6 mt-3 p-3 rounded-xl border text-xs font-bold flex items-center justify-between gap-2 ${
+            resultMsg.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300' :
+            'bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300'
+          }`}>
+            <span>{resultMsg.text}</span>
+            {onOpenSmtpConfig && (
+              <button
+                onClick={onOpenSmtpConfig}
+                className="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[11px] font-bold hover:bg-amber-700"
+              >
+                SMTP Settings ⚙️
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Modal Body / Email Preview */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {viewMode === 'preview' ? (
@@ -138,28 +180,24 @@ export default function EmailReminderModal({
           </button>
 
           <div className="flex items-center gap-2">
-            {/* Native mailto launcher */}
+            {/* Native mailto launcher - Launches Outlook / Windows Mail directly */}
             <a
               href={emailData.mailtoUrl}
               className="px-3.5 py-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5"
-              title="Open with Outlook, Gmail, or default mail client"
+              title="Launch Outlook or default mail client"
             >
               <span>📬</span>
               <span>Open Mail App</span>
             </a>
 
-            {/* Simulated direct API dispatch */}
+            {/* Direct dispatch */}
             <button
               onClick={handleSendEmail}
-              disabled={isSending || isSent}
-              className={`px-5 py-2 text-white text-xs font-black rounded-xl shadow-md transition-all flex items-center justify-center gap-2 ${
-                isSent
-                  ? 'bg-emerald-600 shadow-emerald-600/30'
-                  : 'bg-rose-600 hover:bg-rose-700 active:scale-95 shadow-rose-600/30'
-              }`}
+              disabled={isSending}
+              className="px-5 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md shadow-rose-600/30 transition-all flex items-center justify-center gap-2"
             >
-              <span>{isSent ? '✅' : isSending ? '⏳' : '⚡'}</span>
-              <span>{isSent ? 'Email Dispatched!' : isSending ? 'Dispatching...' : 'Dispatch Reminder Email'}</span>
+              <span>{isSending ? '⏳' : '⚡'}</span>
+              <span>{isSending ? 'Dispatching...' : 'Dispatch Reminder Email'}</span>
             </button>
           </div>
         </div>

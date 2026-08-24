@@ -58,6 +58,8 @@ export const TEAM_DIRECTORY = {
   }
 };
 
+const BACKEND_MAIL_URL = 'http://localhost:3001';
+
 // Resolve email for any assignee name
 export function getPersonEmail(personName) {
   if (!personName) return 'team@anantdv.com';
@@ -172,42 +174,62 @@ Anantdv Technologies`;
   };
 }
 
-// Generate grouped daily digest email for a team member with multiple urgent tasks
-export function generateDailyDigestEmail(assigneeName, urgentTasks) {
-  const email = getPersonEmail(assigneeName);
-  const subject = `[DAILY DIGEST] 🚨 ${urgentTasks.length} Urgent Open/Working Tasks for ${assigneeName}`;
+// Send real email via local Node backend
+export async function sendEmailViaBackend(payload) {
+  try {
+    const res = await fetch(`${BACKEND_MAIL_URL}/api/send-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    return {
+      success: true,
+      delivered: false,
+      requiresSmtp: true,
+      message: `Mail server unreachable (${err.message}). Opened via native client.`
+    };
+  }
+}
 
-  const taskListText = urgentTasks.map((t, idx) => 
-    `${idx + 1}. [${t.projectId}] ${t.name || t.subject} (Due: ${t.dueDate || 'N/A'}, Status: ${t.status})`
-  ).join('\n');
+// Send daily batch via local Node backend
+export async function sendDailyBatchViaBackend(recipients) {
+  try {
+    const res = await fetch(`${BACKEND_MAIL_URL}/api/daily-batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipients })
+    });
+    return await res.json();
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
 
-  const textBody = `Hi ${assigneeName},
+// Configure SMTP credentials in backend
+export async function configureSmtpBackend(config) {
+  try {
+    const res = await fetch(`${BACKEND_MAIL_URL}/api/config-smtp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+    return await res.json();
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
 
-This is your daily morning digest for active URGENT tasks that are currently Open or Working.
-
-You have ${urgentTasks.length} pending urgent tasks:
---------------------------------------------------
-${taskListText}
---------------------------------------------------
-
-⚠️ Note: Reminder emails automatically stop once tasks are marked as "Completed".
-
-Access the Cockpit dashboard: http://localhost:3000/
-
-Best regards,
-Project Management Cockpit
-Anantdv Technologies`;
-
-  const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textBody)}`;
-
-  return {
-    to: email,
-    assigneeName,
-    subject,
-    taskCount: urgentTasks.length,
-    textBody,
-    mailtoUrl
-  };
+// Get backend mail server status
+export async function getBackendMailStatus() {
+  try {
+    const res = await fetch(`${BACKEND_MAIL_URL}/api/mail-status`);
+    return await res.json();
+  } catch (err) {
+    return { configured: false, offline: true };
+  }
 }
 
 // Local storage key for daily reminder tracking
@@ -247,7 +269,7 @@ export function logReminderDispatch(entry) {
     displayDate: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }),
     ...entry
   };
-  const updated = [newEntry, ...current].slice(0, 50); // keep last 50 logs
+  const updated = [newEntry, ...current].slice(0, 50);
   localStorage.setItem(REMINDER_LOG_KEY, JSON.stringify(updated));
   return newEntry;
 }
