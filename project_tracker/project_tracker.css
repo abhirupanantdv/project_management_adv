@@ -1,0 +1,96 @@
+/* ERPNext v15 Project Tracker Desk Page Styles */
+
+:root {
+  --pt-primary: #4f46e5;
+  --pt-primary-hover: #4338ca;
+  --pt-bg-page: #f8fafc;
+  --pt-bg-card: #ffffff;
+  --pt-border: #e2e8f0;
+  --pt-text: #0f172a;
+  --pt-text-muted: #64748b;
+}
+
+[data-theme="dark"] {
+  --pt-primary: #6366f1;
+  --pt-primary-hover: #4f46e5;
+  --pt-bg-page: #0b0f19;
+  --pt-bg-card: #151e2e;
+  --pt-border: #293548;
+  --pt-text: #f8fafc;
+  --pt-text-muted: #94a3b8;
+}
+
+.project-tracker-root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--pt-text);
+  background-color: var(--pt-bg-page);
+  min-height: 100vh;
+  padding: 1.25rem 1.5rem;
+}
+
+/* Animations */
+@keyframes ptSlideLeft {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.pt-animate-slide-left {
+  animation: ptSlideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Scrollbars */
+.pt-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.pt-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+.pt-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 4px;
+}
+
+/* Modal Backdrop */
+.pt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+}
+
+/* Progress bar transitions */
+.pt-progress-fill {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Badges */
+.pt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.pt-badge-open {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.pt-badge-working {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.pt-badge-completed {
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
