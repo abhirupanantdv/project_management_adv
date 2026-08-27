@@ -152,35 +152,59 @@
       'Low': 'bg-slate-100 text-slate-700 border-slate-300 font-medium'
     };
 
-    // Live ERPNext initial dataset
+    // Professional Project Title Formatter
+    function formatProfessionalProjectName(name) {
+      if (!name) return "Untitled Project";
+      let str = name.trim();
+      str = str.replace(/PROPERRTY/gi, 'Property');
+      str = str.replace(/Managment/gi, 'Management');
+      if (str.toLowerCase() === 'draft') return 'Draft Project Workspace';
+      if (/^ADV[-\s]+/i.test(str)) {
+        let rest = str.replace(/^ADV[-\s]+/i, '').trim();
+        // Capitalize words cleanly while keeping known acronyms
+        rest = rest.split(' ').map(w => {
+          if (['CAL', 'WRC', 'PNG', 'RND', 'ERP', 'QA', 'UI', 'DB', 'VMS', 'LBL', 'CAML', 'IMEL', 'FEDEX', 'LTD'].includes(w.toUpperCase())) {
+            return w.toUpperCase();
+          }
+          if (w.length > 1 && w === w.toUpperCase()) {
+            return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+          }
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+        return `ADV • ${rest}`;
+      }
+      return str;
+    }
+
+    // Live ERPNext initial dataset with clean professional titles
     const RAW_INITIAL_PROJECTS = [
-      { id: "PROJ-0084", name: "ADV-PROPERRTY MANAGEMENT", status: "Working", percentCompleted: 89, priority: "Urgent", owner: "Niranjan Kumar Singh", dueDate: "2026-10-30" },
-      { id: "PROJ-0074", name: "ADV-CAL", status: "Working", percentCompleted: 81, priority: "High", owner: "Sharda Kumari", dueDate: "2026-09-30" },
-      { id: "PROJ-0078", name: "ADV-COURTS", status: "Working", percentCompleted: 90, priority: "Urgent", owner: "Niranjan Kumar Singh", dueDate: "2026-09-15" },
-      { id: "PROJ-0081", name: "ADV-PACTAC", status: "Working", percentCompleted: 86, priority: "High", owner: "Dipanwita Das", dueDate: "2026-10-15" },
-      { id: "PROJ-0083", name: "ADV-BOROKO MOTORS", status: "Working", percentCompleted: 95, priority: "High", owner: "Tanuja Das", dueDate: "2026-09-25" },
-      { id: "PROJ-0075", name: "ADV-DUCTUS", status: "Working", percentCompleted: 63, priority: "Medium", owner: "Sushmita Bhowmick", dueDate: "2026-11-10" },
-      { id: "PROJ-0087", name: "ADV-FEDEX", status: "Working", percentCompleted: 57, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-10-20" },
-      { id: "PROJ-0088", name: "ADV-CARPENTER WATER FIJI LTD", status: "Working", percentCompleted: 52, priority: "Medium", owner: "Sharda Kumari", dueDate: "2026-11-30" },
-      { id: "PROJ-0064", name: "CS Logistics", status: "Completed", percentCompleted: 100, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-08-15" },
-      { id: "PROJ-0067", name: "Sharda Kumari-Daily Update", status: "Completed", percentCompleted: 100, priority: "Medium", owner: "Sharda Kumari", dueDate: "2026-08-20" },
-      { id: "PROJ-0073", name: "ADV-WRCPNG", status: "Completed", percentCompleted: 100, priority: "High", owner: "Dipanwita Das", dueDate: "2026-08-10" },
-      { id: "PROJ-0076", name: "ADV-COFFEE", status: "Completed", percentCompleted: 100, priority: "Medium", owner: "Tanuja Das", dueDate: "2026-08-05" },
-      { id: "PROJ-0085", name: "ADV-CONTAINER MANAGEMENT", status: "Completed", percentCompleted: 100, priority: "Urgent", owner: "Niranjan Kumar Singh", dueDate: "2026-08-18" },
-      { id: "PROJ-0089", name: "ADV-RND(Research and Development)", status: "Completed", percentCompleted: 100, priority: "High", owner: "Abhirup Singha", dueDate: "2026-08-12" },
-      { id: "PROJ-0001", name: "draft", status: "Not Started", percentCompleted: 0, priority: "Low", owner: "Administrator", dueDate: "2026-12-31" },
-      { id: "PROJ-0002", name: "ADV-Test Automation Live Sync", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-11-30" },
-      { id: "PROJ-0065", name: "WRC PNG", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Sushmita Bhowmick", dueDate: "2026-12-15" },
-      { id: "PROJ-0066", name: "property Managment", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Sharda Kumari", dueDate: "2026-11-25" },
-      { id: "PROJ-0069", name: "Property Management", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Dipanwita Das", dueDate: "2026-12-05" },
-      { id: "PROJ-0072", name: "ADV-LBL", status: "Not Started", percentCompleted: 0, priority: "Low", owner: "Tanuja Das", dueDate: "2026-12-20" },
-      { id: "PROJ-0077", name: "ADV-CAML", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Niranjan Kumar Singh", dueDate: "2026-12-10" },
-      { id: "PROJ-0079", name: "ADV-MYCARD", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Sharda Kumari", dueDate: "2026-11-18" },
-      { id: "PROJ-0080", name: "ADV-CARPTRADING(VANUATU)", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Dipanwita Das", dueDate: "2026-12-01" },
-      { id: "PROJ-0086", name: "ADV-VEHICLE WORKSHOP & TRANSPORT", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-11-15" },
-      { id: "PROJ-0090", name: "ADV - IMEL", status: "Not Started", percentCompleted: 0, priority: "Low", owner: "Sushmita Bhowmick", dueDate: "2026-12-28" },
-      { id: "PROJ-0091", name: "ADV- VMS", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Tanuja Das", dueDate: "2026-12-18" },
-      { id: "PROJ-0092", name: "ADV- Nirolite", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-12-22" }
+      { id: "PROJ-0084", name: "ADV • Property Management", status: "Working", percentCompleted: 89, priority: "Urgent", owner: "Niranjan Kumar Singh", dueDate: "2026-10-30" },
+      { id: "PROJ-0074", name: "ADV • CAL Systems", status: "Working", percentCompleted: 81, priority: "High", owner: "Sharda Kumari", dueDate: "2026-09-30" },
+      { id: "PROJ-0078", name: "ADV • Courts Legal Services", status: "Working", percentCompleted: 90, priority: "Urgent", owner: "Niranjan Kumar Singh", dueDate: "2026-09-15" },
+      { id: "PROJ-0081", name: "ADV • PACTAC Integration", status: "Working", percentCompleted: 86, priority: "High", owner: "Dipanwita Das", dueDate: "2026-10-15" },
+      { id: "PROJ-0083", name: "ADV • Boroko Motors ERP", status: "Working", percentCompleted: 95, priority: "High", owner: "Tanuja Das", dueDate: "2026-09-25" },
+      { id: "PROJ-0075", name: "ADV • Ductus Implementation", status: "Working", percentCompleted: 63, priority: "Medium", owner: "Sushmita Bhowmick", dueDate: "2026-11-10" },
+      { id: "PROJ-0087", name: "ADV • FedEx Logistics Platform", status: "Working", percentCompleted: 57, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-10-20" },
+      { id: "PROJ-0088", name: "ADV • Carpenter Water Fiji Ltd", status: "Working", percentCompleted: 52, priority: "Medium", owner: "Sharda Kumari", dueDate: "2026-11-30" },
+      { id: "PROJ-0064", name: "CS Logistics & Supply", status: "Completed", percentCompleted: 100, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-08-15" },
+      { id: "PROJ-0067", name: "Daily Operational Updates", status: "Completed", percentCompleted: 100, priority: "Medium", owner: "Sharda Kumari", dueDate: "2026-08-20" },
+      { id: "PROJ-0073", name: "ADV • WRC PNG Operations", status: "Completed", percentCompleted: 100, priority: "High", owner: "Dipanwita Das", dueDate: "2026-08-10" },
+      { id: "PROJ-0076", name: "ADV • Coffee Supply Chain", status: "Completed", percentCompleted: 100, priority: "Medium", owner: "Tanuja Das", dueDate: "2026-08-05" },
+      { id: "PROJ-0085", name: "ADV • Container Management", status: "Completed", percentCompleted: 100, priority: "Urgent", owner: "Niranjan Kumar Singh", dueDate: "2026-08-18" },
+      { id: "PROJ-0089", name: "ADV • Research & Development (R&D)", status: "Completed", percentCompleted: 100, priority: "High", owner: "Abhirup Singha", dueDate: "2026-08-12" },
+      { id: "PROJ-0001", name: "Draft Project Workspace", status: "Not Started", percentCompleted: 0, priority: "Low", owner: "Administrator", dueDate: "2026-12-31" },
+      { id: "PROJ-0002", name: "ADV • Test Automation Live Sync", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-11-30" },
+      { id: "PROJ-0065", name: "WRC PNG Platform", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Sushmita Bhowmick", dueDate: "2026-12-15" },
+      { id: "PROJ-0066", name: "Property Management Solution", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Sharda Kumari", dueDate: "2026-11-25" },
+      { id: "PROJ-0069", name: "Commercial Property Management", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Dipanwita Das", dueDate: "2026-12-05" },
+      { id: "PROJ-0072", name: "ADV • LBL Enterprise", status: "Not Started", percentCompleted: 0, priority: "Low", owner: "Tanuja Das", dueDate: "2026-12-20" },
+      { id: "PROJ-0077", name: "ADV • CAML Core Solution", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Niranjan Kumar Singh", dueDate: "2026-12-10" },
+      { id: "PROJ-0079", name: "ADV • MyCard Financial Platform", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Sharda Kumari", dueDate: "2026-11-18" },
+      { id: "PROJ-0080", name: "ADV • Carp Trading (Vanuatu)", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Dipanwita Das", dueDate: "2026-12-01" },
+      { id: "PROJ-0086", name: "ADV • Vehicle Workshop & Transport", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-11-15" },
+      { id: "PROJ-0090", name: "ADV • IMEL Industrial Systems", status: "Not Started", percentCompleted: 0, priority: "Low", owner: "Sushmita Bhowmick", dueDate: "2026-12-28" },
+      { id: "PROJ-0091", name: "ADV • VMS Vendor Suite", status: "Not Started", percentCompleted: 0, priority: "Medium", owner: "Tanuja Das", dueDate: "2026-12-18" },
+      { id: "PROJ-0092", name: "ADV • Nirolite Enterprise", status: "Not Started", percentCompleted: 0, priority: "High", owner: "Niranjan Kumar Singh", dueDate: "2026-12-22" }
     ];
 
     function buildProjectTasks(p, employees) {
@@ -1243,7 +1267,7 @@
                     </span>
                     <span className="text-slate-300">/</span>
                     <span className="font-semibold text-xs text-slate-700 truncate max-w-sm">
-                      {currentProj.name}
+                      {formatProfessionalProjectName(currentProj.name)}
                     </span>
                   </div>
 
@@ -1271,10 +1295,10 @@
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className={`text-base sm:text-lg font-black ${
+                        <span className={`text-base sm:text-lg font-black tracking-tight ${
                           isProject100Done ? 'text-emerald-950' : isProjectWorking ? 'text-amber-950' : 'text-rose-950'
                         }`}>
-                          {currentProj.name}
+                          {formatProfessionalProjectName(currentProj.name)}
                         </span>
 
                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${
@@ -1964,8 +1988,8 @@
                                   </span>
                                 </div>
 
-                                <h4 className="text-sm font-extrabold text-slate-900 line-clamp-2 select-text">
-                                  {proj.name}
+                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                  {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
 
@@ -2033,8 +2057,8 @@
                                 </span>
                               </div>
 
-                              <h4 className="text-sm font-extrabold text-slate-900 line-clamp-2 select-text">
-                                {proj.name}
+                              <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                {formatProfessionalProjectName(proj.name)}
                               </h4>
                             </div>
 
@@ -2101,8 +2125,8 @@
                                 </span>
                               </div>
 
-                              <h4 className="text-sm font-extrabold text-slate-900 line-clamp-2 select-text">
-                                {proj.name}
+                              <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                {formatProfessionalProjectName(proj.name)}
                               </h4>
                             </div>
 
@@ -2187,8 +2211,8 @@
                                 </span>
                               </div>
 
-                              <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 ${titleColor} select-text`}>
-                                {proj.name}
+                              <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight ${titleColor} select-text`}>
+                                {formatProfessionalProjectName(proj.name)}
                               </h3>
                             </div>
 
@@ -2446,8 +2470,8 @@
                         </span>
                         <span className="text-xs font-bold text-slate-500">• {modalProj.company}</span>
                       </div>
-                      <h2 className="text-xl font-extrabold text-slate-900 font-display">
-                        {modalProj.name}
+                      <h2 className="text-xl font-extrabold text-slate-900 font-display tracking-tight">
+                        {formatProfessionalProjectName(modalProj.name)}
                       </h2>
                     </div>
 
