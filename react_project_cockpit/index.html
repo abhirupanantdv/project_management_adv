@@ -435,42 +435,59 @@
           const projRes = await fetch('/api/erpnext/resource/Project?fields=["name","project_name","status","percent_complete","expected_end_date","priority","notes","customer"]&limit_page_length=100');
           const projJson = await projRes.json();
 
-          const taskRes = await fetch('/api/erpnext/resource/Task?fields=["name","subject","status","priority","project","exp_end_date","type"]&limit_page_length=300');
+          const taskRes = await fetch('/api/erpnext/resource/Task?fields=["name","subject","status","priority","project","exp_end_date","type","parent_task"]&limit_page_length=300');
           const taskJson = await taskRes.json();
 
           if (projJson && projJson.data && projJson.data.length > 0) {
             const rawTasks = taskJson?.data || [];
 
             const formatted = projJson.data.map((p, idx) => {
-              const pTasks = rawTasks
-                .filter(t => t.project === p.name)
-                .map((t, tIdx) => {
-                  const cat = autoDetectCategory(t.subject, t.type);
-                  let mappedStatus = t.status === 'Completed' ? 'Completed' : t.status === 'Working' || t.status === 'In Progress' ? 'Working' : 'Open';
-                  
-                  // Multi-assign 2-3 active employees
-                  const activeEmps = employees.filter(e => e.status === 'Active');
-                  const e1 = activeEmps[tIdx % activeEmps.length]?.name || "Niranjan Kumar Singh";
-                  const e2 = activeEmps[(tIdx + 1) % activeEmps.length]?.name || "Tanuja Das";
-                  const assignedList = [e1, e2];
+              // Strictly isolate tasks that belong to THIS project only!
+              const allTasksForProj = rawTasks.filter(t => t.project === p.name);
+              const topLevelTasks = allTasksForProj.filter(t => !t.parent_task);
+              const nestedSubtasks = allTasksForProj.filter(t => !!t.parent_task);
 
-                  return {
-                    id: t.name,
-                    name: t.subject || `Task ${t.name}`,
-                    category: cat,
-                    assignees: assignedList,
-                    assignee: assignedList.join(', '),
-                    dueDate: t.exp_end_date || "2026-09-30",
-                    priority: t.priority || "Medium",
-                    status: mappedStatus,
-                    projectName: p.project_name || p.name,
-                    projectId: p.name
-                  };
-                });
+              const pTasks = (topLevelTasks.length > 0 ? topLevelTasks : allTasksForProj).map((t, tIdx) => {
+                const cat = autoDetectCategory(t.subject, t.type);
+                let mappedStatus = t.status === 'Completed' ? 'Completed' : t.status === 'Working' || t.status === 'In Progress' ? 'Working' : 'Open';
+                
+                // Attach subtasks belonging to this task
+                const attachedSubs = nestedSubtasks
+                  .filter(sub => sub.parent_task === t.name)
+                  .map(sub => ({
+                    id: sub.name,
+                    name: sub.subject || sub.name,
+                    status: sub.status === 'Completed' ? 'Completed' : 'Open',
+                    assignee: employees.filter(e => e.status === 'Active')[tIdx % 5]?.name || 'Niranjan Kumar Singh',
+                    dueDate: sub.exp_end_date || '2026-10-30',
+                    parentTaskId: t.name
+                  }));
 
-              const tasks = pTasks.length > 0 ? pTasks : buildProjectTasks({ id: p.name, name: p.project_name || p.name, percentCompleted: Math.round(p.percent_complete || 0) }, employees);
+                // Multi-assign 2-3 active employees
+                const activeEmps = employees.filter(e => e.status === 'Active');
+                const e1 = activeEmps[tIdx % activeEmps.length]?.name || 'Niranjan Kumar Singh';
+                const e2 = activeEmps[(tIdx + 1) % activeEmps.length]?.name || 'Tanuja Das';
+                const assignedList = [e1, e2];
+
+                return {
+                  id: t.name,
+                  name: t.subject || ('Task ' + t.name),
+                  category: cat,
+                  assignees: assignedList,
+                  assignee: assignedList.join(', '),
+                  dueDate: t.exp_end_date || '2026-09-30',
+                  priority: t.priority || 'Medium',
+                  status: mappedStatus,
+                  projectName: p.project_name || p.name,
+                  projectId: p.name,
+                  subtasks: attachedSubs
+                };
+              });
+
+              // Tasks are strictly scoped to this project's real tasks
+              const tasks = pTasks;
               const compCount = tasks.filter(t => t.status === 'Completed').length;
-              let finalPct = Math.round((compCount / tasks.length) * 100);
+              let finalPct = tasks.length > 0 ? Math.round((compCount / tasks.length) * 100) : 0;
               if (p.percent_complete > 0) finalPct = Math.round(p.percent_complete);
 
               let finalStatus = finalPct === 100 ? 'Completed' : finalPct > 0 ? 'Working' : 'Not Started';
@@ -486,14 +503,14 @@
               return {
                 id: p.name,
                 name: p.project_name || p.name,
-                company: p.customer || "Anantdv Enterprise",
+                company: p.customer || 'Anantdv Enterprise',
                 status: finalStatus,
-                priority: p.priority || "High",
+                priority: p.priority || 'High',
                 owner: ownerEmp.name,
                 ownerAvatar: ownerEmp.avatar,
                 teamMembers: projTeam,
-                startDate: "2026-05-01",
-                dueDate: p.expected_end_date || "2026-10-30",
+                startDate: '2026-05-01',
+                dueDate: p.expected_end_date || '2026-10-30',
                 assignedTeamCount: projTeam.length,
                 percentCompleted: finalPct,
                 assignedUsers: activeList.slice(0, projTeam.length),
@@ -503,7 +520,6 @@
 
             setProjects(formatted);
             setIsLiveConnected(true);
-            showToast(`🟢 Synced ${formatted.length} Projects with ERPNext!`);
           }
         } catch (err) {
           console.warn("Live API sync fallback:", err);
@@ -511,6 +527,11 @@
           setIsLoadingLive(false);
         }
       }, [employees]);
+
+      // Automatically sync with ERPNext on initial mount
+      useEffect(() => {
+        fetchLiveData();
+      }, [fetchLiveData]);
 
       const handleOpenProject = (id) => {
         setSelectedProjectId(id);
