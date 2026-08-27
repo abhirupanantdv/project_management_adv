@@ -1286,54 +1286,164 @@
                   );
                 })()}
 
-                {/* 2. 5-CATEGORY PROGRESS SUMMARY STRIP */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                  {categoriesList.map(catKey => {
-                    const catConfig = CATEGORY_CONFIG[catKey];
-                    const tasksInCat = allTasks.filter(t => t.category === catKey);
-                    const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
-                    const totalCount = tasksInCat.length;
-                    const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
-                    const isCollapsed = !!collapsedCategories[catKey];
-                    const isSelectedCat = taskCategoryFilter === catKey;
+                {/* 2. 📊 WORKSTREAM & CATEGORY BREAKDOWN DASHBOARD PANEL */}
+                <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+                  
+                  {/* Dashboard Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm shadow-2xs">
+                        📊
+                      </div>
+                      <div>
+                        <h3 className="text-sm sm:text-base font-black text-slate-900 font-display tracking-tight flex items-center gap-2">
+                          <span>Workstream & Category Dashboard</span>
+                          {taskCategoryFilter !== 'All' && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                              Filtered: {taskCategoryFilter}
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-[11px] text-slate-400 font-medium">Click any workstream card below to instantly filter task pipelines</p>
+                      </div>
+                    </div>
 
-                    return (
-                      <div
-                        key={catKey}
-                        onClick={() => toggleCategory(catKey)}
-                        className={`bg-white border rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
-                          isSelectedCat ? 'border-blue-400 ring-2 ring-blue-300' : 'border-slate-200/90'
-                        }`}
-                        title="Click to expand/collapse category tasks"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs">{catConfig.icon}</span>
-                            <span className="text-xs font-black text-slate-800">
-                              {catConfig.label}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {taskCategoryFilter !== 'All' && (
+                        <button
+                          type="button"
+                          onClick={() => setTaskCategoryFilter('All')}
+                          className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs"
+                        >
+                          ✕ Clear Filter (Show All)
+                        </button>
+                      )}
+                      <span className="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1 rounded-xl border border-slate-200/80">
+                        <strong>{categoriesList.filter(k => {
+                          const cTasks = allTasks.filter(t => t.category === k);
+                          return cTasks.length > 0 && cTasks.every(t => t.status === 'Completed');
+                        }).length}</strong> of <strong>{categoriesList.length}</strong> Workstreams 100% Done
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 5 Workstream Dashboard Widget Pods */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+                    {categoriesList.map(catKey => {
+                      const catConfig = CATEGORY_CONFIG[catKey] || { label: catKey, icon: '📌', barColor: 'bg-blue-500' };
+                      const tasksInCat = allTasks.filter(t => t.category === catKey);
+                      const totalCount = tasksInCat.length;
+                      const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
+                      const workCount = tasksInCat.filter(t => t.status === 'Working' || t.status === 'In Progress').length;
+                      const openCount = totalCount - doneCount - workCount;
+                      
+                      const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+                      const workPct = totalCount > 0 ? Math.round((workCount / totalCount) * 100) : 0;
+                      const openPct = totalCount > 0 ? Math.max(0, 100 - pct - workPct) : 0;
+
+                      const isSelectedCat = taskCategoryFilter === catKey;
+                      const isCat100Done = totalCount > 0 && doneCount === totalCount;
+                      const isCatActive = totalCount > 0 && (workCount > 0 || (doneCount > 0 && doneCount < totalCount));
+
+                      return (
+                        <div
+                          key={catKey}
+                          onClick={() => setTaskCategoryFilter(isSelectedCat ? 'All' : catKey)}
+                          className={`group rounded-2xl p-4 transition-all cursor-pointer flex flex-col justify-between space-y-3 border relative overflow-hidden ${
+                            isSelectedCat
+                              ? 'bg-blue-50/80 border-blue-500 ring-2 ring-blue-400/40 shadow-md scale-[1.02]'
+                              : isCat100Done
+                              ? 'bg-emerald-50/40 border-emerald-200/90 hover:border-emerald-400 hover:shadow-md hover:scale-[1.01]'
+                              : isCatActive
+                              ? 'bg-amber-50/30 border-amber-200/90 hover:border-amber-400 hover:shadow-md hover:scale-[1.01]'
+                              : 'bg-slate-50/50 border-slate-200/90 hover:border-slate-300 hover:shadow-md hover:scale-[1.01]'
+                          }`}
+                          title={`Click to ${isSelectedCat ? 'clear filter' : `filter tasks by ${catConfig.label}`}`}
+                        >
+                          {/* Top Row: Icon, Title & Status Pill */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 truncate">
+                              <span className="w-7 h-7 rounded-lg bg-white border border-slate-200/80 text-sm flex items-center justify-center shadow-2xs shrink-0">
+                                {catConfig.icon}
+                              </span>
+                              <div className="truncate">
+                                <h4 className="text-xs font-black text-slate-900 tracking-tight leading-tight truncate">
+                                  {catConfig.label}
+                                </h4>
+                                <span className="text-[10px] text-slate-400 font-medium">
+                                  {totalCount} {totalCount === 1 ? 'Task' : 'Tasks'}
+                                </span>
+                              </div>
+                            </div>
+
+                            <span className={`px-2 py-0.5 text-[9px] font-extrabold rounded-md border shrink-0 ${
+                              isCat100Done
+                                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                : isCatActive
+                                ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                : 'bg-slate-100 text-slate-600 border-slate-200'
+                            }`}>
+                              {isCat100Done ? '🟢 Done' : isCatActive ? '🟡 Active' : '⚪ Queued'}
                             </span>
                           </div>
-                          <span className="font-mono text-xs font-black text-slate-900">
-                            {pct}%
-                          </span>
-                        </div>
 
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-300 ${catConfig.barColor}`}
-                            style={{ width: `${pct}%` }}
-                          ></div>
-                        </div>
+                          {/* Center Velocity Stat */}
+                          <div className="flex items-baseline justify-between pt-1">
+                            <span className={`font-mono text-2xl font-black tracking-tight ${
+                              isCat100Done ? 'text-emerald-700' : isCatActive ? 'text-amber-700' : 'text-slate-800'
+                            }`}>
+                              {pct}%
+                            </span>
+                            <span className="text-[11px] font-bold text-slate-500">
+                              {doneCount}/{totalCount} Done
+                            </span>
+                          </div>
 
-                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5 font-medium">
-                          <span>{doneCount}/{totalCount} Done</span>
-                          <span className="text-[10px] text-slate-400 font-bold">
-                            {isCollapsed ? '▲' : '▼'}
-                          </span>
+                          {/* Multi-Segment Velocity Track */}
+                          <div className="space-y-1.5">
+                            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex border border-slate-200/60 p-0.5 shadow-inner">
+                              {pct > 0 && (
+                                <div
+                                  className="h-full rounded-l-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300"
+                                  style={{ width: `${pct}%` }}
+                                ></div>
+                              )}
+                              {workPct > 0 && (
+                                <div
+                                  className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-300"
+                                  style={{ width: `${workPct}%` }}
+                                ></div>
+                              )}
+                              {openPct > 0 && (
+                                <div
+                                  className="h-full rounded-r-full bg-slate-300/70 transition-all duration-300"
+                                  style={{ width: `${openPct}%` }}
+                                ></div>
+                              )}
+                            </div>
+
+                            {/* Status Counts Breakdown */}
+                            <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                              <span className="text-emerald-700">🟢 {doneCount}</span>
+                              <span className="text-amber-700">🟡 {workCount}</span>
+                              <span className="text-slate-500">🔴 {openCount}</span>
+                            </div>
+                          </div>
+
+                          {/* Hover Selection Indicator */}
+                          <div className="pt-1 text-center">
+                            <span className={`text-[10px] font-bold block transition-colors ${
+                              isSelectedCat ? 'text-blue-700 font-extrabold' : 'text-slate-400 group-hover:text-blue-600'
+                            }`}>
+                              {isSelectedCat ? '✓ Active Filter' : 'Click to Filter ⚡'}
+                            </span>
+                          </div>
+
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+
                 </div>
 
                 {/* 3. TASK CONTROLS & VIEW SWITCHER TOOLBAR */}
