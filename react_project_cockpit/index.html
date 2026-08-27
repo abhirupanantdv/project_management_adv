@@ -1953,7 +1953,139 @@
                 {projectViewMode === 'kanban' ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                     
-                    {/* COLUMN 1: 🟢 COMPLETED PROJECTS */}
+                    {/* COLUMN 1: 🔴 NOT OPEN / OPEN PROJECTS (LEFT) */}
+                    <div className="bg-rose-50/40 border-2 border-rose-200 rounded-3xl p-4 space-y-4 shadow-xs">
+                      <div className="flex items-center justify-between pb-2 border-b border-rose-200">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3.5 h-3.5 rounded-full bg-rose-500 flex items-center justify-center text-[8px] text-white font-black">📌</span>
+                          <h3 className="text-sm font-black text-rose-950 uppercase tracking-wider">
+                            Not Open / Open
+                          </h3>
+                        </div>
+                        <span className="px-2.5 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-extrabold">
+                          {kanbanColumns.notOpen.length}
+                        </span>
+                      </div>
+
+                      <div className="space-y-3.5 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
+                        {kanbanColumns.notOpen.length === 0 ? (
+                          <div className="p-8 text-center text-xs font-semibold text-rose-700/60 bg-rose-50/50 rounded-2xl border border-dashed border-rose-200">
+                            No Open Projects
+                          </div>
+                        ) : (
+                          kanbanColumns.notOpen.map(proj => (
+                            <div
+                              key={proj.id}
+                              className="group bg-white border border-rose-300 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-rose-500 transition-all flex flex-col justify-between space-y-3"
+                            >
+                              <div>
+                                <div className="flex items-center justify-between gap-2 mb-2">
+                                  <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200">
+                                    {proj.id}
+                                  </span>
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-900 border border-rose-300">
+                                    Not Started
+                                  </span>
+                                </div>
+
+                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                  {formatProfessionalProjectName(proj.name)}
+                                </h4>
+                              </div>
+
+                              <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedProjectId(proj.id);
+                                    setCurrentPage('project_details');
+                                  }}
+                                  className="flex-1 px-3 py-1.5 text-[11px] font-extrabold rounded-lg bg-rose-100 hover:bg-rose-600 hover:text-white text-rose-900 border border-rose-300 shadow-2xs transition-all cursor-pointer active:scale-95 text-center"
+                                >
+                                  Open Tasks ({proj.tasks.length})
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
+                                  className="px-2.5 py-1.5 text-[10px] font-semibold rounded-lg border border-amber-300 bg-amber-100 hover:bg-amber-200 text-amber-900 cursor-pointer shrink-0"
+                                >
+                                  Start Working
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    {/* COLUMN 2: 🟡 WORKING PROJECTS (MIDDLE) */}
+                    <div className="bg-amber-50/40 border-2 border-amber-200 rounded-3xl p-4 space-y-4 shadow-xs">
+                      <div className="flex items-center justify-between pb-2 border-b border-amber-200">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center text-[8px] text-white font-black">⚡</span>
+                          <h3 className="text-sm font-black text-amber-950 uppercase tracking-wider">
+                            Working Projects
+                          </h3>
+                        </div>
+                        <span className="px-2.5 py-0.5 bg-amber-200 text-amber-900 rounded-full text-xs font-extrabold">
+                          {kanbanColumns.working.length}
+                        </span>
+                      </div>
+
+                      <div className="space-y-3.5 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
+                        {kanbanColumns.working.length === 0 ? (
+                          <div className="p-8 text-center text-xs font-semibold text-amber-700/60 bg-amber-50/50 rounded-2xl border border-dashed border-amber-200">
+                            No Working Projects
+                          </div>
+                        ) : (
+                          kanbanColumns.working.map(proj => (
+                            <div
+                              key={proj.id}
+                              className="group bg-white border border-amber-300 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-amber-500 transition-all flex flex-col justify-between space-y-3"
+                            >
+                              <div>
+                                <div className="flex items-center justify-between gap-2 mb-2">
+                                  <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                                    {proj.id}
+                                  </span>
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                                    In Progress
+                                  </span>
+                                </div>
+
+                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                  {formatProfessionalProjectName(proj.name)}
+                                </h4>
+                              </div>
+
+                              <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedProjectId(proj.id);
+                                    setCurrentPage('project_details');
+                                  }}
+                                  className="flex-1 px-3 py-1.5 text-[11px] font-extrabold rounded-lg bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 border border-amber-300 shadow-2xs transition-all cursor-pointer active:scale-95 text-center"
+                                >
+                                  Open Tasks ({proj.tasks.length})
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveProjectStatus(proj.id, 'Completed')}
+                                  className="px-2.5 py-1.5 text-[10px] font-semibold rounded-lg border bg-emerald-50 text-emerald-800 hover:bg-emerald-100 cursor-pointer shrink-0"
+                                >
+                                  Complete
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    {/* COLUMN 3: 🟢 COMPLETED PROJECTS (RIGHT / LAST) */}
                     <div className="bg-emerald-50/40 border-2 border-emerald-200 rounded-3xl p-4 space-y-4 shadow-xs">
                       <div className="flex items-center justify-between pb-2 border-b border-emerald-200">
                         <div className="flex items-center gap-2">
@@ -2016,126 +2148,6 @@
                             </div>
                           ))
                         )}
-                      </div>
-                    </div>
-
-                    {/* COLUMN 2: 🟡 WORKING PROJECTS */}
-                    <div className="bg-amber-50/40 border-2 border-amber-200 rounded-3xl p-4 space-y-4 shadow-xs">
-                      <div className="flex items-center justify-between pb-2 border-b border-amber-200">
-                        <div className="flex items-center gap-2">
-                          <span className="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center text-[8px] text-white font-black">⚡</span>
-                          <h3 className="text-sm font-black text-amber-950 uppercase tracking-wider">
-                            Working Projects
-                          </h3>
-                        </div>
-                        <span className="px-2.5 py-0.5 bg-amber-200 text-amber-900 rounded-full text-xs font-extrabold">
-                          {kanbanColumns.working.length}
-                        </span>
-                      </div>
-
-                      <div className="space-y-3.5 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
-                        {kanbanColumns.working.map(proj => (
-                          <div
-                            key={proj.id}
-                            className="group bg-white border border-amber-300 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-amber-500 transition-all flex flex-col justify-between space-y-3"
-                          >
-                            <div>
-                              <div className="flex items-center justify-between gap-2 mb-2">
-                                <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                                  {proj.id}
-                                </span>
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
-                                  In Progress
-                                </span>
-                              </div>
-
-                              <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
-                                {formatProfessionalProjectName(proj.name)}
-                              </h4>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedProjectId(proj.id);
-                                  setCurrentPage('project_details');
-                                }}
-                                className="flex-1 px-3 py-1.5 text-[11px] font-extrabold rounded-lg bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 border border-amber-300 shadow-2xs transition-all cursor-pointer active:scale-95 text-center"
-                              >
-                                Open Tasks ({proj.tasks.length})
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleMoveProjectStatus(proj.id, 'Completed')}
-                                className="px-2.5 py-1.5 text-[10px] font-semibold rounded-lg border bg-emerald-50 text-emerald-800 hover:bg-emerald-100 cursor-pointer shrink-0"
-                              >
-                                Complete
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* COLUMN 3: 🔴 NOT OPEN */}
-                    <div className="bg-rose-50/40 border-2 border-rose-200 rounded-3xl p-4 space-y-4 shadow-xs">
-                      <div className="flex items-center justify-between pb-2 border-b border-rose-200">
-                        <div className="flex items-center gap-2">
-                          <span className="w-3.5 h-3.5 rounded-full bg-rose-500 flex items-center justify-center text-[8px] text-white font-black">📌</span>
-                          <h3 className="text-sm font-black text-rose-950 uppercase tracking-wider">
-                            Not Open / Open
-                          </h3>
-                        </div>
-                        <span className="px-2.5 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-extrabold">
-                          {kanbanColumns.notOpen.length}
-                        </span>
-                      </div>
-
-                      <div className="space-y-3.5 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
-                        {kanbanColumns.notOpen.map(proj => (
-                          <div
-                            key={proj.id}
-                            className="group bg-white border border-rose-300 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-rose-500 transition-all flex flex-col justify-between space-y-3"
-                          >
-                            <div>
-                              <div className="flex items-center justify-between gap-2 mb-2">
-                                <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200">
-                                  {proj.id}
-                                </span>
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-900 border border-rose-300">
-                                  Not Started
-                                </span>
-                              </div>
-
-                              <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
-                                {formatProfessionalProjectName(proj.name)}
-                              </h4>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedProjectId(proj.id);
-                                  setCurrentPage('project_details');
-                                }}
-                                className="flex-1 px-3 py-1.5 text-[11px] font-extrabold rounded-lg bg-rose-100 hover:bg-rose-600 hover:text-white text-rose-900 border border-rose-300 shadow-2xs transition-all cursor-pointer active:scale-95 text-center"
-                              >
-                                Open Tasks ({proj.tasks.length})
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                className="px-2.5 py-1.5 text-[10px] font-semibold rounded-lg border border-amber-300 bg-amber-100 hover:bg-amber-200 text-amber-900 cursor-pointer shrink-0"
-                              >
-                                Start Working
-                              </button>
-                            </div>
-                          </div>
-                        ))}
                       </div>
                     </div>
 
