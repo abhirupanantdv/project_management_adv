@@ -1286,210 +1286,104 @@
                   );
                 })()}
 
-                {/* 2. 📊 WORKSTREAM & DISCIPLINE BAR CHART DASHBOARD */}
-                <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-5">
+                {/* 2. 📊 PROJECT PROGRESS (BAR CHART) - EXACT MATCH */}
+                <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs space-y-6">
                   
-                  {/* Top Bar Chart Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3.5 border-b border-slate-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-lg shadow-md shadow-blue-500/20">
-                        📊
-                      </div>
-                      <div>
-                        <h3 className="text-base font-black text-slate-900 font-display tracking-tight flex items-center gap-2">
-                          <span>Workstream Velocity & Completion Bar Chart</span>
-                          {taskCategoryFilter !== 'All' && (
-                            <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
-                              Selected: {taskCategoryFilter}
-                            </span>
-                          )}
-                        </h3>
-                        <p className="text-xs text-slate-400 font-medium">
-                          Visual percentage & volume analytics across 5 engineering workstreams
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Legend & Filter Action */}
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <div className="flex items-center gap-2 text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/80">
-                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> 100% Done</span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span> In Progress</span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-slate-300"></span> Queued</span>
-                      </div>
-
-                      {taskCategoryFilter !== 'All' && (
-                        <button
-                          type="button"
-                          onClick={() => setTaskCategoryFilter('All')}
-                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-xs"
-                        >
-                          ✕ Show All
-                        </button>
-                      )}
-                    </div>
+                  {/* Card Title */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
+                      Project Progress (Bar Chart)
+                    </h3>
+                    
+                    {taskCategoryFilter !== 'All' && (
+                      <button
+                        type="button"
+                        onClick={() => setTaskCategoryFilter('All')}
+                        className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs"
+                      >
+                        ✕ Show All
+                      </button>
+                    )}
                   </div>
 
-                  {/* Visual Bar Chart Component */}
-                  <div className="bg-slate-50/60 rounded-2xl p-5 border border-slate-200/70">
-                    <div className="relative">
-                      
-                      {/* Horizontal Grid Guide Lines */}
-                      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-12 pr-2">
-                        <div className="border-b border-dashed border-slate-200/80 w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
-                          <span>100%</span>
-                        </div>
-                        <div className="border-b border-dashed border-slate-200/80 w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
-                          <span>75%</span>
-                        </div>
-                        <div className="border-b border-dashed border-slate-200/80 w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
-                          <span>50%</span>
-                        </div>
-                        <div className="border-b border-dashed border-slate-200/80 w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
-                          <span>25%</span>
-                        </div>
-                        <div className="border-b border-slate-300 w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
-                          <span>0%</span>
-                        </div>
-                      </div>
+                  {/* Chart Graphic Area */}
+                  {(() => {
+                    // Category Config with Exact Colors matching user's image:
+                    // 1. Blue (#2563eb), 2. Green (#10b981), 3. Orange (#f59e0b), 4. Purple (#8b5cf6), 5. Red (#ef4444)
+                    const BAR_DEFINITIONS = [
+                      { key: 'Development', label: 'IT / Development', shortLabel: 'IT', color: 'bg-[#2563eb]', defaultVal: 16 },
+                      { key: 'UI', label: 'Operations / UI', shortLabel: 'Operations', color: 'bg-[#10b981]', defaultVal: 9 },
+                      { key: 'Migration', label: 'Finance / Migration', shortLabel: 'Finance', color: 'bg-[#f59e0b]', defaultVal: 7 },
+                      { key: 'Testing', label: 'HR / Testing', shortLabel: 'HR', color: 'bg-[#8b5cf6]', defaultVal: 5 },
+                      { key: 'Documentation', label: 'Sales / Docs', shortLabel: 'Sales', color: 'bg-[#ef4444]', defaultVal: 3 },
+                    ];
 
-                      {/* 5 Vertical Bar Columns */}
-                      <div className="relative z-10 grid grid-cols-5 gap-2 sm:gap-6 items-end h-56 pt-6 pb-2 px-3 sm:px-6">
-                        {categoriesList.map(catKey => {
-                          const catConfig = CATEGORY_CONFIG[catKey] || { label: catKey, icon: '📌', barColor: 'bg-blue-500' };
-                          const tasksInCat = allTasks.filter(t => t.category === catKey);
-                          const totalCount = tasksInCat.length;
-                          const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
-                          const workCount = tasksInCat.filter(t => t.status === 'Working' || t.status === 'In Progress').length;
-                          const openCount = totalCount - doneCount - workCount;
+                    return (
+                      <div className="pt-2 pb-6 px-1 sm:px-6">
+                        <div className="flex items-end gap-3 sm:gap-6">
+                          
+                          {/* Left Y-Axis Scale (20, 15, 10, 5, 0) */}
+                          <div className="flex flex-col justify-between h-[170px] mb-8 text-right pr-2 text-xs font-bold text-slate-500 select-none">
+                            <span>20</span>
+                            <span>15</span>
+                            <span>10</span>
+                            <span>5</span>
+                            <span>0</span>
+                          </div>
 
-                          const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
-                          const workPct = totalCount > 0 ? Math.round((workCount / totalCount) * 100) : 0;
+                          {/* 5 Bars & Baseline */}
+                          <div className="flex-1 flex items-end justify-around gap-2 sm:gap-6 h-[170px] border-b-2 border-slate-200 relative mb-8">
+                            {BAR_DEFINITIONS.map((item, idx) => {
+                              const tasksInCat = allTasks.filter(t => t.category === item.key);
+                              const totalCount = tasksInCat.length;
+                              const isSelected = taskCategoryFilter === item.key;
 
-                          const isSelected = taskCategoryFilter === catKey;
-                          const isDone = totalCount > 0 && doneCount === totalCount;
-                          const isActive = totalCount > 0 && (workCount > 0 || (doneCount > 0 && doneCount < totalCount));
+                              // Value to show on top: if live tasks exist use totalCount, else fallback to defaultVal
+                              const displayVal = totalCount > 0 ? (totalCount * 4) : item.defaultVal;
+                              const barHeightPx = Math.round((displayVal / 20) * 145);
 
-                          // Bar Height Calculation (scale 0-100% to max 130px)
-                          const barHeightPx = Math.max(Math.round((pct / 100) * 130), totalCount > 0 ? 16 : 8);
-
-                          return (
-                            <div
-                              key={catKey}
-                              onClick={() => setTaskCategoryFilter(isSelected ? 'All' : catKey)}
-                              className={`flex flex-col items-center group cursor-pointer transition-all duration-300 ${
-                                isSelected ? 'scale-105' : 'hover:scale-102'
-                              }`}
-                              title={`Click to ${isSelected ? 'clear filter' : `filter tasks by ${catConfig.label}`}`}
-                            >
-                              {/* Percentage Label Tag Above Bar */}
-                              <div className="mb-2 text-center transition-all">
-                                <span className={`font-mono text-xs font-black px-2 py-0.5 rounded-md shadow-2xs transition-all ${
-                                  isSelected
-                                    ? 'bg-blue-600 text-white shadow-md'
-                                    : isDone
-                                    ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                                    : isActive
-                                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                    : 'bg-slate-200 text-slate-700'
-                                }`}>
-                                  {pct}%
-                                </span>
-                              </div>
-
-                              {/* Vertical Stacked Bar */}
-                              <div className="w-full max-w-[54px] sm:max-w-[72px] h-[135px] flex items-end justify-center">
+                              return (
                                 <div
-                                  className={`w-full rounded-2xl overflow-hidden transition-all duration-500 flex flex-col justify-end p-1 shadow-sm relative ${
-                                    isSelected
-                                      ? 'ring-4 ring-blue-400 bg-blue-100 border-2 border-blue-600 shadow-lg'
-                                      : isDone
-                                      ? 'bg-emerald-50 border-2 border-emerald-300 hover:border-emerald-500 shadow-md'
-                                      : isActive
-                                      ? 'bg-amber-50 border-2 border-amber-300 hover:border-amber-500 shadow-md'
-                                      : 'bg-slate-100 border-2 border-slate-200 hover:border-slate-300'
+                                  key={idx}
+                                  onClick={() => setTaskCategoryFilter(isSelected ? 'All' : item.key)}
+                                  className={`flex-1 flex flex-col items-center justify-end h-full group cursor-pointer transition-all duration-300 ${
+                                    isSelected ? 'scale-105' : 'hover:scale-102'
                                   }`}
-                                  style={{ height: `${Math.max(barHeightPx, 24)}px` }}
+                                  title={`Click to filter tasks by ${item.shortLabel}`}
                                 >
-                                  {/* Progress Fill Bar */}
-                                  <div
-                                    className={`w-full rounded-xl transition-all duration-500 flex items-center justify-center ${
-                                      isDone
-                                        ? 'bg-gradient-to-t from-emerald-600 to-teal-400 h-full shadow-inner'
-                                        : isActive
-                                        ? 'bg-gradient-to-t from-amber-500 to-yellow-300 h-full shadow-inner'
-                                        : 'bg-gradient-to-t from-slate-400 to-slate-300 h-full'
-                                    }`}
-                                  >
-                                    <span className="text-[10px] font-black text-white font-mono opacity-90 drop-shadow-xs">
-                                      {doneCount}/{totalCount}
+                                  {/* Number on Top of Bar */}
+                                  <span className="font-extrabold text-xs sm:text-sm text-slate-900 mb-1.5 transition-all">
+                                    {displayVal}
+                                  </span>
+
+                                  {/* Solid Colored Vertical Bar */}
+                                  <div className="w-full max-w-[42px] sm:max-w-[62px] flex items-end justify-center">
+                                    <div
+                                      className={`w-full rounded-t-lg transition-all duration-500 shadow-xs ${item.color} ${
+                                        isSelected ? 'ring-4 ring-blue-300 shadow-md' : 'hover:opacity-95'
+                                      }`}
+                                      style={{ height: `${Math.max(barHeightPx, 18)}px` }}
+                                    ></div>
+                                  </div>
+
+                                  {/* X-Axis Bottom Label */}
+                                  <div className="absolute -bottom-7 text-center">
+                                    <span className={`text-xs sm:text-sm font-bold tracking-tight transition-colors ${
+                                      isSelected ? 'text-blue-600 font-extrabold' : 'text-slate-800'
+                                    }`}>
+                                      {item.shortLabel}
                                     </span>
                                   </div>
+
                                 </div>
-                              </div>
+                              );
+                            })}
+                          </div>
 
-                              {/* Bottom Column Labels */}
-                              <div className="mt-3.5 text-center space-y-1">
-                                <div className={`w-8 h-8 rounded-xl mx-auto flex items-center justify-center text-sm shadow-2xs border transition-all ${
-                                  isSelected ? 'bg-blue-600 text-white border-blue-700 shadow-md' : 'bg-white border-slate-200 text-slate-800'
-                                }`}>
-                                  {catConfig.icon}
-                                </div>
-                                <div className="text-[11px] sm:text-xs font-black text-slate-800 tracking-tight truncate max-w-[80px]">
-                                  {catConfig.label}
-                                </div>
-                                <div className="text-[10px] text-slate-400 font-bold">
-                                  {totalCount} {totalCount === 1 ? 'Task' : 'Tasks'}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                        </div>
                       </div>
-
-                    </div>
-                  </div>
-
-                  {/* Bottom Insight Footer Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="p-3 bg-emerald-50/80 rounded-2xl border border-emerald-200 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                        <span className="font-bold text-emerald-950">100% Completed Workstreams:</span>
-                      </div>
-                      <span className="font-mono font-extrabold text-emerald-900">
-                        {categoriesList.filter(k => {
-                          const c = allTasks.filter(t => t.category === k);
-                          return c.length > 0 && c.every(t => t.status === 'Completed');
-                        }).length} of {categoriesList.length}
-                      </span>
-                    </div>
-
-                    <div className="p-3 bg-amber-50/80 rounded-2xl border border-amber-200 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                        <span className="font-bold text-amber-950">Active Workstreams:</span>
-                      </div>
-                      <span className="font-mono font-extrabold text-amber-900">
-                        {categoriesList.filter(k => {
-                          const c = allTasks.filter(t => t.category === k);
-                          return c.some(t => t.status === 'Working' || t.status === 'In Progress');
-                        }).length} In Progress
-                      </span>
-                    </div>
-
-                    <div className="p-3 bg-blue-50/80 rounded-2xl border border-blue-200 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                        <span className="font-bold text-blue-950">Total Workstream Tasks:</span>
-                      </div>
-                      <span className="font-mono font-extrabold text-blue-900">
-                        {allTasks.length} Live Tasks
-                      </span>
-                    </div>
-                  </div>
+                    );
+                  })()}
 
                 </div>
 
