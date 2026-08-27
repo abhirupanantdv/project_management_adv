@@ -3919,86 +3919,160 @@
                       </select>
                     </div>
 
-                    {/* OPTIONAL PARENT TASK (CREATE AS SUBTASK) */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="font-bold text-slate-700 flex items-center gap-1">
-                          <span>⚡ Parent Task (Optional - Create as Sub-Task)</span>
-                        </label>
-                        {newTaskParentId && (
-                          <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
-                            Nested Sub-Task Mode
-                          </span>
-                        )}
-                      </div>
-                      <select
-                        value={newTaskParentId}
-                        onChange={(e) => setNewTaskParentId(e.target.value)}
-                        className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:ring-2 focus:outline-none font-semibold transition-all ${
-                          newTaskParentId ? 'bg-purple-50/60 border-purple-300 text-purple-950 ring-2 ring-purple-200' : 'bg-slate-50 border-slate-200 text-slate-700'
-                        }`}
-                      >
-                        <option value="">None (Top-Level Independent Task)</option>
-                        {(() => {
-                          const targetProj = projects.find(p => p.id === (targetProjectForNewTask || selectedProjectId)) || projects[0];
-                          return (targetProj?.tasks || []).map(t => (
-                            <option key={t.id} value={t.id}>
-                              📌 Create sub-task under: {t.id} — {t.name}
-                            </option>
-                          ));
-                        })()}
-                      </select>
-                    </div>
+                    {/* PARENT TASK SELECTION & NESTED SUB-TASK MODE */}
+                    {newTaskParentId ? (() => {
+                      const allTasksList = projects.flatMap(p => p.tasks || []);
+                      const parentObj = allTasksList.find(t => t.id === newTaskParentId);
+                      return (
+                        <div className="p-4 bg-purple-50/95 border-2 border-purple-300 rounded-2xl space-y-3 animate-fade-in shadow-xs">
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="w-7 h-7 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                                ⚡
+                              </span>
+                              <div>
+                                <span className="text-[10px] font-black text-purple-900 uppercase tracking-wider block">
+                                  Nested Sub-Task Mode Activated:
+                                </span>
+                                <div className="text-xs font-black text-purple-950 flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-mono bg-white px-2 py-0.5 rounded-md border border-purple-200 text-purple-800 shadow-2xs">
+                                    {parentObj?.id || newTaskParentId}
+                                  </span>
+                                  <span>{parentObj?.name || 'Selected Parent Task'}</span>
+                                </div>
+                              </div>
+                            </div>
 
-                    {/* TASK TITLE WITH SCOPED DUPLICATE DETECTOR */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
-                        <label className="font-bold text-slate-700">Task Title / Subject *</label>
-                        
-                        <div className="flex items-center gap-1.5">
-                          {/* Search Scope Filter: In Current Project vs All Projects */}
-                          <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-[10px]">
                             <button
                               type="button"
-                              onClick={() => setTaskDuplicateScope('current_project')}
-                              className={`px-2 py-0.5 rounded font-bold cursor-pointer transition-all ${
-                                taskDuplicateScope === 'current_project' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-                              }`}
+                              onClick={() => {
+                                setNewTaskParentId('');
+                                showToast('Switched back to Normal Task mode.');
+                              }}
+                              className="px-2.5 py-1 text-xs font-bold text-purple-800 hover:text-rose-700 bg-white hover:bg-rose-50 rounded-xl border border-purple-200 hover:border-rose-300 transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
                             >
-                              📌 In {targetProjectForNewTask} Only
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setTaskDuplicateScope('all_projects')}
-                              className={`px-2 py-0.5 rounded font-bold cursor-pointer transition-all ${
-                                taskDuplicateScope === 'all_projects' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
-                              }`}
-                            >
-                              🌐 All Projects
+                              <span>✕ Unlink Parent</span>
                             </button>
                           </div>
 
-                          {newTaskTitle.trim().length >= 3 && duplicateNameTasks.length === 0 && (
-                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                              ✅ Unique in {targetProjectForNewTask}
-                            </span>
+                          {/* Existing Sub-tasks inside this Parent */}
+                          {(parentObj?.subtasks || []).length > 0 && (
+                            <div className="p-2.5 bg-white/90 rounded-xl border border-purple-200 space-y-1.5">
+                              <div className="text-[10px] font-bold text-purple-800 flex items-center justify-between">
+                                <span>Existing Sub-Tasks in {parentObj.id} ({(parentObj.subtasks || []).length}):</span>
+                                <span className="font-mono text-[9px] text-purple-600">Checklist</span>
+                              </div>
+                              <div className="space-y-1 max-h-24 overflow-y-auto custom-scrollbar pr-1">
+                                {parentObj.subtasks.map((s, sIdx) => (
+                                  <div key={sIdx} className="text-[11px] flex items-center justify-between text-slate-700 bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
+                                    <span className="truncate flex items-center gap-1.5">
+                                      <span>{s.status === 'Completed' ? '🟢' : '⚪'}</span>
+                                      <span className={s.status === 'Completed' ? 'line-through text-slate-400' : 'font-semibold'}>{s.name}</span>
+                                    </span>
+                                    <span className="text-[9px] text-slate-400 font-mono shrink-0">{s.assignee || 'Unassigned'}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           )}
                         </div>
+                      );
+                    })() : (
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="font-bold text-slate-700 flex items-center gap-1">
+                            <span>⚡ Parent Task (Optional - Create as Sub-Task)</span>
+                          </label>
+                          <span className="text-[10px] text-slate-400 font-medium">
+                            Select below or type search to link
+                          </span>
+                        </div>
+                        <select
+                          value={newTaskParentId}
+                          onChange={(e) => {
+                            setNewTaskParentId(e.target.value);
+                            if (e.target.value) {
+                              setNewTaskTitle('');
+                              showToast(`⚡ Selected ${e.target.value} as Parent Task! Enter sub-task details.`);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2.5 border rounded-xl text-xs focus:ring-2 focus:outline-none font-semibold transition-all bg-slate-50 border-slate-200 text-slate-700"
+                        >
+                          <option value="">None (Top-Level Independent Task)</option>
+                          {(() => {
+                            const targetProj = projects.find(p => p.id === (targetProjectForNewTask || selectedProjectId)) || projects[0];
+                            return (targetProj?.tasks || []).map(t => (
+                              <option key={t.id} value={t.id}>
+                                📌 Create sub-task under: {t.id} — {t.name}
+                              </option>
+                            ));
+                          })()}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* TASK OR SUB-TASK TITLE INPUT */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                        <label className={`font-bold ${newTaskParentId ? 'text-purple-900 font-black' : 'text-slate-700'}`}>
+                          {newTaskParentId ? '⚡ Sub-Task Action Item / Title *' : 'Task Title / Subject *'}
+                        </label>
+                        
+                        {!newTaskParentId && (
+                          <div className="flex items-center gap-1.5">
+                            {/* Search Scope Filter: In Current Project vs All Projects */}
+                            <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-[10px]">
+                              <button
+                                type="button"
+                                onClick={() => setTaskDuplicateScope('current_project')}
+                                className={`px-2 py-0.5 rounded font-bold cursor-pointer transition-all ${
+                                  taskDuplicateScope === 'current_project' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                              >
+                                📌 In {targetProjectForNewTask} Only
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setTaskDuplicateScope('all_projects')}
+                                className={`px-2 py-0.5 rounded font-bold cursor-pointer transition-all ${
+                                  taskDuplicateScope === 'all_projects' ? 'bg-white text-blue-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                              >
+                                🌐 All Projects
+                              </button>
+                            </div>
+
+                            {newTaskTitle.trim().length >= 3 && duplicateNameTasks.length === 0 && (
+                              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                ✅ Unique in {targetProjectForNewTask}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       <input 
                         required 
                         value={newTaskTitle}
                         onChange={(e) => setNewTaskTitle(e.target.value)}
-                        placeholder="e.g. ERPNext Schema & Master Data Migration" 
-                        className={`w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 text-xs focus:ring-2 focus:outline-none font-semibold ${
-                          duplicateNameTasks.length > 0 ? 'border-amber-400 ring-2 ring-amber-300/40 bg-amber-50/20' : 'border-slate-200 focus:ring-blue-500'
+                        placeholder={
+                          newTaskParentId 
+                            ? "Enter sub-task action item (e.g. Write Unit Tests, Review PR, Build Form)..."
+                            : "e.g. ERPNext Schema & Master Data Migration"
+                        } 
+                        className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:ring-2 focus:outline-none font-semibold ${
+                          newTaskParentId
+                            ? 'border-purple-400 bg-purple-50/40 text-purple-950 focus:ring-purple-400'
+                            : duplicateNameTasks.length > 0
+                            ? 'border-amber-400 ring-2 ring-amber-300/40 bg-amber-50/20'
+                            : 'border-slate-200 bg-slate-50 focus:ring-blue-500'
                         }`}
+                        autoFocus={!!newTaskParentId}
                       />
 
-                      {/* LIVE DUPLICATE TASK ALERT BOX (SCOPED TO CURRENT PROJECT BY DEFAULT!) */}
-                      {duplicateNameTasks.length > 0 && (
-                        <div className="mt-2.5 p-3.5 rounded-2xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 space-y-2 animate-fade-in shadow-xs">
+                      {/* LIVE MATCHING / DUPLICATE TASK ALERT BOX */}
+                      {!newTaskParentId && duplicateNameTasks.length > 0 && (
+                        <div className="mt-2.5 p-3.5 rounded-2xl bg-amber-50/95 border-2 border-amber-300 text-amber-950 space-y-2.5 animate-fade-in shadow-xs">
                           <div className="flex items-center justify-between flex-wrap gap-1">
                             <div className="flex items-center gap-1.5 font-black text-[11px] text-amber-900">
                               <span>⚠️</span>
@@ -4010,35 +4084,50 @@
                               </span>
                             </div>
 
-                            <span className="text-[10px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-md">
-                              Click to select & open
+                            <span className="text-[10px] bg-purple-100 text-purple-900 font-bold px-2 py-0.5 rounded-md border border-purple-200">
+                              👉 Click to add as Sub-Task
                             </span>
                           </div>
 
-                          <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
+                          <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
                             {duplicateNameTasks.map((dup, i) => (
-                              <div key={i} className="p-2.5 bg-white rounded-xl border border-amber-300 text-[11px] flex items-center justify-between gap-2 shadow-2xs hover:border-blue-400 transition-all">
+                              <div 
+                                key={i} 
+                                onClick={() => {
+                                  setNewTaskParentId(dup.id);
+                                  setNewTaskTitle('');
+                                  showToast(`⚡ Selected ${dup.id} as Parent Task! Enter your sub-task title below.`);
+                                }}
+                                className="p-3 bg-white rounded-2xl border-2 border-amber-200 hover:border-purple-400 text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs cursor-pointer transition-all hover:bg-purple-50/30 group"
+                              >
                                 <div className="truncate">
-                                  <div className="font-extrabold text-slate-900 truncate">
+                                  <div className="font-extrabold text-slate-900 truncate group-hover:text-purple-900">
                                     {dup.name}
                                   </div>
-                                  <div className="text-[10px] text-slate-500">
+                                  <div className="text-[10px] text-slate-500 pt-0.5">
                                     📁 Project: <strong className="text-blue-600">{dup.projectId}</strong> • 👤 {(dup.assignees || [dup.assignee]).join(', ')} • 📅 {dup.dueDate}
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                  <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold ${
-                                    dup.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' :
-                                    dup.status === 'Working' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
-                                  }`}>
-                                    {dup.status}
-                                  </span>
+
+                                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setNewTaskParentId(dup.id);
+                                      setNewTaskTitle('');
+                                      showToast(`⚡ Selected ${dup.id} as Parent Task! Enter your sub-task title below.`);
+                                    }}
+                                    className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-[10px] cursor-pointer shadow-xs transition-all flex items-center gap-1"
+                                  >
+                                    <span>➕ Add Sub-Task ⚡</span>
+                                  </button>
+
                                   <button
                                     type="button"
                                     onClick={() => handleOpenTaskDetails(dup)}
-                                    className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[10px] cursor-pointer shadow-xs"
+                                    className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-[10px] cursor-pointer"
                                   >
-                                    Open Task 👆
+                                    View 🔍
                                   </button>
                                 </div>
                               </div>
@@ -4189,6 +4278,7 @@
                         onClick={() => {
                           setIsNewTaskModalOpen(false);
                           setNewTaskTitle('');
+                          setNewTaskParentId('');
                         }} 
                         className="px-4 py-2.5 border border-slate-200 hover:bg-slate-100 rounded-xl font-bold cursor-pointer"
                       >
@@ -4196,10 +4286,14 @@
                       </button>
                       <button 
                         type="submit" 
-                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md cursor-pointer flex items-center gap-1.5"
+                        className={`px-5 py-2.5 font-bold rounded-xl shadow-md cursor-pointer flex items-center gap-1.5 transition-all ${
+                          newTaskParentId
+                            ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-200'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200'
+                        }`}
                       >
-                        <span>Create in ERPNext</span>
-                        <span>⚡</span>
+                        <span>{newTaskParentId ? `Create Sub-Task against ${newTaskParentId}` : 'Create Task in ERPNext'}</span>
+                        <span>{newTaskParentId ? '🚀' : '⚡'}</span>
                       </button>
                     </div>
                   </form>
