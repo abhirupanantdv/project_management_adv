@@ -312,17 +312,7 @@
 
       const [dragOverColumn, setDragOverColumn] = useState(null);
       const [collapsedCategories, setCollapsedCategories] = useState({});
-      const [collapsedProjectCardSections, setCollapsedProjectCardSections] = useState({});
       const [notification, setNotification] = useState(null);
-
-      // Accordion dropdown toggles for Project Cards View
-      const toggleProjectCardSection = (secKey) => {
-        setCollapsedProjectCardSections(prev => ({ ...prev, [secKey]: !prev[secKey] }));
-      };
-      const expandAllProjectCardSections = () => setCollapsedProjectCardSections({});
-      const collapseAllProjectCardSections = () => {
-        setCollapsedProjectCardSections({ notOpen: true, working: true, completed: true });
-      };
 
       // Reassign Popover State
       const [reassigningTaskId, setReassigningTaskId] = useState(null);
@@ -2000,11 +1990,11 @@
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-slate-100/90 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300/80 hover:border-slate-800 font-bold text-xs rounded-xl shadow-2xs hover:shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
+                                  className="flex-1 py-2 px-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:from-blue-600 hover:to-indigo-600 text-white font-bold text-xs rounded-xl shadow-xs shadow-slate-900/10 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
                                 >
                                   <span>Open Tasks</span>
-                                  <span className="px-1.5 py-0.5 bg-slate-200 text-slate-700 group-hover/btn:bg-white/20 group-hover/btn:text-white text-[10px] font-mono font-bold rounded-md leading-none transition-colors">{proj.tasks.length}</span>
-                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-400 group-hover/btn:text-slate-200">→</span>
+                                  <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
+                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
                                 </button>
 
                                 <button
@@ -2068,11 +2058,11 @@
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-slate-100/90 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300/80 hover:border-slate-800 font-bold text-xs rounded-xl shadow-2xs hover:shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
+                                  className="flex-1 py-2 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-amber-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
                                 >
                                   <span>Open Tasks</span>
-                                  <span className="px-1.5 py-0.5 bg-slate-200 text-slate-700 group-hover/btn:bg-white/20 group-hover/btn:text-white text-[10px] font-mono font-bold rounded-md leading-none transition-colors">{proj.tasks.length}</span>
-                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-400 group-hover/btn:text-slate-200">→</span>
+                                  <span className="px-1.5 py-0.5 bg-black/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
+                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-amber-100">→</span>
                                 </button>
 
                                 <button
@@ -2136,11 +2126,11 @@
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-slate-100/90 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300/80 hover:border-slate-800 font-bold text-xs rounded-xl shadow-2xs hover:shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
+                                  className="flex-1 py-2 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
                                 >
                                   <span>Open Tasks</span>
-                                  <span className="px-1.5 py-0.5 bg-slate-200 text-slate-700 group-hover/btn:bg-white/20 group-hover/btn:text-white text-[10px] font-mono font-bold rounded-md leading-none transition-colors">{proj.tasks.length}</span>
-                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-400 group-hover/btn:text-slate-200">→</span>
+                                  <span className="px-1.5 py-0.5 bg-black/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
+                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-emerald-100">→</span>
                                 </button>
 
                                 <button
@@ -2160,337 +2150,106 @@
                   </div>
                 ) : (
 
-                /* 📋 PROJECTS CARDS VIEW (3 INTERACTIVE COLLAPSIBLE DROPDOWN BOXES) */
+                /* 📋 PROJECTS CARDS VIEW */
                   <div className="space-y-6">
-                    
-                    {/* Top Toolbar Controls for Dropdown Boxes */}
-                    <div className="flex items-center justify-between px-1 text-xs font-bold text-slate-600">
-                      <div className="flex items-center gap-2">
-                        <span className="text-slate-500">📁</span>
-                        <span>Projects Grouped by 3 Status Dropdown Boxes:</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={expandAllProjectCardSections}
-                          className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer font-bold"
-                        >
-                          Expand All
-                        </button>
-                        <span>•</span>
-                        <button
-                          type="button"
-                          onClick={collapseAllProjectCardSections}
-                          className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer font-bold"
-                        >
-                          Collapse All
-                        </button>
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {visibleProjects.map(proj => {
+                        const isProjDone = proj.status === 'Completed' || proj.percentCompleted === 100;
+                        const isProjWorking = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
+                        const isProjNotOpen = !isProjDone && !isProjWorking;
+
+                        const cardBg = isProjDone
+                          ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-400/20 hover:border-emerald-500'
+                          : isProjWorking
+                          ? 'bg-amber-50/70 border-amber-300 ring-1 ring-amber-400/20 hover:border-amber-500'
+                          : 'bg-rose-50/70 border-rose-300 ring-1 ring-rose-400/20 hover:border-rose-500';
+
+                        const titleColor = isProjDone
+                          ? 'text-emerald-950'
+                          : isProjWorking
+                          ? 'text-amber-950'
+                          : 'text-rose-950';
+
+                        const badgeStyle = isProjDone
+                          ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                          : isProjWorking
+                          ? 'bg-amber-100 text-amber-900 border-amber-300'
+                          : 'bg-rose-100 text-rose-900 border-rose-300';
+
+                        return (
+                          <div
+                            key={proj.id}
+                            className={`group rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border ${cardBg}`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between gap-2 mb-2">
+                                <span className={`font-mono text-xs font-extrabold px-2 py-0.5 rounded-md border ${
+                                  isProjDone ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                  isProjWorking ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                  'bg-rose-100 text-rose-800 border-rose-300'
+                                }`}>
+                                  {proj.id}
+                                </span>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeStyle}`}>
+                                  {isProjDone ? '100% Done' : isProjWorking ? 'In Progress' : 'Not Started'}
+                                </span>
+                              </div>
+
+                              <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight ${titleColor} select-text`}>
+                                {formatProfessionalProjectName(proj.name)}
+                              </h3>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-200/60">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedProjectForDetailsModal(proj.id)}
+                                className="py-2 px-3 bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-200/80 active:scale-[0.98] shadow-2xs"
+                              >
+                                More Details
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedProjectId(proj.id);
+                                  setCurrentPage('project_details');
+                                }}
+                                className="py-2 px-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-xs shadow-blue-500/20 transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn"
+                              >
+                                <span>Open Tasks</span>
+                                <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
+                                <span className="transition-transform group-hover/btn:translate-x-0.5 text-blue-100">→</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleMoveProjectStatus(proj.id, isProjDone ? 'Working' : isProjWorking ? 'Completed' : 'Working')}
+                                className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-semibold text-[11px] rounded-xl border border-slate-200/80 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
+                              >
+                                {isProjDone ? 'Move to Working' : isProjWorking ? 'Complete' : 'Start Working'}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
-                    {/* DROPDOWN BOX 1: 🔴 NOT OPEN / OPEN PROJECTS */}
-                    {(() => {
-                      const isCollapsed = !!collapsedProjectCardSections['notOpen'];
-                      const list = kanbanColumns.notOpen;
+                    <div className="p-6 bg-white border border-slate-200 rounded-3xl text-center space-y-3 shadow-xs">
+                      <div className="text-xs text-slate-500">
+                        Displaying <strong>{visibleProjects.length}</strong> / <strong>{filteredProjects.length}</strong> Live ERPNext Projects
+                      </div>
 
-                      return (
-                        <div className="border-2 border-rose-200 rounded-3xl overflow-hidden shadow-xs bg-white">
-                          <div
-                            onClick={() => toggleProjectCardSection('notOpen')}
-                            className="bg-rose-50/90 hover:bg-rose-100/90 px-5 py-4 flex items-center justify-between cursor-pointer select-none transition-colors border-b border-rose-200"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="text-rose-700 text-sm font-black transition-transform">
-                                {isCollapsed ? '▶' : '▼'}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span className="w-5 h-5 rounded-full bg-rose-500 flex items-center justify-center text-[10px] text-white font-black shadow-xs">📌</span>
-                                <h3 className="text-sm sm:text-base font-black text-rose-950 uppercase tracking-wider">
-                                  Not Open / Open Projects
-                                </h3>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-rose-200 text-rose-900 border border-rose-300 rounded-full text-xs font-black">
-                                {list.length} Projects
-                              </span>
-                              <span className="text-xs text-rose-600 font-bold hidden sm:inline">
-                                {isCollapsed ? 'Click to Open Dropdown ▼' : 'Click to Collapse ▲'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {!isCollapsed && (
-                            <div className="p-5 bg-rose-50/20">
-                              {list.length === 0 ? (
-                                <div className="p-8 text-center text-xs font-semibold text-rose-700/60 bg-white/70 rounded-2xl border border-dashed border-rose-200">
-                                  No Open Projects matching current filters
-                                </div>
-                              ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                  {list.map(proj => (
-                                    <div
-                                      key={proj.id}
-                                      className="group rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border bg-white border-rose-200/90 hover:border-rose-400"
-                                    >
-                                      <div>
-                                        <div className="flex items-center justify-between gap-2 mb-2">
-                                          <span className="font-mono text-xs font-extrabold px-2 py-0.5 rounded-md border bg-rose-50 text-rose-800 border-rose-200">
-                                            {proj.id}
-                                          </span>
-                                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold border bg-rose-100 text-rose-900 border-rose-300">
-                                            Not Started
-                                          </span>
-                                        </div>
-
-                                        <h3 className="text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight text-slate-900 select-text">
-                                          {formatProfessionalProjectName(proj.name)}
-                                        </h3>
-                                      </div>
-
-                                      <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
-                                        <button
-                                          type="button"
-                                          onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                          className="py-2 px-3 bg-slate-100/90 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-300/80 active:scale-[0.98] shadow-2xs hover:shadow-md"
-                                        >
-                                          More Details
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setSelectedProjectId(proj.id);
-                                            setCurrentPage('project_details');
-                                          }}
-                                          className="py-2 px-3.5 bg-slate-100/90 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300/80 hover:border-slate-800 font-extrabold text-xs rounded-xl shadow-2xs hover:shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 group/btn"
-                                        >
-                                          <span>Open Tasks</span>
-                                          <span className="px-1.5 py-0.5 bg-slate-200 text-slate-700 group-hover/btn:bg-white/20 group-hover/btn:text-white text-[10px] font-mono font-bold rounded-md leading-none transition-colors">{proj.tasks.length}</span>
-                                          <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-400 group-hover/btn:text-slate-200">→</span>
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                          className="py-2 px-3 bg-white hover:bg-amber-50 hover:border-amber-300 text-slate-700 hover:text-amber-900 font-semibold text-[11px] rounded-xl border border-slate-200/80 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
-                                        >
-                                          Start Working
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-
-                    {/* DROPDOWN BOX 2: 🟡 WORKING / IN PROGRESS PROJECTS */}
-                    {(() => {
-                      const isCollapsed = !!collapsedProjectCardSections['working'];
-                      const list = kanbanColumns.working;
-
-                      return (
-                        <div className="border-2 border-amber-200 rounded-3xl overflow-hidden shadow-xs bg-white">
-                          <div
-                            onClick={() => toggleProjectCardSection('working')}
-                            className="bg-amber-50/90 hover:bg-amber-100/90 px-5 py-4 flex items-center justify-between cursor-pointer select-none transition-colors border-b border-amber-200"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="text-amber-700 text-sm font-black transition-transform">
-                                {isCollapsed ? '▶' : '▼'}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span className="w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center text-[10px] text-white font-black shadow-xs">⚡</span>
-                                <h3 className="text-sm sm:text-base font-black text-amber-950 uppercase tracking-wider">
-                                  In Progress / Working Projects
-                                </h3>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-amber-200 text-amber-900 border border-amber-300 rounded-full text-xs font-black">
-                                {list.length} Projects
-                              </span>
-                              <span className="text-xs text-amber-600 font-bold hidden sm:inline">
-                                {isCollapsed ? 'Click to Open Dropdown ▼' : 'Click to Collapse ▲'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {!isCollapsed && (
-                            <div className="p-5 bg-amber-50/20">
-                              {list.length === 0 ? (
-                                <div className="p-8 text-center text-xs font-semibold text-amber-700/60 bg-white/70 rounded-2xl border border-dashed border-amber-200">
-                                  No Working Projects matching current filters
-                                </div>
-                              ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                  {list.map(proj => (
-                                    <div
-                                      key={proj.id}
-                                      className="group rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border bg-white border-amber-200/90 hover:border-amber-400"
-                                    >
-                                      <div>
-                                        <div className="flex items-center justify-between gap-2 mb-2">
-                                          <span className="font-mono text-xs font-extrabold px-2 py-0.5 rounded-md border bg-amber-50 text-amber-800 border-amber-200">
-                                            {proj.id}
-                                          </span>
-                                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold border bg-amber-100 text-amber-900 border-amber-300">
-                                            In Progress
-                                          </span>
-                                        </div>
-
-                                        <h3 className="text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight text-slate-900 select-text">
-                                          {formatProfessionalProjectName(proj.name)}
-                                        </h3>
-                                      </div>
-
-                                      <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
-                                        <button
-                                          type="button"
-                                          onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                          className="py-2 px-3 bg-slate-100/90 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-300/80 active:scale-[0.98] shadow-2xs hover:shadow-md"
-                                        >
-                                          More Details
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setSelectedProjectId(proj.id);
-                                            setCurrentPage('project_details');
-                                          }}
-                                          className="py-2 px-3.5 bg-slate-100/90 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300/80 hover:border-slate-800 font-extrabold text-xs rounded-xl shadow-2xs hover:shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 group/btn"
-                                        >
-                                          <span>Open Tasks</span>
-                                          <span className="px-1.5 py-0.5 bg-slate-200 text-slate-700 group-hover/btn:bg-white/20 group-hover/btn:text-white text-[10px] font-mono font-bold rounded-md leading-none transition-colors">{proj.tasks.length}</span>
-                                          <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-400 group-hover/btn:text-slate-200">→</span>
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => handleMoveProjectStatus(proj.id, 'Completed')}
-                                          className="py-2 px-3 bg-white hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 hover:text-emerald-900 font-semibold text-[11px] rounded-xl border border-slate-200/80 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
-                                        >
-                                          Complete
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-
-                    {/* DROPDOWN BOX 3: 🟢 COMPLETED PROJECTS */}
-                    {(() => {
-                      const isCollapsed = !!collapsedProjectCardSections['completed'];
-                      const list = kanbanColumns.completed;
-
-                      return (
-                        <div className="border-2 border-emerald-200 rounded-3xl overflow-hidden shadow-xs bg-white">
-                          <div
-                            onClick={() => toggleProjectCardSection('completed')}
-                            className="bg-emerald-50/90 hover:bg-emerald-100/90 px-5 py-4 flex items-center justify-between cursor-pointer select-none transition-colors border-b border-emerald-200"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="text-emerald-700 text-sm font-black transition-transform">
-                                {isCollapsed ? '▶' : '▼'}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-[10px] text-white font-black shadow-xs">✓</span>
-                                <h3 className="text-sm sm:text-base font-black text-emerald-950 uppercase tracking-wider">
-                                  Completed Projects (100% Done)
-                                </h3>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-emerald-200 text-emerald-900 border border-emerald-300 rounded-full text-xs font-black">
-                                {list.length} Projects
-                              </span>
-                              <span className="text-xs text-emerald-600 font-bold hidden sm:inline">
-                                {isCollapsed ? 'Click to Open Dropdown ▼' : 'Click to Collapse ▲'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {!isCollapsed && (
-                            <div className="p-5 bg-emerald-50/20">
-                              {list.length === 0 ? (
-                                <div className="p-8 text-center text-xs font-semibold text-emerald-700/60 bg-white/70 rounded-2xl border border-dashed border-emerald-200">
-                                  No Completed Projects matching current filters
-                                </div>
-                              ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                  {list.map(proj => (
-                                    <div
-                                      key={proj.id}
-                                      className="group rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border bg-white border-emerald-200/90 hover:border-emerald-400"
-                                    >
-                                      <div>
-                                        <div className="flex items-center justify-between gap-2 mb-2">
-                                          <span className="font-mono text-xs font-extrabold px-2 py-0.5 rounded-md border bg-emerald-50 text-emerald-800 border-emerald-200">
-                                            {proj.id}
-                                          </span>
-                                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold border bg-emerald-100 text-emerald-800 border-emerald-300">
-                                            100% Done
-                                          </span>
-                                        </div>
-
-                                        <h3 className="text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight text-slate-900 select-text">
-                                          {formatProfessionalProjectName(proj.name)}
-                                        </h3>
-                                      </div>
-
-                                      <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
-                                        <button
-                                          type="button"
-                                          onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                          className="py-2 px-3 bg-slate-100/90 text-slate-700 hover:bg-slate-800 hover:text-white hover:border-slate-800 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-300/80 active:scale-[0.98] shadow-2xs hover:shadow-md"
-                                        >
-                                          More Details
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setSelectedProjectId(proj.id);
-                                            setCurrentPage('project_details');
-                                          }}
-                                          className="py-2 px-3.5 bg-slate-100/90 hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300/80 hover:border-slate-800 font-extrabold text-xs rounded-xl shadow-2xs hover:shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 group/btn"
-                                        >
-                                          <span>Open Tasks</span>
-                                          <span className="px-1.5 py-0.5 bg-slate-200 text-slate-700 group-hover/btn:bg-white/20 group-hover/btn:text-white text-[10px] font-mono font-bold rounded-md leading-none transition-colors">{proj.tasks.length}</span>
-                                          <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-400 group-hover/btn:text-slate-200">→</span>
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                          className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-semibold text-[11px] rounded-xl border border-slate-200/80 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
-                                        >
-                                          Move to Working
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-
+                      {visibleCount < filteredProjects.length && (
+                        <button
+                          onClick={() => setVisibleCount(prev => Math.min(prev + 12, filteredProjects.length))}
+                          className="px-6 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 mx-auto cursor-pointer"
+                        >
+                          <span>⬇️</span>
+                          <span>Load More Projects (+12 Next)</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
