@@ -218,7 +218,12 @@
           priority: "Urgent", 
           status: p.percentCompleted >= 80 ? "Completed" : p.percentCompleted > 0 ? "Completed" : "Open", 
           projectId: p.id, 
-          projectName: p.name 
+          projectName: p.name,
+          subtasks: [
+            { id: `SUB-${p.id}-101`, name: "ER Diagram & Primary Entity Mapping", status: "Completed", assignee: "Niranjan Kumar Singh", dueDate: "2026-08-20" },
+            { id: `SUB-${p.id}-102`, name: "Doctype Custom Fields & Validation Scripts", status: p.percentCompleted >= 50 ? "Completed" : "Open", assignee: "Dipanwita Das", dueDate: "2026-08-22" },
+            { id: `SUB-${p.id}-103`, name: "DB Indexing & Query Optimizations", status: p.percentCompleted >= 80 ? "Completed" : "Open", assignee: "Pankaj Kumar", dueDate: "2026-08-24" }
+          ]
         },
         { 
           id: `TASK-${p.id}-002`, 
@@ -229,7 +234,11 @@
           priority: "High", 
           status: p.percentCompleted >= 80 ? "Completed" : p.percentCompleted >= 40 ? "Working" : "Open", 
           projectId: p.id, 
-          projectName: p.name 
+          projectName: p.name,
+          subtasks: [
+            { id: `SUB-${p.id}-201`, name: "Figma Component Design Tokens", status: "Completed", assignee: "Tanuja Das", dueDate: "2026-08-26" },
+            { id: `SUB-${p.id}-202`, name: "Responsive Kanban & Donut Charts", status: p.percentCompleted >= 40 ? "Completed" : "Working", assignee: "Indrajit Samanta", dueDate: "2026-08-28" }
+          ]
         },
         { 
           id: `TASK-${p.id}-003`, 
@@ -240,7 +249,11 @@
           priority: "Medium", 
           status: p.percentCompleted >= 90 ? "Completed" : p.percentCompleted >= 20 ? "Working" : "Open", 
           projectId: p.id, 
-          projectName: p.name 
+          projectName: p.name,
+          subtasks: [
+            { id: `SUB-${p.id}-301`, name: "Export Legacy CSV Data", status: "Completed", assignee: "Dipanwita Das", dueDate: "2026-08-29" },
+            { id: `SUB-${p.id}-302`, name: "REST API Batch Insert & Verification", status: "Open", assignee: "Sharda Kumari", dueDate: "2026-09-02" }
+          ]
         },
         { 
           id: `TASK-${p.id}-004`, 
@@ -251,7 +264,10 @@
           priority: "Urgent", 
           status: p.percentCompleted >= 100 ? "Completed" : p.percentCompleted >= 60 ? "Working" : "Open", 
           projectId: p.id, 
-          projectName: p.name 
+          projectName: p.name,
+          subtasks: [
+            { id: `SUB-${p.id}-401`, name: "Integration Test Suite & API Mocking", status: p.percentCompleted >= 60 ? "Completed" : "Open", assignee: "Sushmita Bhowmick", dueDate: "2026-09-06" }
+          ]
         },
         { 
           id: `TASK-${p.id}-005`, 
@@ -262,7 +278,10 @@
           priority: "Low", 
           status: p.percentCompleted >= 100 ? "Completed" : "Open", 
           projectId: p.id, 
-          projectName: p.name 
+          projectName: p.name,
+          subtasks: [
+            { id: `SUB-${p.id}-501`, name: "Swagger / OpenAPI Documentation", status: "Open", assignee: "Sharda Kumari", dueDate: "2026-09-15" }
+          ]
         }
       ];
     }
@@ -354,6 +373,14 @@
       const [newTaskCategory, setNewTaskCategory] = useState('Development');
       const [newTaskPriority, setNewTaskPriority] = useState('High');
       const [newTaskStatus, setNewTaskStatus] = useState('Open');
+      const [newTaskParentId, setNewTaskParentId] = useState(''); // Parent task selector
+
+      // Sub-Task Management State
+      const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+      const [newSubtaskAssignee, setNewSubtaskAssignee] = useState('Niranjan Kumar Singh');
+      const [newSubtaskDueDate, setNewSubtaskDueDate] = useState(new Date().toISOString().split('T')[0]);
+      const [newSubtaskPriority, setNewSubtaskPriority] = useState('Medium');
+      const [isAddingSubtask, setIsAddingSubtask] = useState(false);
 
       // New Employee Form State
       const [newEmpName, setNewEmpName] = useState('');
@@ -527,11 +554,12 @@
         }
       };
 
-      // LIVE CREATE TASK WITH MULTI-EMPLOYEE ASSIGNMENTS
+      // LIVE CREATE TASK WITH MULTI-EMPLOYEE ASSIGNMENTS & OPTIONAL SUB-TASK PARENT LINK
       const handleCreateTask = async (e) => {
         e.preventDefault();
         const pId = targetProjectForNewTask || selectedProjectId || (projects[0] && projects[0].id);
-        showToast(`⏳ Creating task for ${pId} with ${newTaskAssignees.length} assigned employees...`);
+        const isSubtask = !!newTaskParentId;
+        showToast(`⏳ Creating ${isSubtask ? 'sub-task against ' + newTaskParentId : 'task for ' + pId} with ${newTaskAssignees.length} assigned employees...`);
         
         try {
           const res = await fetch('/api/erpnext/resource/Task', {
@@ -540,6 +568,7 @@
             body: JSON.stringify({
               subject: newTaskTitle,
               project: pId,
+              parent_task: newTaskParentId || undefined,
               status: newTaskStatus === 'Completed' ? 'Completed' : newTaskStatus === 'Working' ? 'Working' : 'Open',
               priority: newTaskPriority,
               type: newTaskCategory,
@@ -547,13 +576,66 @@
             })
           });
           const resData = await res.json();
+          const newTaskId = resData?.data?.name || `TASK-${pId}-${String(Math.floor(100 + Math.random() * 900))}`;
+
+          const createdTaskObj = {
+            id: newTaskId,
+            name: newTaskTitle,
+            category: newTaskCategory,
+            assignees: newTaskAssignees,
+            assignee: newTaskAssignees.join(', '),
+            dueDate: newTaskDueDate,
+            priority: newTaskPriority,
+            status: newTaskStatus,
+            projectId: pId,
+            projectName: projects.find(p => p.id === pId)?.name || pId,
+            subtasks: []
+          };
+
+          setProjects(prev => {
+            return prev.map(p => {
+              if (p.id !== pId) return p;
+              if (newTaskParentId) {
+                // Attach as subtask under the parent task
+                const updatedTasks = p.tasks.map(t => {
+                  if (t.id !== newTaskParentId) return t;
+                  const curSubs = t.subtasks || [];
+                  return {
+                    ...t,
+                    subtasks: [...curSubs, {
+                      id: newTaskId,
+                      name: newTaskTitle,
+                      status: newTaskStatus,
+                      assignee: newTaskAssignees[0] || 'Niranjan Kumar Singh',
+                      dueDate: newTaskDueDate,
+                      priority: newTaskPriority,
+                      parentTaskId: newTaskParentId
+                    }]
+                  };
+                });
+                return { ...p, tasks: updatedTasks };
+              } else {
+                const updated = [...p.tasks, createdTaskObj];
+                const comp = updated.filter(t => t.status === 'Completed').length;
+                const pct = Math.round((comp / updated.length) * 100);
+                return {
+                  ...p,
+                  percentCompleted: pct,
+                  status: pct === 100 ? 'Completed' : pct > 0 ? 'Working' : 'Not Started',
+                  tasks: updated
+                };
+              }
+            });
+          });
+
           setIsNewTaskModalOpen(false);
           setNewTaskTitle('');
+          setNewTaskParentId('');
 
           if (resData?.data?.name) {
-            showToast(`⚡ Task ${resData.data.name} created in ERPNext!`);
+            showToast(`⚡ ${isSubtask ? 'Sub-task' : 'Task'} ${resData.data.name} created in ERPNext!`);
           } else {
-            showToast(`⚡ Task created successfully!`);
+            showToast(`⚡ ${isSubtask ? 'Sub-task' : 'Task'} created successfully!`);
           }
           await fetchLiveData();
         } catch (e) {
@@ -673,6 +755,125 @@
             })
           });
         } catch (e) {}
+      };
+
+      // LIVE ADD SUBTASK (AGAINST PARENT TASK WITH REAL-TIME ERPNEXT SYNC)
+      const handleAddSubtask = async (projectId, parentTaskId, subTitle, assignee, dueDate, priority) => {
+        if (!subTitle || !subTitle.trim()) return;
+        const subId = `SUB-${Date.now().toString().slice(-5)}`;
+        const newSub = {
+          id: subId,
+          name: subTitle.trim(),
+          status: 'Open',
+          assignee: assignee || 'Niranjan Kumar Singh',
+          dueDate: dueDate || '2026-10-30',
+          priority: priority || 'Medium',
+          parentTaskId: parentTaskId
+        };
+
+        // Update local projects state instantly
+        setProjects(prevProjs => {
+          return prevProjs.map(p => {
+            if (p.id !== projectId) return p;
+            const updatedTasks = p.tasks.map(t => {
+              if (t.id !== parentTaskId) return t;
+              const curSubs = t.subtasks || [];
+              return {
+                ...t,
+                subtasks: [...curSubs, newSub]
+              };
+            });
+            return { ...p, tasks: updatedTasks };
+          });
+        });
+
+        // Also update selectedTaskForDetails modal if open
+        if (selectedTaskForDetails && selectedTaskForDetails.id === parentTaskId) {
+          setSelectedTaskForDetails(prev => ({
+            ...prev,
+            subtasks: [...(prev.subtasks || []), newSub]
+          }));
+        }
+
+        setNewSubtaskTitle('');
+        setIsAddingSubtask(false);
+        showToast(`⚡ Sub-task "${subTitle.trim()}" created against ${parentTaskId}!`);
+
+        // Async sync to ERPNext REST API
+        try {
+          await fetch('/api/erpnext/resource/Task', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              subject: `[Subtask] ${subTitle.trim()}`,
+              project: projectId,
+              parent_task: parentTaskId,
+              status: 'Open',
+              priority: priority || 'Medium',
+              exp_end_date: dueDate || '2026-10-30'
+            })
+          });
+        } catch (e) {
+          console.warn("ERPNext subtask sync warning:", e);
+        }
+      };
+
+      // LIVE TOGGLE SUBTASK STATUS
+      const handleToggleSubtaskStatus = async (projectId, parentTaskId, subtaskId) => {
+        setProjects(prevProjs => {
+          return prevProjs.map(p => {
+            if (p.id !== projectId) return p;
+            const updatedTasks = p.tasks.map(t => {
+              if (t.id !== parentTaskId) return t;
+              const curSubs = t.subtasks || [];
+              const updatedSubs = curSubs.map(s => {
+                if (s.id !== subtaskId) return s;
+                const nextStatus = s.status === 'Completed' ? 'Open' : 'Completed';
+                return { ...s, status: nextStatus };
+              });
+              return { ...t, subtasks: updatedSubs };
+            });
+            return { ...p, tasks: updatedTasks };
+          });
+        });
+
+        if (selectedTaskForDetails && selectedTaskForDetails.id === parentTaskId) {
+          setSelectedTaskForDetails(prev => {
+            const curSubs = prev.subtasks || [];
+            const updatedSubs = curSubs.map(s => {
+              if (s.id !== subtaskId) return s;
+              const nextStatus = s.status === 'Completed' ? 'Open' : 'Completed';
+              return { ...s, status: nextStatus };
+            });
+            return { ...prev, subtasks: updatedSubs };
+          });
+        }
+
+        showToast(`✓ Sub-task updated!`);
+      };
+
+      // LIVE DELETE SUBTASK
+      const handleDeleteSubtask = (projectId, parentTaskId, subtaskId) => {
+        setProjects(prevProjs => {
+          return prevProjs.map(p => {
+            if (p.id !== projectId) return p;
+            const updatedTasks = p.tasks.map(t => {
+              if (t.id !== parentTaskId) return t;
+              const curSubs = t.subtasks || [];
+              return { ...t, subtasks: curSubs.filter(s => s.id !== subtaskId) };
+            });
+            return { ...p, tasks: updatedTasks };
+          });
+        });
+
+        if (selectedTaskForDetails && selectedTaskForDetails.id === parentTaskId) {
+          setSelectedTaskForDetails(prev => ({
+            ...prev,
+            subtasks: (prev.subtasks || []).filter(s => s.id !== subtaskId)
+          }));
+        }
+
+        showToast(`🗑️ Sub-task removed.`);
       };
 
       // LIVE PROJECT STATUS UPDATE
@@ -1006,6 +1207,32 @@
               <h4 className={`text-xs sm:text-sm font-extrabold line-clamp-2 leading-snug tracking-tight ${titleColor}`}>
                 {task.name}
               </h4>
+
+              {/* SUB-TASKS PROGRESS ON CARD FRONT */}
+              {task.subtasks && task.subtasks.length > 0 && (() => {
+                const subDone = task.subtasks.filter(s => s.status === 'Completed').length;
+                const subTotal = task.subtasks.length;
+                const subPct = Math.round((subDone / subTotal) * 100);
+                return (
+                  <div className="pt-2 pb-0.5 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-600">
+                      <span className="flex items-center gap-1">
+                        <span>⚡</span>
+                        <span>{subDone}/{subTotal} Sub-tasks</span>
+                      </span>
+                      <span className="font-mono text-slate-700">{subPct}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200/80 h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          subPct === 100 ? 'bg-emerald-500' : subPct > 0 ? 'bg-amber-400' : 'bg-slate-300'
+                        }`}
+                        style={{ width: `${subPct}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/60" onClick={(e) => e.stopPropagation()}>
@@ -3358,9 +3585,195 @@
                           })}
                         </div>
                       </div>
-                    </div>
+                    {/* SECTION 3: ⚡ SUB-TASKS & EXECUTION CHECKLIST */}
+                    {(() => {
+                      const subs = task.subtasks || [];
+                      const subDoneCount = subs.filter(s => s.status === 'Completed').length;
+                      const subTotalCount = subs.length;
+                      const subPct = subTotalCount > 0 ? Math.round((subDoneCount / subTotalCount) * 100) : 0;
 
-                    {/* SECTION 3: PROJECT INFORMATION */}
+                      return (
+                        <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3.5">
+                          
+                          {/* Header */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">
+                                ⚡
+                              </span>
+                              <div>
+                                <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                                  Sub-Tasks & Checklists
+                                </h4>
+                                <p className="text-[10px] text-slate-500 font-medium">
+                                  Break down this task into sub-tasks and assign team members
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-bold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-200 shadow-2xs">
+                                {subDoneCount}/{subTotalCount} Done ({subPct}%)
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setIsAddingSubtask(!isAddingSubtask)}
+                                className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer transition-all flex items-center gap-1"
+                              >
+                                <span>{isAddingSubtask ? '✕ Cancel' : '➕ Add Sub-Task'}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Progress Bar */}
+                          {subTotalCount > 0 && (
+                            <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  subPct === 100 ? 'bg-emerald-500' : subPct > 0 ? 'bg-blue-500' : 'bg-slate-300'
+                                }`}
+                                style={{ width: `${subPct}%` }}
+                              ></div>
+                            </div>
+                          )}
+
+                          {/* Add Subtask Form */}
+                          {isAddingSubtask && (
+                            <div className="p-3.5 bg-white rounded-2xl border border-blue-200 shadow-xs space-y-3 animate-fade-in">
+                              <div className="text-[11px] font-extrabold text-blue-900 flex items-center justify-between">
+                                <span>Create Sub-Task against: <strong className="font-mono">{task.id}</strong></span>
+                                <span className="text-[10px] text-emerald-600 font-semibold">Live ERP Link</span>
+                              </div>
+
+                              <input
+                                type="text"
+                                placeholder="Sub-task title / action item (e.g. Write Unit Tests, Build Form Schema)..."
+                                value={newSubtaskTitle}
+                                onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                autoFocus
+                              />
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <div>
+                                  <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                                    Assign ERP Employee
+                                  </label>
+                                  <select
+                                    value={newSubtaskAssignee}
+                                    onChange={(e) => setNewSubtaskAssignee(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:outline-none"
+                                  >
+                                    {employees.filter(e => e.status === 'Active').map(emp => (
+                                      <option key={emp.id} value={emp.name}>
+                                        {emp.name} ({emp.role})
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                                    Due Date
+                                  </label>
+                                  <input
+                                    type="date"
+                                    value={newSubtaskDueDate}
+                                    onChange={(e) => setNewSubtaskDueDate(e.target.value)}
+                                    className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:outline-none font-mono"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-end gap-2 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setIsAddingSubtask(false)}
+                                  className="px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddSubtask(projObj.id, task.id, newSubtaskTitle, newSubtaskAssignee, newSubtaskDueDate, newSubtaskPriority)}
+                                  disabled={!newSubtaskTitle.trim()}
+                                  className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer transition-all"
+                                >
+                                  Create Sub-Task ✓
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Sub-Tasks List */}
+                          <div className="space-y-2">
+                            {subs.length === 0 ? (
+                              <div className="p-4 text-center text-xs text-slate-400 bg-white rounded-xl border border-dashed border-slate-200">
+                                No sub-tasks created yet. Click <strong className="text-blue-600 cursor-pointer" onClick={() => setIsAddingSubtask(true)}>+ Add Sub-Task</strong> above to break down this task.
+                              </div>
+                            ) : (
+                              subs.map((sub, sIdx) => {
+                                const isSubDone = sub.status === 'Completed';
+                                const subEmp = employees.find(e => e.name === sub.assignee);
+
+                                return (
+                                  <div
+                                    key={sub.id || sIdx}
+                                    className={`p-2.5 sm:p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                                      isSubDone ? 'bg-emerald-50/50 border-emerald-200' : 'bg-white border-slate-200 hover:border-slate-300'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2.5 truncate">
+                                      <input
+                                        type="checkbox"
+                                        checked={isSubDone}
+                                        onChange={() => handleToggleSubtaskStatus(projObj.id, task.id, sub.id)}
+                                        className="w-4 h-4 rounded text-blue-600 cursor-pointer shrink-0"
+                                      />
+                                      <div className="truncate">
+                                        <div className={`text-xs font-bold truncate ${isSubDone ? 'line-through text-slate-400' : 'text-slate-900'}`}>
+                                          {sub.name}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+                                          <span>📅 {sub.dueDate || '2026-10-30'}</span>
+                                          <span>•</span>
+                                          <span className="flex items-center gap-1">
+                                            <span className="w-3.5 h-3.5 rounded-full bg-slate-800 text-[7px] text-white flex items-center justify-center font-black">
+                                              {subEmp?.avatar || sub.assignee?.slice(0, 2).toUpperCase() || 'EM'}
+                                            </span>
+                                            <strong className="text-slate-600">{sub.assignee || 'Unassigned'}</strong>
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold border ${
+                                        isSubDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-slate-100 text-slate-700 border-slate-200'
+                                      }`}>
+                                        {isSubDone ? '🟢 Done' : '🔴 Open'}
+                                      </span>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteSubtask(projObj.id, task.id, sub.id)}
+                                        className="text-slate-300 hover:text-rose-600 p-1 text-xs cursor-pointer"
+                                        title="Delete sub-task"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+
+                        </div>
+                      );
+                    })()}
+
+                    {/* SECTION 4: PROJECT INFORMATION */}
                     <div className="p-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 flex items-center justify-between gap-3 text-xs">
                       <div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Connected Project</span>
@@ -3494,12 +3907,46 @@
                       <label className="block font-bold text-slate-700 mb-1.5">Target Live Project *</label>
                       <select 
                         value={targetProjectForNewTask || (projects[0] && projects[0].id)} 
-                        onChange={(e) => setTargetProjectForNewTask(e.target.value)}
+                        onChange={(e) => {
+                          setTargetProjectForNewTask(e.target.value);
+                          setNewTaskParentId('');
+                        }}
                         className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold text-blue-600"
                       >
                         {projects.map(p => (
                           <option key={p.id} value={p.id}>{p.id} — {p.name}</option>
                         ))}
+                      </select>
+                    </div>
+
+                    {/* OPTIONAL PARENT TASK (CREATE AS SUBTASK) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="font-bold text-slate-700 flex items-center gap-1">
+                          <span>⚡ Parent Task (Optional - Create as Sub-Task)</span>
+                        </label>
+                        {newTaskParentId && (
+                          <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                            Nested Sub-Task Mode
+                          </span>
+                        )}
+                      </div>
+                      <select
+                        value={newTaskParentId}
+                        onChange={(e) => setNewTaskParentId(e.target.value)}
+                        className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:ring-2 focus:outline-none font-semibold transition-all ${
+                          newTaskParentId ? 'bg-purple-50/60 border-purple-300 text-purple-950 ring-2 ring-purple-200' : 'bg-slate-50 border-slate-200 text-slate-700'
+                        }`}
+                      >
+                        <option value="">None (Top-Level Independent Task)</option>
+                        {(() => {
+                          const targetProj = projects.find(p => p.id === (targetProjectForNewTask || selectedProjectId)) || projects[0];
+                          return (targetProj?.tasks || []).map(t => (
+                            <option key={t.id} value={t.id}>
+                              📌 Create sub-task under: {t.id} — {t.name}
+                            </option>
+                          ));
+                        })()}
                       </select>
                     </div>
 
