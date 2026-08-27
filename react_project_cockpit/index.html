@@ -1724,265 +1724,186 @@
             /* ========================================================================= */
               <div className="space-y-6">
                 
-                {/* 🌟 OVERALL COMPLETED & SYSTEM KPI DASHBOARD */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  
-                  {/* CARD 1: 📁 TOTAL PROJECTS OVERVIEW */}
-                  {(() => {
-                    const totalP = systemStats.totalProjs || 0;
-                    const compP = systemStats.compProjs || 0;
-                    const workP = systemStats.workProjs || 0;
-                    const openP = systemStats.openProjs || 0;
-                    const pctP = totalP > 0 ? Math.round((compP / totalP) * 100) : 0;
+                {/* 🌟 SYSTEM-WIDE EXECUTIVE PROJECT & TASK COCKPIT DASHBOARD */}
+                {(() => {
+                  const totalP = systemStats.totalProjs || 0;
+                  const compP = systemStats.compProjs || 0;
+                  const workP = systemStats.workProjs || 0;
+                  const openP = systemStats.openProjs || 0;
+                  const pctP = totalP > 0 ? Math.round((compP / totalP) * 100) : 0;
+                  const workPctP = totalP > 0 ? Math.round((workP / totalP) * 100) : 0;
+                  const openPctP = totalP > 0 ? Math.max(0, 100 - pctP - workPctP) : 0;
 
-                    return (
-                      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center text-sm font-black shadow-2xs">
-                              📁
+                  const totalT = systemStats.totalTasks || 0;
+                  const compT = systemStats.compTasks || 0;
+                  const workT = systemStats.workTasks || 0;
+                  const openT = systemStats.openTasks || 0;
+                  const pctT = totalT > 0 ? Math.round((compT / totalT) * 100) : 0;
+                  const workPctT = totalT > 0 ? Math.round((workT / totalT) * 100) : 0;
+                  const openPctT = totalT > 0 ? Math.max(0, 100 - pctT - workPctT) : 0;
+
+                  return (
+                    <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white border border-slate-700/80 rounded-3xl p-6 sm:p-7 shadow-xl relative overflow-hidden space-y-6">
+                      
+                      {/* Ambient Glows */}
+                      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                      {/* Top Header Row: System Identity & Floating Glass KPI Pods */}
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-mono text-xs font-black px-3 py-1 rounded-lg bg-white/10 text-white border border-white/20 shadow-2xs backdrop-blur-xs">
+                              🌐 ERP LIVE SYNC
                             </span>
-                            <div>
-                              <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">Total Projects</h4>
-                              <p className="text-[11px] text-slate-400 font-medium">System Overview</p>
+                            <span className="px-3 py-1 rounded-full text-xs font-black border shadow-2xs bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+                              🟢 System Active
+                            </span>
+                            <span className="text-xs text-slate-300 font-medium flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
+                              <span>🏢</span>
+                              <span>Anantdv Enterprise Command Center</span>
+                            </span>
+                          </div>
+
+                          <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white leading-tight">
+                            Overall Projects & Tasks Cockpit
+                          </h2>
+                          <p className="text-xs sm:text-sm text-slate-300 font-medium">
+                            Real-time ERPNext synchronization across <strong className="text-white">{totalP} Projects</strong> and <strong className="text-white">{totalT} Tasks</strong>
+                          </p>
+                        </div>
+
+                        {/* Floating Glass KPI Pods */}
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          {/* Projects Pod */}
+                          <div className="px-4 py-2.5 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md flex items-center gap-3 shadow-2xs">
+                            <span className="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-300 flex items-center justify-center text-base font-black">📁</span>
+                            <div className="text-left leading-tight space-y-0.5">
+                              <div className="text-xs font-black text-white">{totalP} Total Projects</div>
+                              <div className="text-[10px] text-slate-300 flex items-center gap-1.5">
+                                <span className="text-emerald-300 font-bold">🟢 {compP}</span>
+                                <span>•</span>
+                                <span className="text-amber-300 font-bold">🟡 {workP}</span>
+                                <span>•</span>
+                                <span className="text-rose-300 font-bold">🔴 {openP}</span>
+                              </div>
                             </div>
                           </div>
-                          <span className="font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200">
-                            {pctP}% Done
-                          </span>
-                        </div>
 
-                        <div className="flex items-baseline justify-between">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-black text-slate-900 font-display tracking-tight">{totalP}</span>
-                            <span className="text-xs font-semibold text-slate-500">Live Projects</span>
+                          {/* Tasks Pod */}
+                          <div className="px-4 py-2.5 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md flex items-center gap-3 shadow-2xs">
+                            <span className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-400/30 text-purple-300 flex items-center justify-center text-base font-black">⚡</span>
+                            <div className="text-left leading-tight space-y-0.5">
+                              <div className="text-xs font-black text-white">{totalT} Total Tasks</div>
+                              <div className="text-[10px] text-slate-300 flex items-center gap-1.5">
+                                <span className="text-emerald-300 font-bold">🟢 {compT}</span>
+                                <span>•</span>
+                                <span className="text-amber-300 font-bold">🟡 {workT}</span>
+                                <span>•</span>
+                                <span className="text-rose-300 font-bold">🔴 {openT}</span>
+                              </div>
+                            </div>
                           </div>
-                          <span className="text-xs font-bold text-slate-500">{compP} of {totalP} Completed</span>
+                        </div>
+                      </div>
+
+                      {/* Velocity Meter 1: Overall Projects Velocity */}
+                      <div className="space-y-2 relative z-10 pt-4 border-t border-white/10">
+                        <div className="flex items-center justify-between text-xs sm:text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-300 font-bold">📁 Overall Projects Velocity:</span>
+                            <span className="font-mono font-black text-emerald-400 text-sm">{pctP}%</span>
+                          </div>
+                          <div className="text-xs font-extrabold text-slate-300">
+                            <strong>{compP}</strong> of <strong>{totalP}</strong> Projects Completed
+                          </div>
                         </div>
 
-                        {/* Progress Bar */}
-                        <div className="space-y-1.5">
-                          <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/60">
+                        {/* Projects Multi-Segment Track */}
+                        <div className="w-full bg-slate-800/80 h-3.5 rounded-full overflow-hidden flex border border-white/20 p-0.5 shadow-inner">
+                          {pctP > 0 && (
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500"
-                              style={{ width: `${Math.max(pctP, 3)}%` }}
+                              className="h-full rounded-l-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 shadow-sm"
+                              style={{ width: `${pctP}%` }}
+                              title={`Completed: ${pctP}% (${compP} projects)`}
                             ></div>
-                          </div>
-                          <div className="flex items-center justify-between text-[11px] pt-1">
-                            <span className="font-extrabold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">🟢 {compP} Done</span>
-                            <span className="font-extrabold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">🟡 {workP} Working</span>
-                            <span className="font-extrabold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">🔴 {openP} Open</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* CARD 2: ⚡ TOTAL TASKS OVERVIEW */}
-                  {(() => {
-                    const totalT = systemStats.totalTasks || 0;
-                    const compT = systemStats.compTasks || 0;
-                    const workT = systemStats.workTasks || 0;
-                    const openT = systemStats.openTasks || 0;
-                    const pctT = totalT > 0 ? Math.round((compT / totalT) * 100) : 0;
-
-                    return (
-                      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center text-sm font-black shadow-2xs">
-                              ⚡
-                            </span>
-                            <div>
-                              <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">Total Tasks</h4>
-                              <p className="text-[11px] text-slate-400 font-medium">Task Velocity</p>
-                            </div>
-                          </div>
-                          <span className="font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-800 border border-purple-200">
-                            {pctT}% Done
-                          </span>
-                        </div>
-
-                        <div className="flex items-baseline justify-between">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-black text-slate-900 font-display tracking-tight">{totalT}</span>
-                            <span className="text-xs font-semibold text-slate-500">Live Tasks</span>
-                          </div>
-                          <span className="text-xs font-bold text-slate-500">{compT} of {totalT} Finished</span>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="space-y-1.5">
-                          <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/60">
+                          )}
+                          {workPctP > 0 && (
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 transition-all duration-500"
-                              style={{ width: `${Math.max(pctT, 3)}%` }}
+                              className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-500"
+                              style={{ width: `${workPctP}%` }}
+                              title={`Working: ${workPctP}% (${workP} projects)`}
                             ></div>
-                          </div>
-                          <div className="flex items-center justify-between text-[11px] pt-1">
-                            <span className="font-extrabold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">🟢 {compT} Done</span>
-                            <span className="font-extrabold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">🟡 {workT} Working</span>
-                            <span className="font-extrabold text-rose-800 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">🔴 {openT} Open</span>
-                          </div>
+                          )}
+                          {openPctP > 0 && (
+                            <div
+                              className="h-full rounded-r-full bg-slate-700/60 transition-all duration-500"
+                              style={{ width: `${openPctP}%` }}
+                              title={`Open: ${openPctP}% (${openP} projects)`}
+                            ></div>
+                          )}
+                        </div>
+
+                        {/* Milestone Percentage Indicators */}
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 px-1 pt-0.5">
+                          <span>0%</span>
+                          <span>25%</span>
+                          <span>50%</span>
+                          <span>75%</span>
+                          <span className="font-bold text-emerald-400">100% Target</span>
                         </div>
                       </div>
-                    );
-                  })()}
 
-                  {/* CARD 3: 📊 OVERALL COMPLETION & HEALTH DONUT */}
-                  {(() => {
-                    const total = kpiPieMode === 'tasks' ? systemStats.totalTasks : systemStats.totalProjs;
-                    const comp = kpiPieMode === 'tasks' ? systemStats.compTasks : systemStats.compProjs;
-                    const work = kpiPieMode === 'tasks' ? systemStats.workTasks : systemStats.workProjs;
-                    const open = kpiPieMode === 'tasks' ? systemStats.openTasks : systemStats.openProjs;
-
-                    const pctComp = total > 0 ? Math.round((comp / total) * 100) : 0;
-                    const pctWork = total > 0 ? Math.round((work / total) * 100) : 0;
-                    const pctOpen = total > 0 ? Math.max(0, 100 - pctComp - pctWork) : 0;
-
-                    const r = 38;
-                    const c = 2 * Math.PI * r;
-                    const lenComp = (pctComp / 100) * c;
-                    const lenWork = (pctWork / 100) * c;
-                    const lenOpen = (pctOpen / 100) * c;
-
-                    return (
-                      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3">
-                        <div className="flex items-center justify-between">
+                      {/* Velocity Meter 2: Overall Tasks Velocity */}
+                      <div className="space-y-2 relative z-10 pt-3 border-t border-white/10">
+                        <div className="flex items-center justify-between text-xs sm:text-sm">
                           <div className="flex items-center gap-2">
-                            <span className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shadow-2xs">
-                              📊
-                            </span>
-                            <div>
-                              <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">Overall Completion</h4>
-                              <p className="text-[11px] text-slate-400 font-medium">Live System Health</p>
-                            </div>
+                            <span className="text-slate-300 font-bold">⚡ Overall Tasks Velocity:</span>
+                            <span className="font-mono font-black text-purple-400 text-sm">{pctT}%</span>
                           </div>
-                          
-                          {/* Live Switch between Tasks & Projects */}
-                          <div className="flex items-center bg-slate-100 p-0.5 rounded-xl text-[10px] font-bold border border-slate-200 shadow-2xs">
-                            <button
-                              type="button"
-                              onClick={() => setKpiPieMode('tasks')}
-                              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                kpiPieMode === 'tasks' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-500 hover:text-slate-800'
-                              }`}
-                            >
-                              ⚡ Tasks
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setKpiPieMode('projects')}
-                              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                kpiPieMode === 'projects' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-500 hover:text-slate-800'
-                              }`}
-                            >
-                              📁 Projects
-                            </button>
+                          <div className="text-xs font-extrabold text-slate-300">
+                            <strong>{compT}</strong> of <strong>{totalT}</strong> Tasks Completed
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                          {/* Donut Chart SVG */}
-                          <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
-                            <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
-                              <circle
-                                cx="50"
-                                cy="50"
-                                r={r}
-                                fill="transparent"
-                                stroke="#f1f5f9"
-                                strokeWidth="16"
-                              />
-                              {lenOpen > 0 && (
-                                <circle
-                                  cx="50"
-                                  cy="50"
-                                  r={r}
-                                  fill="transparent"
-                                  stroke="#f43f5e"
-                                  strokeWidth="16"
-                                  strokeDasharray={`${lenOpen} ${c}`}
-                                  strokeDashoffset={`${-(lenComp + lenWork)}`}
-                                  className="transition-all duration-500"
-                                />
-                              )}
-                              {lenWork > 0 && (
-                                <circle
-                                  cx="50"
-                                  cy="50"
-                                  r={r}
-                                  fill="transparent"
-                                  stroke="#f59e0b"
-                                  strokeWidth="16"
-                                  strokeDasharray={`${lenWork} ${c}`}
-                                  strokeDashoffset={`${-lenComp}`}
-                                  className="transition-all duration-500"
-                                />
-                              )}
-                              {lenComp > 0 && (
-                                <circle
-                                  cx="50"
-                                  cy="50"
-                                  r={r}
-                                  fill="transparent"
-                                  stroke="#10b981"
-                                  strokeWidth="16"
-                                  strokeDasharray={`${lenComp} ${c}`}
-                                  strokeDashoffset="0"
-                                  className="transition-all duration-500"
-                                />
-                              )}
-                            </svg>
-                            {/* Center Percentage */}
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                              <span className="text-sm font-black text-slate-900 font-mono leading-none">
-                                {pctComp}%
-                              </span>
-                              <span className="text-[8px] font-extrabold text-emerald-700 uppercase tracking-tight mt-0.5">
-                                Done
-                              </span>
-                            </div>
-                          </div>
+                        {/* Tasks Multi-Segment Track */}
+                        <div className="w-full bg-slate-800/80 h-3.5 rounded-full overflow-hidden flex border border-white/20 p-0.5 shadow-inner">
+                          {pctT > 0 && (
+                            <div
+                              className="h-full rounded-l-full bg-gradient-to-r from-purple-500 to-indigo-400 transition-all duration-500 shadow-sm"
+                              style={{ width: `${pctT}%` }}
+                              title={`Completed: ${pctT}% (${compT} tasks)`}
+                            ></div>
+                          )}
+                          {workPctT > 0 && (
+                            <div
+                              className="h-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-500"
+                              style={{ width: `${workPctT}%` }}
+                              title={`Working: ${workPctT}% (${workT} tasks)`}
+                            ></div>
+                          )}
+                          {openPctT > 0 && (
+                            <div
+                              className="h-full rounded-r-full bg-slate-700/60 transition-all duration-500"
+                              style={{ width: `${openPctT}%` }}
+                              title={`Open: ${openPctT}% (${openT} tasks)`}
+                            ></div>
+                          )}
+                        </div>
 
-                          {/* Color Breakdown List */}
-                          <div className="flex-1 space-y-1.5 text-xs">
-                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-emerald-50 text-emerald-950 border border-emerald-200">
-                              <div className="flex items-center gap-1.5 truncate">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                                <span className="font-bold text-[10px]">🟢 Completed:</span>
-                              </div>
-                              <span className="font-mono font-extrabold text-[10px] text-emerald-900">
-                                {pctComp}% ({comp})
-                              </span>
-                            </div>
-
-                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-amber-50 text-amber-950 border border-amber-200">
-                              <div className="flex items-center gap-1.5 truncate">
-                                <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
-                                <span className="font-bold text-[10px]">🟡 Working:</span>
-                              </div>
-                              <span className="font-mono font-extrabold text-[10px] text-amber-900">
-                                {pctWork}% ({work})
-                              </span>
-                            </div>
-
-                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-rose-50 text-rose-950 border border-rose-200">
-                              <div className="flex items-center gap-1.5 truncate">
-                                <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
-                                <span className="font-bold text-[10px]">🔴 Open:</span>
-                              </div>
-                              <span className="font-mono font-extrabold text-[10px] text-rose-900">
-                                {pctOpen}% ({open})
-                              </span>
-                            </div>
-                          </div>
+                        {/* Milestone Percentage Indicators */}
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 px-1 pt-0.5">
+                          <span>0%</span>
+                          <span>25%</span>
+                          <span>50%</span>
+                          <span>75%</span>
+                          <span className="font-bold text-purple-400">100% Target</span>
                         </div>
                       </div>
-                    );
-                  })()}
 
-                </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Search & Status Action Toolbar */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
