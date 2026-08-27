@@ -31,9 +31,9 @@ $mimeTypes = @{
     ".ico"  = "image/x-icon"
 }
 
-# Default ERPNext proxy target
-$erpBaseUrl = "http://192.168.101.175"
-$erpToken = "56d7e5504ef6796:9d6e53480ab4aa9"
+# Live ERPNext Target Instance and Token
+$erpBaseUrl = "http://192.168.101.125:8080"
+$erpToken = "f13b1b924ac9194:fa26ad1326aef0c"
 
 while ($listener.IsListening) {
     try {
@@ -52,7 +52,7 @@ while ($listener.IsListening) {
                 $proxyReq = [System.Net.HttpWebRequest]::Create($targetUrl)
                 $proxyReq.Method = $request.HttpMethod
                 $proxyReq.Headers.Add("Authorization", "token $erpToken")
-                $proxyReq.Timeout = 6000
+                $proxyReq.Timeout = 15000
 
                 if ($request.HttpMethod -eq "POST" -or $request.HttpMethod -eq "PUT") {
                     $proxyReq.ContentType = "application/json"
