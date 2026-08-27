@@ -327,7 +327,8 @@
       const [searchTerm, setSearchTerm] = useState('');
       const [statusFilter, setStatusFilter] = useState('All');
       
-      const [taskLayoutMode, setTaskLayoutMode] = useState('kanban');
+      const [taskLayoutMode, setTaskLayoutMode] = useState('list');
+      const [taskStatusFilter, setTaskStatusFilter] = useState('All');
       const [taskPriorityFilter, setTaskPriorityFilter] = useState('All');
       const [taskCategoryFilter, setTaskCategoryFilter] = useState('All');
       const [taskSearchTerm, setTaskSearchTerm] = useState('');
@@ -435,7 +436,7 @@
           const projRes = await fetch('/api/erpnext/resource/Project?fields=["name","project_name","status","percent_complete","expected_end_date","priority","notes","customer"]&limit_page_length=100');
           const projJson = await projRes.json();
 
-          const taskRes = await fetch('/api/erpnext/resource/Task?fields=["name","subject","status","priority","project","exp_end_date","type","parent_task"]&limit_page_length=300');
+          const taskRes = await fetch('/api/erpnext/resource/Task?fields=["name","subject","status","priority","project","exp_end_date","type","parent_task"]&limit_page_length=2000');
           const taskJson = await taskRes.json();
 
           if (projJson && projJson.data && projJson.data.length > 0) {
