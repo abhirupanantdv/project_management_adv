@@ -1958,7 +1958,7 @@
                                   <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
                                     {proj.id}
                                   </span>
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
                                     100% Done
                                   </span>
                                 </div>
@@ -1969,18 +1969,12 @@
                                 >
                                   {proj.name}
                                 </h4>
-                                <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5">
-                                  <span className="w-4 h-4 rounded-full bg-slate-800 text-[8px] font-bold text-white flex items-center justify-center">
-                                    {proj.ownerAvatar}
-                                  </span>
-                                  <span>Owner: <strong className="text-slate-800">{proj.owner}</strong></span>
-                                </div>
                               </div>
 
                               <div className="space-y-1 pt-2 border-t border-slate-100">
                                 <div className="flex items-center justify-between text-[11px]">
-                                  <span className="font-bold text-slate-400">Progress</span>
-                                  <span className="font-mono font-black text-emerald-700">100%</span>
+                                  <span className="font-bold text-slate-400">Progress Status</span>
+                                  <span className="font-mono font-black text-emerald-700">100% Done</span>
                                 </div>
                                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                                   <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }}></div>
@@ -1990,9 +1984,10 @@
                               <div className="flex items-center justify-between pt-1 border-t border-slate-100">
                                 <button
                                   onClick={() => handleOpenProject(proj.id)}
-                                  className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+                                  className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer flex items-center gap-1"
                                 >
-                                  Open Tasks ({proj.tasks.length}) →
+                                  <span>More Details ({proj.tasks.length})</span>
+                                  <span>→</span>
                                 </button>
                                 <button
                                   onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
@@ -2032,7 +2027,7 @@
                                 <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
                                   {proj.id}
                                 </span>
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
                                   In Progress
                                 </span>
                               </div>
@@ -2043,17 +2038,11 @@
                               >
                                 {proj.name}
                               </h4>
-                              <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5">
-                                <span className="w-4 h-4 rounded-full bg-slate-800 text-[8px] font-bold text-white flex items-center justify-center">
-                                  {proj.ownerAvatar}
-                                </span>
-                                <span>Owner: <strong className="text-slate-800">{proj.owner}</strong></span>
-                              </div>
                             </div>
 
                             <div className="space-y-1 pt-2 border-t border-slate-100">
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-bold text-slate-400">Progress</span>
+                                <span className="font-bold text-slate-400">Progress Status</span>
                                 <span className="font-mono font-black text-amber-800">{proj.percentCompleted}%</span>
                               </div>
                               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -2064,9 +2053,10 @@
                             <div className="flex items-center justify-between pt-1 border-t border-slate-100">
                               <button
                                 onClick={() => handleOpenProject(proj.id)}
-                                className="text-[11px] font-bold text-amber-800 hover:underline cursor-pointer"
+                                className="text-[11px] font-bold text-amber-800 hover:underline cursor-pointer flex items-center gap-1"
                               >
-                                Open Tasks ({proj.tasks.length}) →
+                                <span>More Details ({proj.tasks.length})</span>
+                                <span>→</span>
                               </button>
                               <button
                                 onClick={() => handleMoveProjectStatus(proj.id, 'Completed')}
@@ -2116,17 +2106,11 @@
                               >
                                 {proj.name}
                               </h4>
-                              <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5">
-                                <span className="w-4 h-4 rounded-full bg-slate-800 text-[8px] font-bold text-white flex items-center justify-center">
-                                  {proj.ownerAvatar}
-                                </span>
-                                <span>Owner: <strong className="text-slate-800">{proj.owner}</strong></span>
-                              </div>
                             </div>
 
                             <div className="space-y-1 pt-2 border-t border-slate-100">
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-bold text-slate-400">Progress</span>
+                                <span className="font-bold text-slate-400">Progress Status</span>
                                 <span className="font-mono font-black text-rose-700">0%</span>
                               </div>
                               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -2137,9 +2121,10 @@
                             <div className="flex items-center justify-between pt-1 border-t border-slate-100">
                               <button
                                 onClick={() => handleOpenProject(proj.id)}
-                                className="text-[11px] font-bold text-rose-700 hover:underline cursor-pointer"
+                                className="text-[11px] font-bold text-rose-700 hover:underline cursor-pointer flex items-center gap-1"
                               >
-                                Open Tasks ({proj.tasks.length}) →
+                                <span>More Details ({proj.tasks.length})</span>
+                                <span>→</span>
                               </button>
                               <button
                                 onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
@@ -2205,18 +2190,11 @@
                               <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 ${titleColor}`}>
                                 {proj.name}
                               </h3>
-
-                              <div className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                                <span className="w-4 h-4 rounded-full bg-slate-800 text-[8px] font-bold text-white flex items-center justify-center">
-                                  {proj.ownerAvatar}
-                                </span>
-                                <span>Owner: <strong className="text-slate-800">{proj.owner}</strong> • Tasks: <strong className="text-slate-800">{proj.tasks.length}</strong></span>
-                              </div>
                             </div>
 
                             <div className="space-y-1.5 pt-2 border-t border-slate-200/50">
                               <div className="flex items-center justify-between text-xs">
-                                <span className="font-bold text-slate-500 text-[11px] uppercase">Progress</span>
+                                <span className="font-bold text-slate-500 text-[11px] uppercase">Progress Status</span>
                                 <span className={`font-mono font-black text-sm ${
                                   isProjDone ? 'text-emerald-700' : isProjWorking ? 'text-amber-800' : 'text-rose-700'
                                 }`}>
@@ -2233,16 +2211,12 @@
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-xs pt-1 text-slate-600">
-                              <span className="font-mono text-[11px]">📅 Due: <strong>{proj.dueDate}</strong></span>
-                              <span className="font-semibold text-[11px]">👥 {proj.assignedTeamCount} Members</span>
-                            </div>
-
                             <div className="pt-1 text-right">
-                              <span className={`text-[11px] font-bold group-hover:underline ${
+                              <span className={`text-[11px] font-bold group-hover:underline flex items-center justify-end gap-1 ${
                                 isProjDone ? 'text-emerald-700' : isProjWorking ? 'text-amber-800' : 'text-rose-700'
                               }`}>
-                                Open Project Details →
+                                <span>More Details ({proj.tasks.length} Tasks)</span>
+                                <span>→</span>
                               </span>
                             </div>
                           </div>
