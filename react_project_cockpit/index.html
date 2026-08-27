@@ -957,18 +957,17 @@
         setCollapsedCategories(all);
       };
 
-      // RENDER TASK CARD WITH MULTI-EMPLOYEE AVATARS & POPOVER REASSIGN
+      // RENDER TASK CARD (CLEAN FRONT VIEW: DETAILS SHOWN INSIDE MODAL)
       const renderTaskCard = (task) => {
         const isCompleted = task.status === 'Completed';
         const isWorking = task.status === 'Working' || task.status === 'In Progress';
         const isOpen = !isCompleted && !isWorking;
-        const isUrgent = task.priority === 'Urgent';
 
         const cardBg = isCompleted
-          ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-400/20'
+          ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-400/20 hover:border-emerald-500'
           : isWorking
-          ? 'bg-amber-50/75 border-amber-300 ring-1 ring-amber-400/20'
-          : 'bg-rose-50/70 border-rose-300 ring-1 ring-rose-400/20';
+          ? 'bg-amber-50/75 border-amber-300 ring-1 ring-amber-400/20 hover:border-amber-500'
+          : 'bg-rose-50/70 border-rose-300 ring-1 ring-rose-400/20 hover:border-rose-500';
 
         const titleColor = isCompleted
           ? 'text-emerald-950'
@@ -976,171 +975,54 @@
           ? 'text-amber-950'
           : 'text-rose-950';
 
-        const catConfig = CATEGORY_CONFIG[task.category] || CATEGORY_CONFIG["Development"];
-        const isReassignOpen = reassigningTaskId === task.id;
-        const currentAssignees = task.assignees || [task.assignee || 'Niranjan Kumar Singh'];
-
         return (
           <div
             key={task.id}
             draggable="true"
             onDragStart={(e) => handleDragStartTask(e, task.id)}
             onClick={() => handleOpenTaskDetails(task)}
-            title="Click to view/edit details or drag to change column"
-            className={`relative p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3 cursor-pointer hover:scale-[1.01] ${cardBg} ${isUrgent ? 'border-rose-400 ring-2 ring-rose-300/50 shadow-xs' : 'shadow-xs hover:shadow-md'}`}
+            title="Click to open full task details (Assigned ERP Persons, Due Date, Category, Priority)"
+            className={`relative p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3.5 cursor-pointer hover:scale-[1.01] shadow-xs hover:shadow-md ${cardBg}`}
           >
             <div>
-              <div className="flex items-center justify-between gap-1.5 flex-wrap mb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className={`font-mono text-xs font-black px-2 py-0.5 rounded border ${
-                    isCompleted ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
-                    isWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
-                    'bg-rose-100 text-rose-900 border-rose-300'
-                  }`}>
-                    {task.id}
-                  </span>
+              <div className="flex items-center justify-between gap-1.5 mb-2">
+                <span className={`font-mono text-xs font-black px-2 py-0.5 rounded border ${
+                  isCompleted ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                  isWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                  'bg-rose-100 text-rose-900 border-rose-300'
+                }`}>
+                  {task.id}
+                </span>
 
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md border ${catConfig.bgClass}`}>
-                    <span>{catConfig.icon}</span>
-                    <span>{catConfig.label}</span>
-                  </span>
-                </div>
-
-                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] rounded-md border ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
-                  {task.priority === 'Urgent' && '🔥 Urgent'}
-                  {task.priority === 'High' && '▲ High'}
-                  {task.priority === 'Medium' && '● Medium'}
-                  {task.priority === 'Low' && '▽ Low'}
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                  isCompleted ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                  isWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                  'bg-rose-100 text-rose-900 border-rose-300'
+                }`}>
+                  {isCompleted ? '100% Done' : isWorking ? 'In Progress' : 'Not Started'}
                 </span>
               </div>
 
-              <h4 className={`text-xs sm:text-sm font-extrabold line-clamp-2 mt-1.5 flex items-center gap-1.5 ${titleColor}`}>
-                {isCompleted && <span className="text-emerald-600 shrink-0">✅</span>}
-                {isWorking && <span className="text-amber-600 shrink-0">⚡</span>}
-                {isOpen && <span className="text-rose-600 shrink-0">📌</span>}
-                <span className="hover:underline">{task.name}</span>
+              <h4 className={`text-xs sm:text-sm font-extrabold line-clamp-2 leading-snug tracking-tight ${titleColor}`}>
+                {task.name}
               </h4>
-
-              {/* MULTI-EMPLOYEE ASSIGNMENT DISPLAY & REASSIGN POPUP */}
-              <div className="relative flex items-center justify-between text-[11px] text-slate-600 pt-2.5 mt-2 border-t border-slate-200/60">
-                
-                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => setReassigningTaskId(isReassignOpen ? null : task.id)}
-                    title="Click to assign/unassign multiple ERP employees (up to 10+ persons)"
-                    className="flex items-center gap-1.5 font-medium hover:text-blue-700 bg-white/90 hover:bg-blue-50 px-2 py-1 rounded-xl border border-slate-200/90 shadow-2xs transition-all cursor-pointer"
-                  >
-                    <div className="flex -space-x-1.5 overflow-hidden">
-                      {currentAssignees.slice(0, 4).map((name, idx) => {
-                        const empObj = employees.find(e => e.name === name);
-                        const av = empObj?.avatar || name.slice(0, 2).toUpperCase();
-                        return (
-                          <span key={idx} title={name} className="w-4 h-4 rounded-full bg-slate-800 ring-1 ring-white text-[7px] font-black text-white flex items-center justify-center">
-                            {av}
-                          </span>
-                        );
-                      })}
-                    </div>
-
-                    <strong className="text-slate-900 truncate max-w-[110px]">
-                      {currentAssignees.length === 1 ? currentAssignees[0] : `${currentAssignees[0]} +${currentAssignees.length - 1}`}
-                    </strong>
-                    <span className="text-[9px] text-slate-400">👥✏️</span>
-                  </button>
-
-                  {/* MULTI-EMPLOYEE CHECKBOX REASSIGN POPOVER */}
-                  {isReassignOpen && (
-                    <div className="absolute left-0 bottom-full mb-2 z-50 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 w-72 space-y-2 animate-fade-in">
-                      <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                          Assign ERP Employees ({currentAssignees.length} selected)
-                        </div>
-                        <button onClick={() => setReassigningTaskId(null)} className="text-slate-400 hover:text-slate-600 text-xs">✕</button>
-                      </div>
-
-                      <div className="max-h-56 overflow-y-auto custom-scrollbar space-y-1">
-                        {employees.map(emp => {
-                          const isAssigned = currentAssignees.includes(emp.name);
-                          return (
-                            <div
-                              key={emp.id}
-                              onClick={() => handleToggleTaskAssignee(currentProj.id, task.id, emp.name)}
-                              className={`px-2 py-1.5 rounded-xl text-xs flex items-center justify-between gap-2 transition-all cursor-pointer select-none ${
-                                isAssigned ? 'bg-blue-50 border border-blue-200 text-blue-950 font-bold' : 'hover:bg-slate-50 text-slate-700'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 truncate">
-                                <span className="w-5 h-5 rounded-full bg-slate-800 text-[8px] font-bold text-white flex items-center justify-center shrink-0">
-                                  {emp.avatar}
-                                </span>
-                                <div className="truncate">
-                                  <div className="truncate font-semibold flex items-center gap-1">
-                                    <span>{emp.name}</span>
-                                    {emp.status === 'Active' ? (
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                                    ) : (
-                                      <span className="text-[8px] text-slate-400 shrink-0">(Left)</span>
-                                    )}
-                                  </div>
-                                  <div className="text-[9px] text-slate-400 truncate">{emp.role}</div>
-                                </div>
-                              </div>
-
-                              <input
-                                type="checkbox"
-                                checked={isAssigned}
-                                onChange={() => {}}
-                                className="rounded text-blue-600 pointer-events-none"
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <div className="pt-1.5 border-t border-slate-100 flex justify-between items-center text-[10px]">
-                        <span className="text-slate-400">Can select 10+ persons</span>
-                        <button
-                          onClick={() => setReassigningTaskId(null)}
-                          className="px-3 py-1 bg-blue-600 text-white font-bold rounded-lg cursor-pointer"
-                        >
-                          Done ✓
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <span className="flex items-center gap-1 font-mono text-slate-600">
-                  <span>📅</span>
-                  <strong className="text-slate-800">{task.dueDate}</strong>
-                </span>
-              </div>
             </div>
 
-            <div className="flex items-center justify-between pt-1 border-t border-slate-200/50" onClick={(e) => e.stopPropagation()}>
-              <div>
-                {isCompleted && (
-                  <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300">
-                    Completed
-                  </span>
-                )}
-                {isWorking && (
-                  <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-md bg-amber-100 text-amber-900 border border-amber-300">
-                    Working
-                  </span>
-                )}
-                {isOpen && (
-                  <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-md bg-rose-100 text-rose-900 border border-rose-300">
-                    Open
-                  </span>
-                )}
-              </div>
+            <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/60" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() => handleOpenTaskDetails(task)}
+                className="py-1.5 px-2.5 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-300 hover:border-slate-900 active:scale-[0.98] shadow-2xs flex items-center gap-1"
+              >
+                <span>More Details</span>
+              </button>
 
               <div className="flex items-center gap-1.5">
                 {isCompleted && (
                   <button
+                    type="button"
                     onClick={() => handleTaskStatusChange(currentProj.id, task.id, 'Working')}
-                    className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer"
+                    className="py-1.5 px-2.5 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-semibold text-[11px] rounded-xl border border-slate-300 hover:border-slate-900 shadow-2xs cursor-pointer active:scale-[0.98] transition-all"
                   >
                     Reopen ⚡
                   </button>
@@ -1148,14 +1030,16 @@
                 {isWorking && (
                   <>
                     <button
+                      type="button"
                       onClick={() => handleTaskStatusChange(currentProj.id, task.id, 'Open')}
-                      className="px-2 py-1 text-[11px] font-bold rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 cursor-pointer"
+                      className="py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-semibold text-[11px] rounded-xl border border-slate-300 hover:border-slate-900 shadow-2xs cursor-pointer active:scale-[0.98] transition-all"
                     >
                       Open 📌
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleTaskStatusChange(currentProj.id, task.id, 'Completed')}
-                      className="px-2.5 py-1 text-[11px] font-extrabold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-md cursor-pointer flex items-center gap-1"
+                      className="py-1.5 px-2.5 bg-emerald-600 hover:bg-slate-900 text-white font-bold text-[11px] rounded-xl transition-all shadow-xs cursor-pointer active:scale-[0.98] flex items-center gap-1"
                     >
                       <span>Done</span>
                       <span>✓</span>
@@ -1165,14 +1049,16 @@
                 {isOpen && (
                   <>
                     <button
+                      type="button"
                       onClick={() => handleTaskStatusChange(currentProj.id, task.id, 'Working')}
-                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-amber-300 bg-amber-100 hover:bg-amber-200 text-amber-950 transition-colors shadow-2xs cursor-pointer"
+                      className="py-1.5 px-2.5 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-semibold text-[11px] rounded-xl border border-slate-300 hover:border-slate-900 shadow-2xs cursor-pointer active:scale-[0.98] transition-all"
                     >
                       Work ⚡
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleTaskStatusChange(currentProj.id, task.id, 'Completed')}
-                      className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-2xs cursor-pointer"
+                      className="py-1.5 px-2.5 bg-emerald-600 hover:bg-slate-900 text-white font-bold text-[11px] rounded-xl transition-all shadow-xs cursor-pointer active:scale-[0.98]"
                     >
                       Done ✓
                     </button>
@@ -3302,6 +3188,242 @@
                       type="button"
                       onClick={() => setSelectedProjectForDetailsModal(null)}
                       className="px-5 py-2 text-xs font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      Close Window ✕
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ========================================================================= */}
+          {/* MODAL 1: TASK DETAILS MODAL (OPENED VIA TASK CLICK / MORE DETAILS)         */}
+          {/* ========================================================================= */}
+          {selectedTaskForDetails && (() => {
+            const task = selectedTaskForDetails;
+            const isCompleted = task.status === 'Completed';
+            const isWorking = task.status === 'Working' || task.status === 'In Progress';
+            const isOpen = !isCompleted && !isWorking;
+            const currentAssignees = task.assignees || (task.assignee ? [task.assignee] : ['Niranjan Kumar Singh']);
+            const catConfig = CATEGORY_CONFIG[task.category] || CATEGORY_CONFIG["Development"];
+            const projObj = projects.find(p => p.id === (task.projectId || selectedProjectId)) || currentProj;
+
+            return (
+              <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full shadow-2xl space-y-0 animate-fade-in max-h-[90vh] overflow-hidden flex flex-col">
+                  
+                  {/* Modal Header */}
+                  <div className="p-6 pb-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50/50">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-md bg-white border border-slate-200 text-slate-800 shadow-2xs">
+                          {task.id}
+                        </span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                          isCompleted ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                          isWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                          'bg-rose-100 text-rose-900 border-rose-300'
+                        }`}>
+                          {isCompleted ? '🟢 Completed (Done)' : isWorking ? '🟡 In Progress / Working' : '🔴 Open / Not Started'}
+                        </span>
+                        <span className="text-xs text-slate-500 font-mono">
+                          📁 {projObj?.id || task.projectId}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-extrabold text-slate-900 tracking-tight leading-snug">
+                        {task.name}
+                      </h3>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTaskForDetails(null)}
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors cursor-pointer text-base"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1">
+                    
+                    {/* SECTION 1: CATEGORY, PRIORITY & DUE DATE */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {/* Work Category / Type */}
+                      <div className="p-3 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-1">
+                        <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                          🏷️ Category / Type
+                        </span>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg border ${catConfig.bgClass}`}>
+                          <span>{catConfig.icon}</span>
+                          <span>{catConfig.label}</span>
+                        </span>
+                      </div>
+
+                      {/* Priority */}
+                      <div className="p-3 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-1">
+                        <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                          ⚡ Priority
+                        </span>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg border ${PRIORITY_STYLES[task.priority] || PRIORITY_STYLES['Medium']}`}>
+                          {task.priority === 'Urgent' && '🔥 Urgent'}
+                          {task.priority === 'High' && '▲ High'}
+                          {task.priority === 'Medium' && '● Medium'}
+                          {task.priority === 'Low' && '▽ Low'}
+                        </span>
+                      </div>
+
+                      {/* Due Date */}
+                      <div className="p-3 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-1">
+                        <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                          📅 Due Date
+                        </span>
+                        <div className="font-mono text-xs font-bold text-slate-800 flex items-center gap-1 pt-0.5">
+                          <span>📅</span>
+                          <span>{task.dueDate || '2026-10-30'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SECTION 2: ASSIGNED ERP PERSONS (WITH REASSIGN CHECKLIST) */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                          👥 Assigned Person(s) ({currentAssignees.length} Assigned)
+                        </span>
+                        <span className="text-[11px] text-blue-600 font-semibold">Select below to change assignees</span>
+                      </div>
+
+                      {/* Currently Assigned Person Pills */}
+                      <div className="flex flex-wrap gap-2">
+                        {currentAssignees.map((assigneeName, idx) => {
+                          const empObj = employees.find(e => e.name.toLowerCase() === assigneeName.toLowerCase());
+                          return (
+                            <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-950 border border-blue-200 text-xs font-bold shadow-2xs">
+                              <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[8px] flex items-center justify-center">
+                                {empObj?.avatar || assigneeName.slice(0, 2).toUpperCase()}
+                              </span>
+                              <span>{assigneeName}</span>
+                              <span className="text-[10px] text-slate-400 font-normal">({empObj?.role || 'Staff'})</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Multi-Employee ERP Staff Assign Selector */}
+                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                        <div className="text-[11px] font-extrabold text-slate-600 flex items-center justify-between">
+                          <span>Click to Assign / Unassign ERP Staff (10+ Staff):</span>
+                          <span className="text-slate-400 font-mono text-[10px]">ERP Master Link</span>
+                        </div>
+
+                        <div className="max-h-44 overflow-y-auto custom-scrollbar space-y-1 pr-1">
+                          {employees.map(emp => {
+                            const isAssigned = currentAssignees.includes(emp.name);
+                            return (
+                              <div
+                                key={emp.id}
+                                onClick={() => handleToggleTaskAssignee(projObj.id, task.id, emp.name)}
+                                className={`px-2.5 py-1.5 rounded-xl text-xs flex items-center justify-between gap-2 transition-all cursor-pointer select-none ${
+                                  isAssigned ? 'bg-white border-2 border-blue-500 text-blue-950 font-bold shadow-2xs' : 'bg-white/80 hover:bg-white border border-slate-200/80 text-slate-700'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 truncate">
+                                  <span className="w-5 h-5 rounded-full bg-slate-800 text-[8px] font-bold text-white flex items-center justify-center shrink-0">
+                                    {emp.avatar}
+                                  </span>
+                                  <div className="truncate">
+                                    <div className="truncate font-semibold flex items-center gap-1">
+                                      <span>{emp.name}</span>
+                                      {emp.status === 'Active' ? (
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                      ) : (
+                                        <span className="text-[8px] text-slate-400 shrink-0">(Left)</span>
+                                      )}
+                                    </div>
+                                    <div className="text-[9px] text-slate-400 truncate">{emp.role} • {emp.dept}</div>
+                                  </div>
+                                </div>
+
+                                <input
+                                  type="checkbox"
+                                  checked={isAssigned}
+                                  onChange={() => {}}
+                                  className="rounded text-blue-600 pointer-events-none"
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SECTION 3: PROJECT INFORMATION */}
+                    <div className="p-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 flex items-center justify-between gap-3 text-xs">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Connected Project</span>
+                        <div className="font-extrabold text-slate-900">{projObj?.name || task.projectId}</div>
+                        <div className="text-[11px] text-slate-500">ID: <strong className="font-mono text-blue-600">{projObj?.id || task.projectId}</strong> • Company: {projObj?.company || 'Anantdv Enterprise'}</div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedTaskForDetails(null);
+                          handleOpenProject(projObj?.id || task.projectId);
+                        }}
+                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer shrink-0"
+                      >
+                        View Project →
+                      </button>
+                    </div>
+
+                    {/* SECTION 4: TASK STATUS ACTIONS */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                      <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider block">
+                        Change Task Status (Live ERPNext Sync):
+                      </span>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleTaskStatusChange(projObj.id, task.id, 'Open')}
+                          className={`py-2 px-3 rounded-xl font-extrabold text-xs border transition-all cursor-pointer ${
+                            isOpen ? 'bg-rose-600 text-white border-rose-700 shadow-md ring-2 ring-rose-300' : 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-200'
+                          }`}
+                        >
+                          🔴 Open
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleTaskStatusChange(projObj.id, task.id, 'Working')}
+                          className={`py-2 px-3 rounded-xl font-extrabold text-xs border transition-all cursor-pointer ${
+                            isWorking ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-300' : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200'
+                          }`}
+                        >
+                          🟡 Working
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleTaskStatusChange(projObj.id, task.id, 'Completed')}
+                          className={`py-2 px-3 rounded-xl font-extrabold text-xs border transition-all cursor-pointer ${
+                            isCompleted ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-2 ring-emerald-300' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-200'
+                          }`}
+                        >
+                          🟢 Completed
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="p-4 px-6 border-t border-slate-100 flex items-center justify-end bg-slate-50/80">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTaskForDetails(null)}
+                      className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
                     >
                       Close Window ✕
                     </button>
