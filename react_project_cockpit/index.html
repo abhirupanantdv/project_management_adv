@@ -1943,8 +1943,8 @@
                 {projectViewMode === 'kanban' ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                     
-                    {/* COLUMN 1: 🔴 NOT OPEN / OPEN PROJECTS (LEFT) */}
-                    <div className="bg-slate-100/70 border border-slate-200/90 rounded-3xl p-4.5 space-y-4 shadow-xs backdrop-blur-xs">
+                    {/* COLUMN 1: ⚪ NOT OPEN / OPEN PROJECTS (LEFT - SLATE) */}
+                    <div className="bg-slate-100/80 border border-slate-200/90 rounded-3xl p-4.5 space-y-4 shadow-xs backdrop-blur-xs">
                       <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
                         <div className="flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
@@ -1979,7 +1979,7 @@
                                   </span>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text group-hover:text-blue-600 transition-colors">
+                                <h4 className="text-[14.5px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text group-hover:text-slate-700 transition-colors">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
@@ -1991,17 +1991,17 @@
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-blue-500/15 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
+                                  className="flex-1 py-2 px-3 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold text-xs rounded-xl shadow-xs shadow-slate-900/10 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
                                 >
                                   <span>Open Tasks</span>
                                   <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-blue-100">→</span>
+                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
                                 </button>
 
                                 <button
                                   type="button"
                                   onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                  className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 font-semibold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
+                                  className="py-2 px-3 bg-white hover:bg-sky-50 hover:border-sky-300 text-slate-700 hover:text-sky-900 border border-slate-200 font-semibold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
                                 >
                                   Start Working
                                 </button>
@@ -2012,43 +2012,43 @@
                       </div>
                     </div>
 
-                    {/* COLUMN 2: 🟡 WORKING PROJECTS (MIDDLE) */}
-                    <div className="bg-slate-100/70 border border-slate-200/90 rounded-3xl p-4.5 space-y-4 shadow-xs backdrop-blur-xs">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
+                    {/* COLUMN 2: 🔵 WORKING PROJECTS (MIDDLE - SKY / BLUE) */}
+                    <div className="bg-sky-50/40 border border-sky-200/70 rounded-3xl p-4.5 space-y-4 shadow-xs backdrop-blur-xs">
+                      <div className="flex items-center justify-between pb-3 border-b border-sky-200/70">
                         <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
-                          <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                          <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
+                          <h3 className="text-xs font-extrabold text-sky-950 uppercase tracking-wider">
                             Working Projects
                           </h3>
                         </div>
-                        <span className="px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-extrabold font-mono">
+                        <span className="px-2.5 py-0.5 bg-sky-100 text-sky-900 rounded-full text-xs font-extrabold font-mono border border-sky-200">
                           {kanbanColumns.working.length}
                         </span>
                       </div>
 
                       <div className="space-y-3.5 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
                         {kanbanColumns.working.length === 0 ? (
-                          <div className="p-8 text-center text-xs font-semibold text-slate-400 bg-white/60 rounded-2xl border border-dashed border-slate-200">
+                          <div className="p-8 text-center text-xs font-semibold text-sky-600/60 bg-sky-50/30 rounded-2xl border border-dashed border-sky-200">
                             No Working Projects
                           </div>
                         ) : (
                           kanbanColumns.working.map(proj => (
                             <div
                               key={proj.id}
-                              className="group bg-white border border-blue-200/70 hover:border-blue-300 rounded-2xl p-4.5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5"
+                              className="group bg-white border border-sky-200/80 hover:border-sky-400 rounded-2xl p-4.5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5"
                             >
                               <div>
                                 <div className="flex items-center justify-between gap-2 mb-2.5">
-                                  <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/60">
+                                  <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200/60">
                                     {proj.id}
                                   </span>
-                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80 flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-800 border border-sky-200/90 flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
                                     <span>In Progress</span>
                                   </span>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text group-hover:text-blue-600 transition-colors">
+                                <h4 className="text-[14.5px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text group-hover:text-sky-700 transition-colors">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
@@ -2060,7 +2060,7 @@
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-blue-500/15 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
+                                  className="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-blue-500/15 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn"
                                 >
                                   <span>Open Tasks</span>
                                   <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
@@ -2081,37 +2081,37 @@
                       </div>
                     </div>
 
-                    {/* COLUMN 3: 🟢 COMPLETED PROJECTS (RIGHT / LAST) */}
-                    <div className="bg-slate-100/70 border border-slate-200/90 rounded-3xl p-4.5 space-y-4 shadow-xs backdrop-blur-xs">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
+                    {/* COLUMN 3: 🟢 COMPLETED PROJECTS (RIGHT - EMERALD) */}
+                    <div className="bg-emerald-50/40 border border-emerald-200/70 rounded-3xl p-4.5 space-y-4 shadow-xs backdrop-blur-xs">
+                      <div className="flex items-center justify-between pb-3 border-b border-emerald-200/70">
                         <div className="flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                          <h3 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                          <h3 className="text-xs font-extrabold text-emerald-950 uppercase tracking-wider">
                             Completed Projects
                           </h3>
                         </div>
-                        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-extrabold font-mono">
+                        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-900 rounded-full text-xs font-extrabold font-mono border border-emerald-200">
                           {kanbanColumns.completed.length}
                         </span>
                       </div>
 
                       <div className="space-y-3.5 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
                         {kanbanColumns.completed.length === 0 ? (
-                          <div className="p-8 text-center text-xs font-semibold text-slate-400 bg-white/60 rounded-2xl border border-dashed border-slate-200">
+                          <div className="p-8 text-center text-xs font-semibold text-emerald-700/60 bg-emerald-50/30 rounded-2xl border border-dashed border-emerald-200">
                             No Completed Projects
                           </div>
                         ) : (
                           kanbanColumns.completed.map(proj => (
                             <div
                               key={proj.id}
-                              className="group bg-white border border-emerald-200/70 hover:border-emerald-300 rounded-2xl p-4.5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5"
+                              className="group bg-white border border-emerald-200/80 hover:border-emerald-400 rounded-2xl p-4.5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5"
                             >
                               <div>
                                 <div className="flex items-center justify-between gap-2 mb-2.5">
                                   <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200/60">
                                     {proj.id}
                                   </span>
-                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center gap-1.5">
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/90 flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                     <span>100% Done</span>
                                   </span>
@@ -2161,22 +2161,34 @@
                         const isProjWorking = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
                         const isProjNotOpen = !isProjDone && !isProjWorking;
 
-                        const badgeStyle = isProjDone
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
+                        const cardBorder = isProjDone
+                          ? 'border-emerald-200 hover:border-emerald-400'
                           : isProjWorking
-                          ? 'bg-blue-50 text-blue-700 border-blue-200/80'
-                          : 'bg-slate-100 text-slate-600 border-slate-200';
+                          ? 'border-sky-200 hover:border-sky-400'
+                          : 'border-slate-200 hover:border-slate-300';
+
+                        const badgeStyle = isProjDone
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200/90'
+                          : isProjWorking
+                          ? 'bg-sky-50 text-sky-800 border-sky-200/90'
+                          : 'bg-slate-100 text-slate-700 border-slate-200';
 
                         const dotColor = isProjDone
                           ? 'bg-emerald-500'
                           : isProjWorking
-                          ? 'bg-blue-500'
+                          ? 'bg-sky-500'
                           : 'bg-slate-400';
+
+                        const btnGradient = isProjDone
+                          ? 'from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white'
+                          : isProjWorking
+                          ? 'from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                          : 'from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white';
 
                         return (
                           <div
                             key={proj.id}
-                            className="group bg-white border border-slate-200 hover:border-slate-300 rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4"
+                            className={`group bg-white rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border ${cardBorder}`}
                           >
                             <div>
                               <div className="flex items-center justify-between gap-2 mb-2.5">
@@ -2209,11 +2221,11 @@
                                   setSelectedProjectId(proj.id);
                                   setCurrentPage('project_details');
                                 }}
-                                className="py-2 px-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs shadow-blue-500/15 transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn"
+                                className={`py-2 px-3.5 bg-gradient-to-r ${btnGradient} font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn`}
                               >
                                 <span>Open Tasks</span>
                                 <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                <span className="transition-transform group-hover/btn:translate-x-0.5 text-blue-100">→</span>
+                                <span className="transition-transform group-hover/btn:translate-x-0.5 opacity-80">→</span>
                               </button>
 
                               <button
