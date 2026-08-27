@@ -1955,7 +1955,7 @@
                               className="group bg-white border border-emerald-300 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-emerald-500 transition-all flex flex-col justify-between space-y-3"
                             >
                               <div>
-                                <div className="flex items-center justify-between gap-2 mb-1.5">
+                                <div className="flex items-center justify-between gap-2 mb-2">
                                   <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
                                     {proj.id}
                                   </span>
@@ -1969,24 +1969,13 @@
                                 </h4>
                               </div>
 
-                              <div className="space-y-1 pt-2 border-t border-slate-100">
-                                <div className="flex items-center justify-between text-[11px]">
-                                  <span className="font-bold text-slate-400">Progress Status</span>
-                                  <span className="font-mono font-black text-emerald-700">100% Done</span>
-                                </div>
-                                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }}></div>
-                                </div>
-                              </div>
-
                               <div className="flex items-center justify-between gap-1.5 pt-2.5 border-t border-slate-100">
                                 <button
                                   type="button"
                                   onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                  className="px-2.5 py-1.5 text-[10px] font-extrabold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer flex items-center gap-1 border border-slate-200"
-                                  title="View Project Details & Workers"
+                                  className="px-2 py-1 text-[10px] font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border border-slate-200"
                                 >
-                                  <span>🔍 More Details</span>
+                                  More Details
                                 </button>
 
                                 <button
@@ -1995,19 +1984,17 @@
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="px-3 py-1.5 text-[10px] font-extrabold rounded-xl bg-emerald-100 hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-300 shadow-2xs transition-all cursor-pointer flex items-center gap-1 active:scale-95"
-                                  title="Open Project Task Board"
+                                  className="px-2.5 py-1 text-[10px] font-extrabold rounded-lg bg-emerald-100 hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-300 shadow-2xs transition-all cursor-pointer active:scale-95"
                                 >
-                                  <span>📋 Open Tasks ({proj.tasks.length})</span>
-                                  <span>→</span>
+                                  Open Tasks ({proj.tasks.length})
                                 </button>
 
                                 <button
                                   type="button"
                                   onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                  className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl border bg-slate-50 hover:bg-slate-100 text-slate-600 cursor-pointer shrink-0"
+                                  className="px-2 py-1 text-[10px] font-semibold rounded-lg border bg-slate-50 hover:bg-slate-100 text-slate-600 cursor-pointer shrink-0"
                                 >
-                                  Move to Working ⚡
+                                  Move to Working
                                 </button>
                               </div>
                             </div>
@@ -2037,7 +2024,7 @@
                             className="group bg-white border border-amber-300 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-amber-500 transition-all flex flex-col justify-between space-y-3"
                           >
                             <div>
-                              <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <div className="flex items-center justify-between gap-2 mb-2">
                                 <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
                                   {proj.id}
                                 </span>
@@ -2051,24 +2038,13 @@
                               </h4>
                             </div>
 
-                            <div className="space-y-1 pt-2 border-t border-slate-100">
-                              <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-bold text-slate-400">Progress Status</span>
-                                <span className="font-mono font-black text-amber-800">{proj.percentCompleted}%</span>
-                              </div>
-                              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                <div className="h-full bg-amber-400 rounded-full" style={{ width: `${proj.percentCompleted}%` }}></div>
-                              </div>
-                            </div>
-
                             <div className="flex items-center justify-between gap-1.5 pt-2.5 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                className="px-2.5 py-1.5 text-[10px] font-extrabold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer flex items-center gap-1 border border-slate-200"
-                                title="View Project Details & Workers"
+                                className="px-2 py-1 text-[10px] font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border border-slate-200"
                               >
-                                <span>🔍 More Details</span>
+                                More Details
                               </button>
 
                               <button
@@ -2077,19 +2053,17 @@
                                   setSelectedProjectId(proj.id);
                                   setCurrentPage('project_details');
                                 }}
-                                className="px-3 py-1.5 text-[10px] font-extrabold rounded-xl bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 border border-amber-300 shadow-2xs transition-all cursor-pointer flex items-center gap-1 active:scale-95"
-                                title="Open Project Task Board"
+                                className="px-2.5 py-1 text-[10px] font-extrabold rounded-lg bg-amber-100 hover:bg-amber-500 hover:text-white text-amber-900 border border-amber-300 shadow-2xs transition-all cursor-pointer active:scale-95"
                               >
-                                <span>📋 Open Tasks ({proj.tasks.length})</span>
-                                <span>→</span>
+                                Open Tasks ({proj.tasks.length})
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handleMoveProjectStatus(proj.id, 'Completed')}
-                                className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl border bg-emerald-50 text-emerald-800 hover:bg-emerald-100 cursor-pointer shrink-0"
+                                className="px-2 py-1 text-[10px] font-semibold rounded-lg border bg-emerald-50 text-emerald-800 hover:bg-emerald-100 cursor-pointer shrink-0"
                               >
-                                Done ✓
+                                Complete
                               </button>
                             </div>
                           </div>
@@ -2118,7 +2092,7 @@
                             className="group bg-white border border-rose-300 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-rose-500 transition-all flex flex-col justify-between space-y-3"
                           >
                             <div>
-                              <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <div className="flex items-center justify-between gap-2 mb-2">
                                 <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200">
                                   {proj.id}
                                 </span>
@@ -2132,24 +2106,13 @@
                               </h4>
                             </div>
 
-                            <div className="space-y-1 pt-2 border-t border-slate-100">
-                              <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-bold text-slate-400">Progress Status</span>
-                                <span className="font-mono font-black text-rose-700">0%</span>
-                              </div>
-                              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                <div className="h-full bg-slate-200 rounded-full" style={{ width: '4%' }}></div>
-                              </div>
-                            </div>
-
                             <div className="flex items-center justify-between gap-1.5 pt-2.5 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                className="px-2.5 py-1.5 text-[10px] font-extrabold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer flex items-center gap-1 border border-slate-200"
-                                title="View Project Details & Workers"
+                                className="px-2 py-1 text-[10px] font-bold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer border border-slate-200"
                               >
-                                <span>🔍 More Details</span>
+                                More Details
                               </button>
 
                               <button
@@ -2158,19 +2121,17 @@
                                   setSelectedProjectId(proj.id);
                                   setCurrentPage('project_details');
                                 }}
-                                className="px-3 py-1.5 text-[10px] font-extrabold rounded-xl bg-rose-100 hover:bg-rose-600 hover:text-white text-rose-900 border border-rose-300 shadow-2xs transition-all cursor-pointer flex items-center gap-1 active:scale-95"
-                                title="Open Project Task Board"
+                                className="px-2.5 py-1 text-[10px] font-extrabold rounded-lg bg-rose-100 hover:bg-rose-600 hover:text-white text-rose-900 border border-rose-300 shadow-2xs transition-all cursor-pointer active:scale-95"
                               >
-                                <span>📋 Open Tasks ({proj.tasks.length})</span>
-                                <span>→</span>
+                                Open Tasks ({proj.tasks.length})
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                className="px-2.5 py-1.5 text-[10px] font-bold rounded-xl border border-amber-300 bg-amber-100 hover:bg-amber-200 text-amber-900 cursor-pointer shrink-0"
+                                className="px-2 py-1 text-[10px] font-semibold rounded-lg border border-amber-300 bg-amber-100 hover:bg-amber-200 text-amber-900 cursor-pointer shrink-0"
                               >
-                                Start Working ⚡
+                                Start Working
                               </button>
                             </div>
                           </div>
@@ -2222,7 +2183,7 @@
                                   {proj.id}
                                 </span>
                                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeStyle}`}>
-                                  {isProjDone ? '🟢 Completed (100%)' : isProjWorking ? '🟡 Working' : '🔴 Open / Not Started'}
+                                  {isProjDone ? '100% Done' : isProjWorking ? 'In Progress' : 'Not Started'}
                                 </span>
                               </div>
 
@@ -2231,32 +2192,13 @@
                               </h3>
                             </div>
 
-                            <div className="space-y-1.5 pt-2 border-t border-slate-200/50">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="font-bold text-slate-500 text-[11px] uppercase">Progress Status</span>
-                                <span className={`font-mono font-black text-sm ${
-                                  isProjDone ? 'text-emerald-700' : isProjWorking ? 'text-amber-800' : 'text-rose-700'
-                                }`}>
-                                  {proj.percentCompleted}%
-                                </span>
-                              </div>
-                              <div className="w-full bg-white/80 h-2.5 rounded-full overflow-hidden border border-slate-200/50">
-                                <div
-                                  className={`h-full rounded-full transition-all duration-300 ${
-                                    isProjDone ? 'bg-emerald-500' : isProjWorking ? 'bg-amber-400' : 'bg-rose-400'
-                                  }`}
-                                  style={{ width: `${Math.max(proj.percentCompleted, isProjNotOpen ? 4 : proj.percentCompleted)}%` }}
-                                ></div>
-                              </div>
-                            </div>
-
                             <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/50">
                               <button
                                 type="button"
                                 onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                className="px-3 py-1.5 text-xs font-bold rounded-xl bg-white hover:bg-slate-100 text-slate-700 transition-all cursor-pointer flex items-center gap-1 border border-slate-200"
+                                className="px-3 py-1.5 text-xs font-bold rounded-xl bg-white hover:bg-slate-100 text-slate-700 transition-all cursor-pointer border border-slate-200"
                               >
-                                <span>🔍 More Details</span>
+                                More Details
                               </button>
 
                               <button
@@ -2265,10 +2207,9 @@
                                   setSelectedProjectId(proj.id);
                                   setCurrentPage('project_details');
                                 }}
-                                className="px-4 py-1.5 text-xs font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+                                className="px-3.5 py-1.5 text-xs font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all cursor-pointer active:scale-95"
                               >
-                                <span>📋 Open Tasks ({proj.tasks.length})</span>
-                                <span>→</span>
+                                Open Tasks ({proj.tasks.length})
                               </button>
                             </div>
                           </div>
