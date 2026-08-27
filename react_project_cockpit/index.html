@@ -1179,21 +1179,11 @@
                     <h1 className="text-lg font-black font-display bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                       Project Cockpit
                     </h1>
-                    <p className="text-[11px] text-slate-500 font-medium">ERPNext Enterprise System ({systemStats.totalProjs} Projects • {systemStats.totalTasks} Tasks • {employees.length} ERP Staff)</p>
+                    <p className="text-[11px] text-slate-500 font-medium">ERPNext Enterprise System ({systemStats.totalProjs} Projects • {systemStats.totalTasks} Tasks)</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  
-                  {/* Manage ERP Employee Directory Button */}
-                  <button
-                    onClick={() => setIsEmployeeModalOpen(true)}
-                    title="Manage ERP Employee List (View 40 employees, Active/Left status)"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl text-[11px] font-bold text-purple-900 transition-all cursor-pointer"
-                  >
-                    <span>👥</span>
-                    <span>ERP Staff ({employees.length})</span>
-                  </button>
 
                   {/* Live Sync Status & Manual Refresh Button */}
                   <button
