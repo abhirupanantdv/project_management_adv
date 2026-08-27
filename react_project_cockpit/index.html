@@ -1286,105 +1286,54 @@
                   );
                 })()}
 
-                {/* 2. 📊 PROJECT PROGRESS (BAR CHART) - EXACT MATCH */}
-                <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs space-y-6">
-                  
-                  {/* Card Title */}
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
-                      Project Progress (Bar Chart)
-                    </h3>
-                    
-                    {taskCategoryFilter !== 'All' && (
-                      <button
-                        type="button"
-                        onClick={() => setTaskCategoryFilter('All')}
-                        className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-2xs"
-                      >
-                        ✕ Show All
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Chart Graphic Area */}
-                  {(() => {
-                    // Category Config with Exact Colors matching user's image:
-                    // 1. Blue (#2563eb), 2. Green (#10b981), 3. Orange (#f59e0b), 4. Purple (#8b5cf6), 5. Red (#ef4444)
-                    const BAR_DEFINITIONS = [
-                      { key: 'Development', label: 'IT / Development', shortLabel: 'IT', color: 'bg-[#2563eb]', defaultVal: 16 },
-                      { key: 'UI', label: 'Operations / UI', shortLabel: 'Operations', color: 'bg-[#10b981]', defaultVal: 9 },
-                      { key: 'Migration', label: 'Finance / Migration', shortLabel: 'Finance', color: 'bg-[#f59e0b]', defaultVal: 7 },
-                      { key: 'Testing', label: 'HR / Testing', shortLabel: 'HR', color: 'bg-[#8b5cf6]', defaultVal: 5 },
-                      { key: 'Documentation', label: 'Sales / Docs', shortLabel: 'Sales', color: 'bg-[#ef4444]', defaultVal: 3 },
-                    ];
+                {/* 2. 5-CATEGORY PROGRESS SUMMARY STRIP */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {categoriesList.map(catKey => {
+                    const catConfig = CATEGORY_CONFIG[catKey];
+                    const tasksInCat = allTasks.filter(t => t.category === catKey);
+                    const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
+                    const totalCount = tasksInCat.length;
+                    const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+                    const isCollapsed = !!collapsedCategories[catKey];
+                    const isSelectedCat = taskCategoryFilter === catKey;
 
                     return (
-                      <div className="pt-2 pb-6 px-1 sm:px-6">
-                        <div className="flex items-end gap-3 sm:gap-6">
-                          
-                          {/* Left Y-Axis Scale (20, 15, 10, 5, 0) */}
-                          <div className="flex flex-col justify-between h-[170px] mb-8 text-right pr-2 text-xs font-bold text-slate-500 select-none">
-                            <span>20</span>
-                            <span>15</span>
-                            <span>10</span>
-                            <span>5</span>
-                            <span>0</span>
+                      <div
+                        key={catKey}
+                        onClick={() => toggleCategory(catKey)}
+                        className={`bg-white border rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
+                          isSelectedCat ? 'border-blue-400 ring-2 ring-blue-300' : 'border-slate-200/90'
+                        }`}
+                        title="Click to expand/collapse category tasks"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs">{catConfig.icon}</span>
+                            <span className="text-xs font-black text-slate-800">
+                              {catConfig.label}
+                            </span>
                           </div>
+                          <span className="font-mono text-xs font-black text-slate-900">
+                            {pct}%
+                          </span>
+                        </div>
 
-                          {/* 5 Bars & Baseline */}
-                          <div className="flex-1 flex items-end justify-around gap-2 sm:gap-6 h-[170px] border-b-2 border-slate-200 relative mb-8">
-                            {BAR_DEFINITIONS.map((item, idx) => {
-                              const tasksInCat = allTasks.filter(t => t.category === item.key);
-                              const totalCount = tasksInCat.length;
-                              const isSelected = taskCategoryFilter === item.key;
+                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-300 ${catConfig.barColor}`}
+                            style={{ width: `${pct}%` }}
+                          ></div>
+                        </div>
 
-                              // Value to show on top: if live tasks exist use totalCount, else fallback to defaultVal
-                              const displayVal = totalCount > 0 ? (totalCount * 4) : item.defaultVal;
-                              const barHeightPx = Math.round((displayVal / 20) * 145);
-
-                              return (
-                                <div
-                                  key={idx}
-                                  onClick={() => setTaskCategoryFilter(isSelected ? 'All' : item.key)}
-                                  className={`flex-1 flex flex-col items-center justify-end h-full group cursor-pointer transition-all duration-300 ${
-                                    isSelected ? 'scale-105' : 'hover:scale-102'
-                                  }`}
-                                  title={`Click to filter tasks by ${item.shortLabel}`}
-                                >
-                                  {/* Number on Top of Bar */}
-                                  <span className="font-extrabold text-xs sm:text-sm text-slate-900 mb-1.5 transition-all">
-                                    {displayVal}
-                                  </span>
-
-                                  {/* Solid Colored Vertical Bar */}
-                                  <div className="w-full max-w-[42px] sm:max-w-[62px] flex items-end justify-center">
-                                    <div
-                                      className={`w-full rounded-t-lg transition-all duration-500 shadow-xs ${item.color} ${
-                                        isSelected ? 'ring-4 ring-blue-300 shadow-md' : 'hover:opacity-95'
-                                      }`}
-                                      style={{ height: `${Math.max(barHeightPx, 18)}px` }}
-                                    ></div>
-                                  </div>
-
-                                  {/* X-Axis Bottom Label */}
-                                  <div className="absolute -bottom-7 text-center">
-                                    <span className={`text-xs sm:text-sm font-bold tracking-tight transition-colors ${
-                                      isSelected ? 'text-blue-600 font-extrabold' : 'text-slate-800'
-                                    }`}>
-                                      {item.shortLabel}
-                                    </span>
-                                  </div>
-
-                                </div>
-                              );
-                            })}
-                          </div>
-
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5 font-medium">
+                          <span>{doneCount}/{totalCount} Done</span>
+                          <span className="text-[10px] text-slate-400 font-bold">
+                            {isCollapsed ? '▲' : '▼'}
+                          </span>
                         </div>
                       </div>
                     );
-                  })()}
-
+                  })}
                 </div>
 
                 {/* 3. TASK CONTROLS & VIEW SWITCHER TOOLBAR */}
