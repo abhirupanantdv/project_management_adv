@@ -300,7 +300,8 @@
 
       const [currentPage, setCurrentPage] = useState('projects_list');
       const [projectViewMode, setProjectViewMode] = useState('kanban');
-      const [cardCategoryTab, setCardCategoryTab] = useState('completed'); // 'completed', 'working', 'notOpen'
+      const [cardCategoryTab, setCardCategoryTab] = useState('notOpen'); // 'notOpen' (Left), 'working' (Middle), 'completed' (Right)
+      const [cardLayoutMode, setCardLayoutMode] = useState('list'); // 'list' or 'grid'
       const [selectedProjectId, setSelectedProjectId] = useState('PROJ-0084');
       const [visibleCount, setVisibleCount] = useState(12);
       const [searchTerm, setSearchTerm] = useState('');
@@ -2232,75 +2233,13 @@
                   </div>
                 ) : (
 
-                /* 📋 PROJECTS CARDS VIEW (3 Category Views: Completed, In Progress, Open) */
+                /* 📋 PROJECTS CARDS VIEW (Left: Open, Middle: In Progress, Right: Completed) */
                   <div className="space-y-6">
                     
-                    {/* 3 CATEGORY TABS SELECTOR */}
+                    {/* 3 CATEGORY TABS SELECTOR (Left: Open, Middle: In Progress, Right: Completed) */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                       
-                      {/* TAB 1: 🟢 COMPLETED PROJECTS */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCardCategoryTab('completed');
-                          setVisibleCount(12);
-                        }}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
-                          cardCategoryTab === 'completed'
-                            ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-2 ring-emerald-300'
-                            : 'bg-white hover:bg-emerald-50/50 text-slate-800 border-emerald-200 hover:border-emerald-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-base shadow-2xs ${
-                            cardCategoryTab === 'completed' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
-                          }`}>✓</span>
-                          <div>
-                            <h4 className="font-extrabold text-sm tracking-tight leading-none">Completed Projects</h4>
-                            <p className={`text-[11px] mt-1 font-medium ${
-                              cardCategoryTab === 'completed' ? 'text-emerald-100' : 'text-slate-500'
-                            }`}>100% Done Projects</p>
-                          </div>
-                        </div>
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-black font-mono shadow-2xs ${
-                          cardCategoryTab === 'completed' ? 'bg-white text-emerald-900' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        }`}>
-                          {kanbanColumns.completed.length}
-                        </span>
-                      </button>
-
-                      {/* TAB 2: 🟡 IN PROGRESS / WORKING PROJECTS */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCardCategoryTab('working');
-                          setVisibleCount(12);
-                        }}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
-                          cardCategoryTab === 'working'
-                            ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-300'
-                            : 'bg-white hover:bg-amber-50/50 text-slate-800 border-amber-200 hover:border-amber-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-base shadow-2xs ${
-                            cardCategoryTab === 'working' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-900'
-                          }`}>⚡</span>
-                          <div>
-                            <h4 className="font-extrabold text-sm tracking-tight leading-none">In Progress Projects</h4>
-                            <p className={`text-[11px] mt-1 font-medium ${
-                              cardCategoryTab === 'working' ? 'text-amber-100' : 'text-slate-500'
-                            }`}>Active Working Projects</p>
-                          </div>
-                        </div>
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-black font-mono shadow-2xs ${
-                          cardCategoryTab === 'working' ? 'bg-white text-amber-900' : 'bg-amber-100 text-amber-900 border border-amber-200'
-                        }`}>
-                          {kanbanColumns.working.length}
-                        </span>
-                      </button>
-
-                      {/* TAB 3: 🔴 OPEN / NOT STARTED PROJECTS */}
+                      {/* TAB 1 (LEFT): 🔴 OPEN / NOT STARTED PROJECTS */}
                       <button
                         type="button"
                         onClick={() => {
@@ -2331,11 +2270,73 @@
                         </span>
                       </button>
 
+                      {/* TAB 2 (MIDDLE): 🟡 IN PROGRESS / WORKING PROJECTS */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCardCategoryTab('working');
+                          setVisibleCount(12);
+                        }}
+                        className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
+                          cardCategoryTab === 'working'
+                            ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-300'
+                            : 'bg-white hover:bg-amber-50/50 text-slate-800 border-amber-200 hover:border-amber-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-base shadow-2xs ${
+                            cardCategoryTab === 'working' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-900'
+                          }`}>⚡</span>
+                          <div>
+                            <h4 className="font-extrabold text-sm tracking-tight leading-none">In Progress Projects</h4>
+                            <p className={`text-[11px] mt-1 font-medium ${
+                              cardCategoryTab === 'working' ? 'text-amber-100' : 'text-slate-500'
+                            }`}>Active Working Projects</p>
+                          </div>
+                        </div>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-black font-mono shadow-2xs ${
+                          cardCategoryTab === 'working' ? 'bg-white text-amber-900' : 'bg-amber-100 text-amber-900 border border-amber-200'
+                        }`}>
+                          {kanbanColumns.working.length}
+                        </span>
+                      </button>
+
+                      {/* TAB 3 (RIGHT): 🟢 COMPLETED PROJECTS */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCardCategoryTab('completed');
+                          setVisibleCount(12);
+                        }}
+                        className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
+                          cardCategoryTab === 'completed'
+                            ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-2 ring-emerald-300'
+                            : 'bg-white hover:bg-emerald-50/50 text-slate-800 border-emerald-200 hover:border-emerald-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-base shadow-2xs ${
+                            cardCategoryTab === 'completed' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
+                          }`}>✓</span>
+                          <div>
+                            <h4 className="font-extrabold text-sm tracking-tight leading-none">Completed Projects</h4>
+                            <p className={`text-[11px] mt-1 font-medium ${
+                              cardCategoryTab === 'completed' ? 'text-emerald-100' : 'text-slate-500'
+                            }`}>100% Done Projects</p>
+                          </div>
+                        </div>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-black font-mono shadow-2xs ${
+                          cardCategoryTab === 'completed' ? 'bg-white text-emerald-900' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                        }`}>
+                          {kanbanColumns.completed.length}
+                        </span>
+                      </button>
+
                     </div>
 
-                    {/* ACTIVE CATEGORY CARD GRID */}
+                    {/* ACTIVE CATEGORY CARD LIST / GRID */}
                     {(() => {
-                      const categoryProjects = (kanbanColumns[cardCategoryTab] || kanbanColumns.completed).filter(p => {
+                      const categoryProjects = (kanbanColumns[cardCategoryTab] || kanbanColumns.notOpen).filter(p => {
                         if (!searchTerm) return true;
                         const s = searchTerm.toLowerCase();
                         return (p.name && p.name.toLowerCase().includes(s)) || (p.id && p.id.toLowerCase().includes(s));
@@ -2346,7 +2347,7 @@
                         return (
                           <div className="p-12 text-center bg-white border border-dashed border-slate-300 rounded-3xl space-y-2">
                             <p className="text-sm font-bold text-slate-600">
-                              No {cardCategoryTab === 'completed' ? 'Completed' : cardCategoryTab === 'working' ? 'In Progress' : 'Open'} Projects Found
+                              No {cardCategoryTab === 'notOpen' ? 'Open' : cardCategoryTab === 'working' ? 'In Progress' : 'Completed'} Projects Found
                             </p>
                             <p className="text-xs text-slate-400">Try changing your search term or switch to another category tab above.</p>
                           </div>
@@ -2354,92 +2355,243 @@
                       }
 
                       return (
-                        <div className="space-y-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {displayList.map(proj => {
-                              const isProjDone = proj.status === 'Completed' || proj.percentCompleted === 100;
-                              const isProjWorking = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
+                        <div className="space-y-4">
+                          
+                          {/* Layout Header & Switcher (List View vs Grid View) */}
+                          <div className="flex items-center justify-between pb-1">
+                            <div className="text-xs font-extrabold text-slate-700">
+                              Showing <strong>{displayList.length}</strong> of <strong>{categoryProjects.length}</strong> {cardCategoryTab === 'notOpen' ? 'Open' : cardCategoryTab === 'working' ? 'In Progress' : 'Completed'} Projects
+                            </div>
+                            
+                            <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-2xs text-xs font-bold">
+                              <button
+                                type="button"
+                                onClick={() => setCardLayoutMode('list')}
+                                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all ${
+                                  cardLayoutMode === 'list' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                              >
+                                <span>☰</span>
+                                <span>List View</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCardLayoutMode('grid')}
+                                className={`px-3 py-1 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all ${
+                                  cardLayoutMode === 'grid' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                              >
+                                <span>▦</span>
+                                <span>Grid View</span>
+                              </button>
+                            </div>
+                          </div>
 
-                              const cardBg = isProjDone
-                                ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-400/20 hover:border-emerald-500'
-                                : isProjWorking
-                                ? 'bg-amber-50/70 border-amber-300 ring-1 ring-amber-400/20 hover:border-amber-500'
-                                : 'bg-rose-50/70 border-rose-300 ring-1 ring-rose-400/20 hover:border-rose-500';
+                          {/* ☰ LIST VIEW (ROW CARDS) */}
+                          {cardLayoutMode === 'list' ? (
+                            <div className="space-y-3">
+                              {displayList.map(proj => {
+                                const isProjDone = proj.status === 'Completed' || proj.percentCompleted === 100;
+                                const isProjWorking = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
 
-                              const titleColor = isProjDone
-                                ? 'text-emerald-950'
-                                : isProjWorking
-                                ? 'text-amber-950'
-                                : 'text-rose-950';
+                                const cardBg = isProjDone
+                                  ? 'bg-emerald-50/70 border-emerald-300 hover:border-emerald-500'
+                                  : isProjWorking
+                                  ? 'bg-amber-50/70 border-amber-300 hover:border-amber-500'
+                                  : 'bg-rose-50/70 border-rose-300 hover:border-rose-500';
 
-                              const badgeStyle = isProjDone
-                                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                                : isProjWorking
-                                ? 'bg-amber-100 text-amber-900 border-amber-300'
-                                : 'bg-rose-100 text-rose-900 border-rose-300';
+                                const titleColor = isProjDone
+                                  ? 'text-emerald-950'
+                                  : isProjWorking
+                                  ? 'text-amber-950'
+                                  : 'text-rose-950';
 
-                              return (
-                                <div
-                                  key={proj.id}
-                                  className={`group rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border ${cardBg}`}
-                                >
-                                  <div>
-                                    <div className="flex items-center justify-between gap-2 mb-2">
-                                      <span className={`font-mono text-xs font-extrabold px-2 py-0.5 rounded-md border ${
-                                        isProjDone ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
-                                        isProjWorking ? 'bg-amber-100 text-amber-800 border-amber-300' :
-                                        'bg-rose-100 text-rose-800 border-rose-300'
-                                      }`}>
-                                        {proj.id}
-                                      </span>
-                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeStyle}`}>
-                                        {isProjDone ? '100% Done' : isProjWorking ? 'In Progress' : 'Not Started'}
-                                      </span>
+                                const badgeStyle = isProjDone
+                                  ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                  : isProjWorking
+                                  ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                  : 'bg-rose-100 text-rose-900 border-rose-300';
+
+                                return (
+                                  <div
+                                    key={proj.id}
+                                    className={`group rounded-2xl p-4 sm:p-5 shadow-xs hover:shadow-lg transition-all border flex flex-col lg:flex-row lg:items-center justify-between gap-4 ${cardBg}`}
+                                  >
+                                    {/* Left: ID, Status, Title, Company */}
+                                    <div className="space-y-1.5 flex-1 min-w-0">
+                                      <div className="flex items-center gap-2">
+                                        <span className={`font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-md border ${
+                                          isProjDone ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                          isProjWorking ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                          'bg-rose-100 text-rose-800 border-rose-300'
+                                        }`}>
+                                          {proj.id}
+                                        </span>
+                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeStyle}`}>
+                                          {isProjDone ? '100% Done' : isProjWorking ? 'In Progress' : 'Not Started'}
+                                        </span>
+                                        <span className="text-[11px] text-slate-500 font-medium truncate">
+                                          🏢 {proj.company || 'Anantdv Enterprise'}
+                                        </span>
+                                      </div>
+
+                                      <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-1 tracking-tight ${titleColor} select-text`}>
+                                        {formatProfessionalProjectName(proj.name)}
+                                      </h3>
                                     </div>
 
-                                    <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight ${titleColor} select-text`}>
-                                      {formatProfessionalProjectName(proj.name)}
-                                    </h3>
+                                    {/* Middle: Progress Bar & Lead Owner */}
+                                    <div className="flex items-center gap-6 shrink-0">
+                                      <div className="w-36 sm:w-44 space-y-1">
+                                        <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-700">
+                                          <span>Progress</span>
+                                          <span className="font-mono">{proj.percentCompleted}%</span>
+                                        </div>
+                                        <div className="w-full bg-slate-200/80 h-2.5 rounded-full overflow-hidden">
+                                          <div
+                                            className={`h-full rounded-full transition-all ${
+                                              isProjDone ? 'bg-emerald-500' : isProjWorking ? 'bg-amber-400' : 'bg-rose-400'
+                                            }`}
+                                            style={{ width: `${Math.max(proj.percentCompleted, 4)}%` }}
+                                          ></div>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-8 h-8 rounded-xl bg-purple-700 text-white font-bold text-xs flex items-center justify-center shadow-2xs">
+                                          {proj.ownerAvatar || proj.owner?.slice(0, 2).toUpperCase() || 'NK'}
+                                        </span>
+                                        <div className="text-left hidden sm:block">
+                                          <div className="text-[11px] font-extrabold text-slate-900 leading-none">{proj.owner || 'Niranjan Kumar'}</div>
+                                          <div className="text-[10px] text-slate-400 mt-0.5 font-medium">Project Lead</div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Right: More Details, Open Tasks (in dark gray), Quick Move */}
+                                    <div className="flex items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-200/60">
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedProjectForDetailsModal(proj.id)}
+                                        className="py-2 px-3.5 bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 font-bold text-xs rounded-xl transition-all cursor-pointer border border-slate-200/80 active:scale-[0.98] shadow-2xs"
+                                      >
+                                        More Details
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedProjectId(proj.id);
+                                          setCurrentPage('project_details');
+                                        }}
+                                        className="py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs shadow-slate-900/20 hover:shadow-md transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn border border-slate-800"
+                                      >
+                                        <span>Open Tasks</span>
+                                        <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
+                                        <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleMoveProjectStatus(proj.id, isProjDone ? 'Working' : isProjWorking ? 'Completed' : 'Working')}
+                                        className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-bold text-xs rounded-xl border border-slate-200/80 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
+                                      >
+                                        {isProjDone ? 'Move to Working' : isProjWorking ? 'Complete' : 'Start Working'}
+                                      </button>
+                                    </div>
                                   </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
 
-                                  <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-200/60">
-                                    <button
-                                      type="button"
-                                      onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                      className="py-2 px-3 bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-200/80 active:scale-[0.98] shadow-2xs"
-                                    >
-                                      More Details
-                                    </button>
+                          /* ▦ GRID VIEW */
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {displayList.map(proj => {
+                                const isProjDone = proj.status === 'Completed' || proj.percentCompleted === 100;
+                                const isProjWorking = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
 
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setSelectedProjectId(proj.id);
-                                        setCurrentPage('project_details');
-                                      }}
-                                      className="py-2 px-3.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs shadow-slate-900/20 hover:shadow-md transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn border border-slate-800"
-                                    >
-                                      <span>Open Tasks</span>
-                                      <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                      <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
-                                    </button>
+                                const cardBg = isProjDone
+                                  ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-400/20 hover:border-emerald-500'
+                                  : isProjWorking
+                                  ? 'bg-amber-50/70 border-amber-300 ring-1 ring-amber-400/20 hover:border-amber-500'
+                                  : 'bg-rose-50/70 border-rose-300 ring-1 ring-rose-400/20 hover:border-rose-500';
 
-                                    <button
-                                      type="button"
-                                      onClick={() => handleMoveProjectStatus(proj.id, isProjDone ? 'Working' : isProjWorking ? 'Completed' : 'Working')}
-                                      className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-semibold text-[11px] rounded-xl border border-slate-200/80 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
-                                    >
-                                      {isProjDone ? 'Move to Working' : isProjWorking ? 'Complete' : 'Start Working'}
-                                    </button>
+                                const titleColor = isProjDone
+                                  ? 'text-emerald-950'
+                                  : isProjWorking
+                                  ? 'text-amber-950'
+                                  : 'text-rose-950';
+
+                                const badgeStyle = isProjDone
+                                  ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                  : isProjWorking
+                                  ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                  : 'bg-rose-100 text-rose-900 border-rose-300';
+
+                                return (
+                                  <div
+                                    key={proj.id}
+                                    className={`group rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border ${cardBg}`}
+                                  >
+                                    <div>
+                                      <div className="flex items-center justify-between gap-2 mb-2">
+                                        <span className={`font-mono text-xs font-extrabold px-2 py-0.5 rounded-md border ${
+                                          isProjDone ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                          isProjWorking ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                          'bg-rose-100 text-rose-800 border-rose-300'
+                                        }`}>
+                                          {proj.id}
+                                        </span>
+                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeStyle}`}>
+                                          {isProjDone ? '100% Done' : isProjWorking ? 'In Progress' : 'Not Started'}
+                                        </span>
+                                      </div>
+
+                                      <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight ${titleColor} select-text`}>
+                                        {formatProfessionalProjectName(proj.name)}
+                                      </h3>
+                                    </div>
+
+                                    <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-200/60">
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedProjectForDetailsModal(proj.id)}
+                                        className="py-2 px-3 bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-200/80 active:scale-[0.98] shadow-2xs"
+                                      >
+                                        More Details
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedProjectId(proj.id);
+                                          setCurrentPage('project_details');
+                                        }}
+                                        className="py-2 px-3.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs shadow-slate-900/20 hover:shadow-md transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn border border-slate-800"
+                                      >
+                                        <span>Open Tasks</span>
+                                        <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
+                                        <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleMoveProjectStatus(proj.id, isProjDone ? 'Working' : isProjWorking ? 'Completed' : 'Working')}
+                                        className="py-2 px-3 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-semibold text-[11px] rounded-xl border border-slate-200/80 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
+                                      >
+                                        {isProjDone ? 'Move to Working' : isProjWorking ? 'Complete' : 'Start Working'}
+                                      </button>
+                                    </div>
                                   </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+                                );
+                              })}
+                            </div>
+                          )}
 
                           <div className="p-6 bg-white border border-slate-200 rounded-3xl text-center space-y-3 shadow-xs">
                             <div className="text-xs text-slate-500">
-                              Displaying <strong>{displayList.length}</strong> of <strong>{categoryProjects.length}</strong> {cardCategoryTab === 'completed' ? 'Completed' : cardCategoryTab === 'working' ? 'In Progress' : 'Open'} Projects
+                              Displaying <strong>{displayList.length}</strong> of <strong>{categoryProjects.length}</strong> {cardCategoryTab === 'notOpen' ? 'Open' : cardCategoryTab === 'working' ? 'In Progress' : 'Completed'} Projects
                             </div>
 
                             {visibleCount < categoryProjects.length && (
