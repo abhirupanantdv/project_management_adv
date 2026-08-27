@@ -2302,14 +2302,7 @@
                                   key={proj.id}
                                   className={`group rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border ${cardBg}`}
                                 >
-                                  <div
-                                    onClick={() => {
-                                      setSelectedProjectId(proj.id);
-                                      setCurrentPage('project_details');
-                                    }}
-                                    className="cursor-pointer"
-                                    title="Click to view full project details and tasks"
-                                  >
+                                  <div>
                                     <div className="flex items-center justify-between gap-2 mb-2">
                                       <span className={`font-mono text-xs font-extrabold px-2 py-0.5 rounded-md border ${
                                         isProjDone ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
@@ -2323,7 +2316,7 @@
                                       </span>
                                     </div>
 
-                                    <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight ${titleColor} hover:underline select-text`}>
+                                    <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight ${titleColor} select-text`}>
                                       {formatProfessionalProjectName(proj.name)}
                                     </h3>
                                   </div>
@@ -2331,10 +2324,7 @@
                                   <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-200/60">
                                     <button
                                       type="button"
-                                      onClick={() => {
-                                        setSelectedProjectId(proj.id);
-                                        setCurrentPage('project_details');
-                                      }}
+                                      onClick={() => setSelectedProjectForDetailsModal(proj.id)}
                                       className="py-2 px-3 bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-200/80 active:scale-[0.98] shadow-2xs"
                                     >
                                       More Details
@@ -2392,6 +2382,240 @@
             )}
 
           </main>
+
+          {/* ========================================================================= */}
+          {/* MODAL 0: PROJECT DETAILS MODAL (OPENED VIA 'MORE DETAILS' BUTTON)          */}
+          {/* ========================================================================= */}
+          {selectedProjectForDetailsModal && (() => {
+            const modalProj = projects.find(p => p.id === selectedProjectForDetailsModal) || projects[0];
+            if (!modalProj) return null;
+
+            const isProjDone = modalProj.status === 'Completed' || modalProj.percentCompleted === 100;
+            const isProjWorking = (modalProj.status === 'Working' || modalProj.status === 'In Progress') && modalProj.percentCompleted > 0 && modalProj.percentCompleted < 100;
+            const totalTasks = modalProj.tasks.length;
+            const compTasks = modalProj.tasks.filter(t => t.status === 'Completed').length;
+            const workTasks = modalProj.tasks.filter(t => t.status === 'Working' || t.status === 'In Progress').length;
+            const openTasks = totalTasks - compTasks - workTasks;
+            const calculatedPct = totalTasks > 0 ? Math.round((compTasks / totalTasks) * 100) : (modalProj.percentCompleted || 0);
+
+            // Collect all unique staff members assigned across tasks in this project + the project lead owner
+            const staffSet = new Set();
+            if (modalProj.owner) staffSet.add(modalProj.owner);
+            modalProj.tasks.forEach(t => {
+              const assignees = t.assignees || (t.assignee ? [t.assignee] : []);
+              assignees.forEach(a => staffSet.add(a));
+            });
+            const workingTeam = Array.from(staffSet);
+
+            return (
+              <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full shadow-2xl space-y-0 animate-fade-in max-h-[90vh] overflow-hidden flex flex-col">
+                  
+                  {/* Modal Header */}
+                  <div className="p-6 pb-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50/50">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-md bg-white border border-slate-200 text-slate-800 shadow-2xs">
+                          {modalProj.id}
+                        </span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                          isProjDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                          isProjWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                          'bg-rose-100 text-rose-900 border-rose-300'
+                        }`}>
+                          {isProjDone ? '🟢 Completed (100% Done)' : isProjWorking ? '🟡 In Progress' : '🔴 Open / Not Started'}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-extrabold text-slate-900 tracking-tight leading-snug">
+                        {formatProfessionalProjectName(modalProj.name)}
+                      </h3>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProjectForDetailsModal(null)}
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-colors cursor-pointer text-base"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1">
+                    
+                    {/* SECTION 1: % PROGRESS & HEALTH */}
+                    <div className="p-4 rounded-2xl border border-slate-200/90 bg-slate-50/70 space-y-2.5 shadow-2xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                          Overall Progress
+                        </span>
+                        <span className="font-mono text-base font-black text-slate-900">
+                          {calculatedPct}% Completed
+                        </span>
+                      </div>
+
+                      <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            isProjDone ? 'bg-emerald-500' : isProjWorking ? 'bg-amber-400' : 'bg-rose-400'
+                          }`}
+                          style={{ width: `${Math.max(calculatedPct, 4)}%` }}
+                        ></div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-1">
+                        <span>{compTasks} of {totalTasks} Tasks Finished</span>
+                        <span className="font-bold text-slate-700">Company: {modalProj.company || 'Anantdv Enterprise'}</span>
+                      </div>
+                    </div>
+
+                    {/* SECTION 2: WHO IS WORKING ON THIS PROJECT */}
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                          👥 Staff Working On This Project ({workingTeam.length})
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium">Lead & Assigned ERP Staff</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {workingTeam.map((workerName, idx) => {
+                          const empObj = (employees || []).find(e => e.name.toLowerCase() === workerName.toLowerCase());
+                          const isOwner = workerName.toLowerCase() === (modalProj.owner || '').toLowerCase();
+                          const assignedTaskCount = modalProj.tasks.filter(t => {
+                            const assignees = t.assignees || (t.assignee ? [t.assignee] : []);
+                            return assignees.some(a => a.toLowerCase() === workerName.toLowerCase());
+                          }).length;
+
+                          return (
+                            <div
+                              key={idx}
+                              className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 shadow-2xs ${
+                                isOwner ? 'bg-purple-50/80 border-purple-200' : 'bg-white border-slate-200/80'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 truncate">
+                                <span className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs ${
+                                  isOwner ? 'bg-purple-700 text-white' : 'bg-slate-800 text-white'
+                                }`}>
+                                  {empObj?.avatar || workerName.slice(0, 2).toUpperCase()}
+                                </span>
+                                <div className="truncate">
+                                  <div className="font-extrabold text-slate-900 text-xs truncate flex items-center gap-1">
+                                    <span>{workerName}</span>
+                                    {isOwner && (
+                                      <span className="px-1.5 py-0.2 bg-purple-200 text-purple-900 text-[9px] font-black rounded">
+                                        Owner
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-[10px] text-slate-400 truncate">
+                                    {empObj?.role || 'ERP Staff Member'} • {empObj?.department || 'Engineering'}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <span className="inline-block font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 shrink-0">
+                                {assignedTaskCount} {assignedTaskCount === 1 ? 'Task' : 'Tasks'}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* SECTION 3: HOW MANY TASKS AVAILABLE UNDER THIS PROJECT */}
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                          ⚡ Tasks Under This Project ({totalTasks} Total)
+                        </span>
+                      </div>
+
+                      {/* Task Breakdown Pills */}
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+                          <span className="text-[10px] font-bold text-emerald-800 block">🟢 Completed</span>
+                          <strong className="font-mono text-base font-black text-emerald-950">{compTasks}</strong>
+                        </div>
+                        <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 text-center">
+                          <span className="text-[10px] font-bold text-amber-800 block">🟡 In Progress</span>
+                          <strong className="font-mono text-base font-black text-amber-950">{workTasks}</strong>
+                        </div>
+                        <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-center">
+                          <span className="text-[10px] font-bold text-rose-800 block">🔴 Open</span>
+                          <strong className="font-mono text-base font-black text-rose-950">{openTasks}</strong>
+                        </div>
+                      </div>
+
+                      {/* Task Preview List */}
+                      <div className="space-y-1.5 max-h-44 overflow-y-auto custom-scrollbar border border-slate-200 rounded-2xl p-2 bg-slate-50/40">
+                        {modalProj.tasks.length === 0 ? (
+                          <div className="p-4 text-center text-slate-400 text-xs font-medium">No tasks currently under this project</div>
+                        ) : (
+                          modalProj.tasks.map(t => {
+                            const isTaskDone = t.status === 'Completed';
+                            const isTaskWork = t.status === 'Working' || t.status === 'In Progress';
+
+                            return (
+                              <div
+                                key={t.id}
+                                className="p-2 bg-white rounded-xl border border-slate-200/80 flex items-center justify-between gap-2 text-xs shadow-2xs"
+                              >
+                                <div className="flex items-center gap-2 truncate">
+                                  <span className={`w-2 h-2 rounded-full shrink-0 ${
+                                    isTaskDone ? 'bg-emerald-500' : isTaskWork ? 'bg-amber-400' : 'bg-rose-500'
+                                  }`}></span>
+                                  <span className="font-bold text-slate-900 truncate">{t.name}</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <span className="text-[10px] text-slate-500 font-mono">📅 {t.dueDate}</span>
+                                  <span className={`px-2 py-0.5 text-[9px] font-extrabold rounded-md border ${
+                                    isTaskDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                                    isTaskWork ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                                    'bg-rose-100 text-rose-900 border-rose-300'
+                                  }`}>
+                                    {t.status}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Modal Footer with Primary "Open Task List" Button */}
+                  <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProjectForDetailsModal(null)}
+                      className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
+                    >
+                      Close
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedProjectId(modalProj.id);
+                        setCurrentPage('project_details');
+                        setSelectedProjectForDetailsModal(null);
+                      }}
+                      className="px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-blue-500/20 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>📋 Open Task List / Board</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            );
+          })()}
 
           {/* ========================================================================= */}
           {/* MODAL 1: TASK DETAILS & MULTI-EMPLOYEE REASSIGN INSPECTOR MODAL           */}
