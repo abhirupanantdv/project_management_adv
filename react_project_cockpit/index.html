@@ -52,23 +52,23 @@
       border-radius: 999px;
     }
     .kanban-dropzone-active {
-      background-color: rgba(220, 252, 231, 0.6) !important;
+      background-color: rgba(6, 78, 59, 0.6) !important;
       border-color: #10b981 !important;
       outline: 2px dashed #059669;
     }
     .kanban-dropzone-active-amber {
-      background-color: rgba(254, 243, 199, 0.6) !important;
+      background-color: rgba(120, 53, 15, 0.6) !important;
       border-color: #f59e0b !important;
       outline: 2px dashed #d97706;
     }
     .kanban-dropzone-active-rose {
-      background-color: rgba(255, 228, 230, 0.6) !important;
+      background-color: rgba(136, 19, 55, 0.6) !important;
       border-color: #f43f5e !important;
       outline: 2px dashed #e11d48;
     }
   </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-900 min-h-screen antialiased">
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen antialiased selection:bg-blue-600 selection:text-white">
   <div id="root"></div>
 
   <script type="text/babel">
@@ -1051,7 +1051,7 @@
                   {/* MULTI-EMPLOYEE CHECKBOX REASSIGN POPOVER */}
                   {isReassignOpen && (
                     <div className="absolute left-0 bottom-full mb-2 z-50 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 w-72 space-y-2 animate-fade-in">
-                      <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
                         <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
                           Assign ERP Employees ({currentAssignees.length} selected)
                         </div>
@@ -1097,7 +1097,7 @@
                         })}
                       </div>
 
-                      <div className="pt-1.5 border-t border-slate-100 flex justify-between items-center text-[10px]">
+                      <div className="pt-1.5 border-t border-slate-800 flex justify-between items-center text-[10px]">
                         <span className="text-slate-400">Can select 10+ persons</span>
                         <button
                           onClick={() => setReassigningTaskId(null)}
@@ -1196,7 +1196,7 @@
           )}
 
           {/* TOP NAVIGATION BAR */}
-          <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+          <nav className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-xl">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 
@@ -1208,7 +1208,7 @@
                     <h1 className="text-lg font-black font-display bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                       Project Cockpit
                     </h1>
-                    <p className="text-[11px] text-slate-500 font-medium">ERPNext Enterprise System ({systemStats.totalProjs} Projects • {systemStats.totalTasks} Tasks)</p>
+                    <p className="text-[11px] text-slate-400 font-medium">ERPNext Enterprise System ({systemStats.totalProjs} Projects • {systemStats.totalTasks} Tasks)</p>
                   </div>
                 </div>
 
@@ -1218,7 +1218,7 @@
                   <button
                     onClick={fetchLiveData}
                     title="Click to fetch live updates immediately from ERPNext"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-[11px] font-semibold text-slate-700 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-[11px] font-semibold text-slate-200 transition-all cursor-pointer"
                   >
                     <span className={`text-xs ${isLoadingLive ? 'animate-spin' : ''}`}>🔄</span>
                     <span className="hidden sm:inline">Refresh Data</span>
@@ -1228,7 +1228,7 @@
                   <button
                     onClick={() => setIsConfigModalOpen(true)}
                     title="Live ERPNext Instance Connected. Click to edit."
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] font-bold text-emerald-900 hover:border-emerald-400 transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-950/70 border border-emerald-800/80 rounded-xl text-[11px] font-bold text-emerald-300 hover:border-emerald-500 transition-all cursor-pointer"
                   >
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span className="truncate max-w-[130px] font-mono">192.168.101.125:8080</span>
@@ -1438,23 +1438,23 @@
                         key={catKey}
                         onClick={() => toggleCategory(catKey)}
                         className={`bg-white border rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
-                          isSelectedCat ? 'border-blue-400 ring-2 ring-blue-300' : 'border-slate-200/90'
+                          isSelectedCat ? 'border-blue-400 ring-2 ring-blue-500/40 bg-slate-800' : 'border-slate-800 bg-slate-900/90'
                         }`}
                         title="Click to expand/collapse category tasks"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <span className="text-xs">{catConfig.icon}</span>
-                            <span className="text-xs font-black text-slate-800">
+                            <span className="text-xs font-black text-white">
                               {catConfig.label}
                             </span>
                           </div>
-                          <span className="font-mono text-xs font-black text-slate-900">
+                          <span className="font-mono text-xs font-black text-white">
                             {pct}%
                           </span>
                         </div>
 
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-300 ${catConfig.barColor}`}
                             style={{ width: `${pct}%` }}
@@ -1473,7 +1473,7 @@
                 </div>
 
                 {/* 3. TASK CONTROLS & VIEW SWITCHER TOOLBAR */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+                <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl text-white space-y-3">
                   <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
                     
                     <div className="relative flex-1 min-w-[200px]">
@@ -1483,7 +1483,7 @@
                         placeholder="Search tasks by name, ID, assignee..."
                         value={taskSearchTerm}
                         onChange={(e) => setTaskSearchTerm(e.target.value)}
-                        className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-8 py-2 bg-slate-950/80 border border-slate-700 text-white placeholder-slate-500 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -1530,7 +1530,7 @@
                         </span>
                       </div>
 
-                      <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs shrink-0">
+                      <div className="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs shrink-0">
                         <button
                           onClick={() => setTaskLayoutMode('kanban')}
                           className={`flex items-center gap-1 px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
@@ -1738,7 +1738,7 @@
                     const openPctP = totalP > 0 ? Math.max(0, 100 - pctP - workPctP) : 0;
 
                     return (
-                      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5">
+                      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl hover:shadow-2xl transition-all flex flex-col justify-between space-y-3.5 text-white">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center text-sm font-black shadow-2xs">
@@ -1756,7 +1756,7 @@
 
                         <div className="flex items-baseline justify-between">
                           <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-black text-slate-900 font-display tracking-tight">{totalP}</span>
+                            <span className="text-3xl font-black text-white font-display tracking-tight">{totalP}</span>
                             <span className="text-xs font-semibold text-slate-500">Live Projects</span>
                           </div>
                           <span className="text-xs font-bold text-slate-500">{compP} of {totalP} Completed</span>
@@ -1764,7 +1764,7 @@
 
                         {/* Multi-Segment Color Progress Bar */}
                         <div className="space-y-1.5">
-                          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex border border-slate-200/60 p-0.5">
+                          <div className="w-full bg-slate-800/90 h-3 rounded-full overflow-hidden flex border border-slate-700/60 p-0.5">
                             {pctP > 0 && (
                               <div
                                 className="h-full rounded-l-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
@@ -1808,7 +1808,7 @@
                     const openPctT = totalT > 0 ? Math.max(0, 100 - pctT - workPctT) : 0;
 
                     return (
-                      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3.5">
+                      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl hover:shadow-2xl transition-all flex flex-col justify-between space-y-3.5 text-white">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center text-sm font-black shadow-2xs">
@@ -1826,7 +1826,7 @@
 
                         <div className="flex items-baseline justify-between">
                           <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-black text-slate-900 font-display tracking-tight">{totalT}</span>
+                            <span className="text-3xl font-black text-white font-display tracking-tight">{totalT}</span>
                             <span className="text-xs font-semibold text-slate-500">Live Tasks</span>
                           </div>
                           <span className="text-xs font-bold text-slate-500">{compT} of {totalT} Finished</span>
@@ -1834,7 +1834,7 @@
 
                         {/* Multi-Segment Color Progress Bar */}
                         <div className="space-y-1.5">
-                          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex border border-slate-200/60 p-0.5">
+                          <div className="w-full bg-slate-800/90 h-3 rounded-full overflow-hidden flex border border-slate-700/60 p-0.5">
                             {pctT > 0 && (
                               <div
                                 className="h-full rounded-l-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
@@ -1885,7 +1885,7 @@
                     const lenOpen = (pctOpen / 100) * c;
 
                     return (
-                      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+                      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl hover:shadow-2xl transition-all flex flex-col justify-between space-y-3 text-white">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-black shadow-2xs">
@@ -1898,12 +1898,12 @@
                           </div>
                           
                           {/* Live Switch between Tasks & Projects */}
-                          <div className="flex items-center bg-slate-100 p-0.5 rounded-xl text-[10px] font-bold border border-slate-200 shadow-2xs">
+                          <div className="flex items-center bg-slate-950 p-0.5 rounded-xl text-[10px] font-bold border border-slate-800 shadow-inner">
                             <button
                               type="button"
                               onClick={() => setKpiPieMode('tasks')}
                               className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                kpiPieMode === 'tasks' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-500 hover:text-slate-800'
+                                kpiPieMode === 'tasks' ? 'bg-slate-800 text-white shadow-xs font-black' : 'text-slate-400 hover:text-white'
                               }`}
                             >
                               ⚡ Tasks
@@ -1912,7 +1912,7 @@
                               type="button"
                               onClick={() => setKpiPieMode('projects')}
                               className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                                kpiPieMode === 'projects' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-500 hover:text-slate-800'
+                                kpiPieMode === 'projects' ? 'bg-slate-800 text-white shadow-xs font-black' : 'text-slate-400 hover:text-white'
                               }`}
                             >
                               📁 Projects
@@ -1929,7 +1929,7 @@
                                 cy="50"
                                 r={r}
                                 fill="transparent"
-                                stroke="#f1f5f9"
+                                stroke="#1e293b"
                                 strokeWidth="16"
                               />
                               {lenOpen > 0 && (
@@ -1974,7 +1974,7 @@
                             </svg>
                             {/* Center Percentage */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                              <span className="text-sm font-black text-slate-900 font-mono leading-none">
+                              <span className="text-sm font-black text-white font-mono leading-none">
                                 {pctComp}%
                               </span>
                               <span className="text-[8px] font-extrabold text-emerald-700 uppercase tracking-tight mt-0.5">
@@ -1985,7 +1985,7 @@
 
                           {/* Color Breakdown List */}
                           <div className="flex-1 space-y-1.5 text-xs">
-                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-emerald-50 text-emerald-950 border border-emerald-200">
+                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-emerald-950/40 text-emerald-200 border border-emerald-800/60">
                               <div className="flex items-center gap-1.5 truncate">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
                                 <span className="font-bold text-[10px]">🟢 Completed:</span>
@@ -1995,7 +1995,7 @@
                               </span>
                             </div>
 
-                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-amber-50 text-amber-950 border border-amber-200">
+                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-amber-950/40 text-amber-200 border border-amber-800/60">
                               <div className="flex items-center gap-1.5 truncate">
                                 <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
                                 <span className="font-bold text-[10px]">🟡 Working:</span>
@@ -2005,7 +2005,7 @@
                               </span>
                             </div>
 
-                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-rose-50 text-rose-950 border border-rose-200">
+                            <div className="flex items-center justify-between p-1 px-2 rounded-lg bg-rose-950/40 text-rose-200 border border-rose-800/60">
                               <div className="flex items-center gap-1.5 truncate">
                                 <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
                                 <span className="font-bold text-[10px]">🔴 Open:</span>
@@ -2034,7 +2034,7 @@
                         placeholder={`Search ${projects.length} live ERPNext projects by name, ID, owner...`}
                         value={searchTerm}
                         onChange={(e) => { setSearchTerm(e.target.value); setVisibleCount(12); }}
-                        className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-8 py-2.5 bg-slate-950/80 border border-slate-700 text-white placeholder-slate-500 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -2067,7 +2067,7 @@
                         <button
                           onClick={() => setProjectViewMode('kanban')}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                            projectViewMode === 'kanban' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                            projectViewMode === 'kanban' ? 'bg-slate-800 text-blue-400 shadow-xs' : 'text-slate-400 hover:text-white'
                           }`}
                         >
                           <span>📌</span>
@@ -2076,7 +2076,7 @@
                         <button
                           onClick={() => setProjectViewMode('grid')}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                            projectViewMode === 'grid' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                            projectViewMode === 'grid' ? 'bg-slate-800 text-blue-400 shadow-xs' : 'text-slate-400 hover:text-white'
                           }`}
                         >
                           <span>📋</span>
@@ -2109,7 +2109,7 @@
                       onDragOver={(e) => handleDragOverProjectCol(e, 'Not Started')}
                       onDragLeave={handleDragLeaveProjectCol}
                       onDrop={(e) => handleDropProject(e, 'Not Started')}
-                      className={`bg-rose-50/40 border-2 rounded-3xl p-4 space-y-4 shadow-xs transition-all ${
+                      className={`bg-rose-950/20 border-2 border-rose-900/40 rounded-3xl p-4 space-y-4 shadow-xl transition-all ${
                         dragOverProjectColumn === 'Not Started'
                           ? 'border-rose-500 ring-4 ring-rose-300 bg-rose-100/80 scale-[1.01]'
                           : 'border-rose-200'
@@ -2138,7 +2138,7 @@
                               key={proj.id}
                               draggable={true}
                               onDragStart={(e) => handleDragStartProject(e, proj.id)}
-                              className="group bg-white border border-rose-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-rose-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01]"
+                              className="group bg-slate-900/95 border border-rose-900/50 hover:border-rose-500 rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01] text-white"
                               title="Click and drag to move to Completed or Working column"
                             >
                               <div>
@@ -2157,12 +2157,12 @@
                                   </div>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                <h4 className="text-[14.5px] font-extrabold text-white tracking-tight leading-snug line-clamp-2 select-text">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-800">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -2195,7 +2195,7 @@
                       onDragOver={(e) => handleDragOverProjectCol(e, 'Working')}
                       onDragLeave={handleDragLeaveProjectCol}
                       onDrop={(e) => handleDropProject(e, 'Working')}
-                      className={`bg-amber-50/40 border-2 rounded-3xl p-4 space-y-4 shadow-xs transition-all ${
+                      className={`bg-amber-950/20 border-2 border-amber-900/40 rounded-3xl p-4 space-y-4 shadow-xl transition-all ${
                         dragOverProjectColumn === 'Working'
                           ? 'border-amber-500 ring-4 ring-amber-300 bg-amber-100/80 scale-[1.01]'
                           : 'border-amber-200'
@@ -2224,7 +2224,7 @@
                               key={proj.id}
                               draggable={true}
                               onDragStart={(e) => handleDragStartProject(e, proj.id)}
-                              className="group bg-white border border-amber-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-amber-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01]"
+                              className="group bg-slate-900/95 border border-amber-900/50 hover:border-amber-500 rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01] text-white"
                               title="Click and drag to move to Completed column"
                             >
                               <div>
@@ -2243,12 +2243,12 @@
                                   </div>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                <h4 className="text-[14.5px] font-extrabold text-white tracking-tight leading-snug line-clamp-2 select-text">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-800">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -2281,7 +2281,7 @@
                       onDragOver={(e) => handleDragOverProjectCol(e, 'Completed')}
                       onDragLeave={handleDragLeaveProjectCol}
                       onDrop={(e) => handleDropProject(e, 'Completed')}
-                      className={`bg-emerald-50/40 border-2 rounded-3xl p-4 space-y-4 shadow-xs transition-all ${
+                      className={`bg-emerald-950/20 border-2 border-emerald-900/40 rounded-3xl p-4 space-y-4 shadow-xl transition-all ${
                         dragOverProjectColumn === 'Completed'
                           ? 'border-emerald-500 ring-4 ring-emerald-300 bg-emerald-100/80 scale-[1.01]'
                           : 'border-emerald-200'
@@ -2310,7 +2310,7 @@
                               key={proj.id}
                               draggable={true}
                               onDragStart={(e) => handleDragStartProject(e, proj.id)}
-                              className="group bg-white border border-emerald-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-emerald-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01]"
+                              className="group bg-slate-900/95 border border-emerald-900/50 hover:border-emerald-500 rounded-2xl p-4 shadow-xl hover:shadow-2xl transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01] text-white"
                               title="Click and drag to move to another column"
                             >
                               <div>
@@ -2329,12 +2329,12 @@
                                   </div>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                <h4 className="text-[14.5px] font-extrabold text-white tracking-tight leading-snug line-clamp-2 select-text">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-800">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -2379,9 +2379,7 @@
                           setVisibleCount(12);
                         }}
                         className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
-                          cardCategoryTab === 'notOpen'
-                            ? 'bg-rose-500 text-white border-rose-600 shadow-md ring-2 ring-rose-300'
-                            : 'bg-white hover:bg-rose-50/50 text-slate-800 border-rose-200 hover:border-rose-300'
+                          cardCategoryTab === 'notOpen' ? 'bg-rose-600 text-white border-rose-500 shadow-lg ring-2 ring-rose-400/50' : 'bg-slate-900/90 hover:bg-slate-800 text-white border-rose-900/60 hover:border-rose-500 shadow-md'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -2410,9 +2408,7 @@
                           setVisibleCount(12);
                         }}
                         className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
-                          cardCategoryTab === 'working'
-                            ? 'bg-amber-500 text-white border-amber-600 shadow-md ring-2 ring-amber-300'
-                            : 'bg-white hover:bg-amber-50/50 text-slate-800 border-amber-200 hover:border-amber-300'
+                          cardCategoryTab === 'working' ? 'bg-amber-600 text-white border-amber-500 shadow-lg ring-2 ring-amber-400/50' : 'bg-slate-900/90 hover:bg-slate-800 text-white border-amber-900/60 hover:border-amber-500 shadow-md'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -2441,9 +2437,7 @@
                           setVisibleCount(12);
                         }}
                         className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
-                          cardCategoryTab === 'completed'
-                            ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-2 ring-emerald-300'
-                            : 'bg-white hover:bg-emerald-50/50 text-slate-800 border-emerald-200 hover:border-emerald-300'
+                          cardCategoryTab === 'completed' ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg ring-2 ring-emerald-400/50' : 'bg-slate-900/90 hover:bg-slate-800 text-white border-emerald-900/60 hover:border-emerald-500 shadow-md'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -2495,12 +2489,12 @@
                               Showing <strong>{displayList.length}</strong> of <strong>{categoryProjects.length}</strong> {cardCategoryTab === 'notOpen' ? 'Open' : cardCategoryTab === 'working' ? 'In Progress' : 'Completed'} Projects
                             </div>
                             
-                            <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 shadow-2xs text-xs font-bold">
+                            <div className="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800 shadow-xl text-xs font-bold">
                               <button
                                 type="button"
                                 onClick={() => setCardLayoutMode('list')}
                                 className={`px-3 py-1 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all ${
-                                  cardLayoutMode === 'list' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                                  cardLayoutMode === 'list' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
                                 }`}
                               >
                                 <span>☰</span>
@@ -2510,7 +2504,7 @@
                                 type="button"
                                 onClick={() => setCardLayoutMode('grid')}
                                 className={`px-3 py-1 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all ${
-                                  cardLayoutMode === 'grid' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                                  cardLayoutMode === 'grid' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-400 hover:text-white'
                                 }`}
                               >
                                 <span>▦</span>
@@ -2693,7 +2687,7 @@
                             </div>
                           )}
 
-                          <div className="p-6 bg-white border border-slate-200 rounded-3xl text-center space-y-3 shadow-xs">
+                          <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-3xl text-center space-y-3 shadow-xl text-slate-300">
                             <div className="text-xs text-slate-500">
                               Displaying <strong>{displayList.length}</strong> of <strong>{categoryProjects.length}</strong> {cardCategoryTab === 'notOpen' ? 'Open' : cardCategoryTab === 'working' ? 'In Progress' : 'Completed'} Projects
                             </div>
@@ -2745,14 +2739,14 @@
             const workingTeam = Array.from(staffSet);
 
             return (
-              <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-                <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full shadow-2xl space-y-0 animate-fade-in max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-xl w-full shadow-2xl space-y-0 animate-fade-in max-h-[90vh] overflow-hidden flex flex-col text-white">
                   
                   {/* Modal Header */}
-                  <div className="p-6 pb-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50/50">
+                  <div className="p-6 pb-4 border-b border-slate-800 flex items-start justify-between gap-3 bg-slate-950/80">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-md bg-white border border-slate-200 text-slate-800 shadow-2xs">
+                        <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-white shadow-2xs">
                           {modalProj.id}
                         </span>
                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
@@ -2763,7 +2757,7 @@
                           {isProjDone ? '🟢 Completed (100% Done)' : isProjWorking ? '🟡 In Progress' : '🔴 Open / Not Started'}
                         </span>
                       </div>
-                      <h3 className="text-lg font-extrabold text-slate-900 tracking-tight leading-snug">
+                      <h3 className="text-lg font-extrabold text-white tracking-tight leading-snug">
                         {formatProfessionalProjectName(modalProj.name)}
                       </h3>
                     </div>
@@ -2781,17 +2775,17 @@
                   <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1">
                     
                     {/* SECTION 1: % PROGRESS & HEALTH */}
-                    <div className="p-4 rounded-2xl border border-slate-200/90 bg-slate-50/70 space-y-2.5 shadow-2xs">
+                    <div className="p-4 rounded-2xl border border-slate-800 bg-slate-950/60 space-y-2.5 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                        <span className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">
                           Overall Progress
                         </span>
-                        <span className="font-mono text-base font-black text-slate-900">
+                        <span className="font-mono text-base font-black text-white">
                           {calculatedPct}% Completed
                         </span>
                       </div>
 
-                      <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                      <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
                             isProjDone ? 'bg-emerald-500' : isProjWorking ? 'bg-amber-400' : 'bg-rose-400'
@@ -2802,7 +2796,7 @@
 
                       <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-1">
                         <span>{compTasks} of {totalTasks} Tasks Finished</span>
-                        <span className="font-bold text-slate-700">Company: {modalProj.company || 'Anantdv Enterprise'}</span>
+                        <span className="font-bold text-slate-300">Company: {modalProj.company || 'Anantdv Enterprise'}</span>
                       </div>
                     </div>
 
@@ -2828,7 +2822,7 @@
                             <div
                               key={idx}
                               className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 shadow-2xs ${
-                                isOwner ? 'bg-purple-50/80 border-purple-200' : 'bg-white border-slate-200/80'
+                                isOwner ? 'bg-purple-950/40 border-purple-800/60' : 'bg-slate-800/80 border-slate-700/80 text-white'
                               }`}
                             >
                               <div className="flex items-center gap-2.5 truncate">
@@ -2838,7 +2832,7 @@
                                   {empObj?.avatar || workerName.slice(0, 2).toUpperCase()}
                                 </span>
                                 <div className="truncate">
-                                  <div className="font-extrabold text-slate-900 text-xs truncate flex items-center gap-1">
+                                  <div className="font-extrabold text-white text-xs truncate flex items-center gap-1">
                                     <span>{workerName}</span>
                                     {isOwner && (
                                       <span className="px-1.5 py-0.2 bg-purple-200 text-purple-900 text-[9px] font-black rounded">
@@ -2852,7 +2846,7 @@
                                 </div>
                               </div>
 
-                              <span className="inline-block font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 shrink-0">
+                              <span className="inline-block font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-900 text-slate-300 border border-slate-700 shrink-0">
                                 {assignedTaskCount} {assignedTaskCount === 1 ? 'Task' : 'Tasks'}
                               </span>
                             </div>
@@ -2926,7 +2920,7 @@
                   </div>
 
                   {/* Modal Footer with Primary "Open Task List" Button */}
-                  <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+                  <div className="p-4 border-t border-slate-800 bg-slate-50 flex items-center justify-between gap-3">
                     <button
                       type="button"
                       onClick={() => setSelectedProjectForDetailsModal(null)}
@@ -2958,10 +2952,10 @@
           {/* MODAL 1: TASK DETAILS & MULTI-EMPLOYEE REASSIGN INSPECTOR MODAL           */}
           {/* ========================================================================= */}
           {selectedTaskForDetails && (
-            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fade-in max-h-[90vh] overflow-y-auto custom-scrollbar">
                 
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                   <div className="flex items-center gap-2.5">
                     <span className="text-2xl">
                       {selectedTaskForDetails.status === 'Completed' ? '✅' : selectedTaskForDetails.status === 'Working' ? '⚡' : '📌'}
@@ -3073,7 +3067,7 @@
                   </div>
 
                   {/* 1-Click Status Transitions */}
-                  <div className="pt-2 border-t border-slate-100 space-y-2">
+                  <div className="pt-2 border-t border-slate-800 space-y-2">
                     <span className="text-slate-500 font-bold block">Quick Status Action:</span>
                     <div className="flex items-center gap-2 flex-wrap">
                       <button
@@ -3105,7 +3099,7 @@
 
                 </div>
 
-                <div className="flex justify-end pt-3 border-t border-slate-100">
+                <div className="flex justify-end pt-3 border-t border-slate-800">
                   <button
                     onClick={() => setSelectedTaskForDetails(null)}
                     className="px-5 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl cursor-pointer hover:bg-slate-800"
@@ -3145,7 +3139,7 @@
                 <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-scale-up max-h-[90vh] flex flex-col">
                   
                   {/* Modal Header */}
-                  <div className="p-5 border-b border-slate-100 flex items-start justify-between bg-slate-50/80">
+                  <div className="p-5 border-b border-slate-800 flex items-start justify-between bg-slate-50/80">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-lg bg-blue-100 text-blue-900 border border-blue-200">
@@ -3357,7 +3351,7 @@
                   </div>
 
                   {/* Modal Footer */}
-                  <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end">
+                  <div className="p-4 border-t border-slate-800 bg-slate-50 flex items-center justify-end">
                     <button
                       type="button"
                       onClick={() => setSelectedProjectForDetailsModal(null)}
@@ -3376,10 +3370,10 @@
           {/* MODAL 2: ADD OR LINK TASK (SCOPED TO CURRENT PROJECT BY DEFAULT!)         */}
           {/* ========================================================================= */}
           {isNewTaskModalOpen && (
-            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fade-in max-h-[90vh] overflow-y-auto custom-scrollbar">
                 
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-lg">
                       ⚡
@@ -3429,7 +3423,7 @@
                   <form onSubmit={handleCreateTask} className="space-y-4 text-xs">
                     
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5">Target Live Project *</label>
+                      <label className="block font-bold text-slate-300 mb-1.5">Target Live Project *</label>
                       <select 
                         value={targetProjectForNewTask || (projects[0] && projects[0].id)} 
                         onChange={(e) => setTargetProjectForNewTask(e.target.value)}
@@ -3541,11 +3535,11 @@
 
                     <div className="grid grid-cols-2 gap-3.5">
                       <div>
-                        <label className="block font-bold text-slate-700 mb-1.5">Work Category *</label>
+                        <label className="block font-bold text-slate-300 mb-1.5">Work Category *</label>
                         <select 
                           value={newTaskCategory} 
                           onChange={(e) => setNewTaskCategory(e.target.value)}
-                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
+                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
                         >
                           <option value="Development">💻 Development</option>
                           <option value="UI">🎨 UI</option>
@@ -3556,11 +3550,11 @@
                       </div>
 
                       <div>
-                        <label className="block font-bold text-slate-700 mb-1.5">Priority</label>
+                        <label className="block font-bold text-slate-300 mb-1.5">Priority</label>
                         <select 
                           value={newTaskPriority} 
                           onChange={(e) => setNewTaskPriority(e.target.value)}
-                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
+                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
                         >
                           <option value="Urgent">🔥 Urgent Priority</option>
                           <option value="High">▲ High Priority</option>
@@ -3650,11 +3644,11 @@
 
                     <div className="grid grid-cols-2 gap-3.5">
                       <div>
-                        <label className="block font-bold text-slate-700 mb-1.5">Initial Status</label>
+                        <label className="block font-bold text-slate-300 mb-1.5">Initial Status</label>
                         <select 
                           value={newTaskStatus} 
                           onChange={(e) => setNewTaskStatus(e.target.value)}
-                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
+                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
                         >
                           <option value="Open">🔴 Open (Light Red)</option>
                           <option value="Working">🟡 Working (Yellow)</option>
@@ -3663,18 +3657,18 @@
                       </div>
 
                       <div>
-                        <label className="block font-bold text-slate-700 mb-1.5">Due Date *</label>
+                        <label className="block font-bold text-slate-300 mb-1.5">Due Date *</label>
                         <input 
                           required 
                           value={newTaskDueDate} 
                           onChange={(e) => setNewTaskDueDate(e.target.value)}
                           type="date" 
-                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" 
+                          className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" 
                         />
                       </div>
                     </div>
 
-                    <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-100">
+                    <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-800">
                       <button 
                         type="button" 
                         onClick={() => {
@@ -3792,7 +3786,7 @@
                       )}
                     </div>
 
-                    <div className="flex justify-end pt-3 border-t border-slate-100">
+                    <div className="flex justify-end pt-3 border-t border-slate-800">
                       <button 
                         type="button" 
                         onClick={() => setIsNewTaskModalOpen(false)} 
@@ -3813,10 +3807,10 @@
           {/* MODAL 3: ERP EMPLOYEE DIRECTORY & STAFF MANAGER (40 STAFF)                */}
           {/* ========================================================================= */}
           {isEmployeeModalOpen && (
-            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fade-in max-h-[90vh] overflow-y-auto custom-scrollbar">
                 
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                   <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xl">
                       👥
@@ -3975,7 +3969,7 @@
                   ))}
                 </div>
 
-                <div className="flex justify-end pt-3 border-t border-slate-100">
+                <div className="flex justify-end pt-3 border-t border-slate-800">
                   <button 
                     type="button" 
                     onClick={() => setIsEmployeeModalOpen(false)} 
@@ -3993,10 +3987,10 @@
           {/* MODAL 4: ADD NEW PROJECT MODAL (WITH LIVE DUPLICATE PROJECT DETECTOR)     */}
           {/* ========================================================================= */}
           {isNewProjectModalOpen && (
-            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fade-in max-h-[90vh] overflow-y-auto custom-scrollbar">
                 
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">
                       📁
@@ -4097,19 +4091,19 @@
 
                   <div className="grid grid-cols-2 gap-3.5">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5">Customer / Company</label>
+                      <label className="block font-bold text-slate-300 mb-1.5">Customer / Company</label>
                       <input 
                         value={newProjectCompany} 
                         onChange={(e) => setNewProjectCompany(e.target.value)}
-                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none" 
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5">Priority</label>
+                      <label className="block font-bold text-slate-300 mb-1.5">Priority</label>
                       <select 
                         value={newProjectPriority} 
                         onChange={(e) => setNewProjectPriority(e.target.value)}
-                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
+                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
                       >
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -4121,11 +4115,11 @@
 
                   <div className="grid grid-cols-2 gap-3.5">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5">Project Lead Owner (ERP Staff) *</label>
+                      <label className="block font-bold text-slate-300 mb-1.5">Project Lead Owner (ERP Staff) *</label>
                       <select 
                         value={newProjectOwner} 
                         onChange={(e) => setNewProjectOwner(e.target.value)}
-                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold text-blue-700" 
+                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-blue-400 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold" 
                       >
                         {employees.map(emp => (
                           <option key={emp.id} value={emp.name}>{emp.name} — {emp.role}</option>
@@ -4133,11 +4127,11 @@
                       </select>
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5">Initial Status</label>
+                      <label className="block font-bold text-slate-300 mb-1.5">Initial Status</label>
                       <select 
                         value={newProjectStatus} 
                         onChange={(e) => setNewProjectStatus(e.target.value)}
-                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
+                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
                       >
                         <option value="Open">🔴 Open (Not Started)</option>
                         <option value="Working">🟡 Working (In Progress)</option>
@@ -4148,27 +4142,27 @@
 
                   <div className="grid grid-cols-2 gap-3.5">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5">Start Date</label>
+                      <label className="block font-bold text-slate-300 mb-1.5">Start Date</label>
                       <input 
                         value={newProjectStartDate} 
                         onChange={(e) => setNewProjectStartDate(e.target.value)}
                         type="date" 
-                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" 
+                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" 
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1.5">Due Date *</label>
+                      <label className="block font-bold text-slate-300 mb-1.5">Due Date *</label>
                       <input 
                         required 
                         value={newProjectDueDate} 
                         onChange={(e) => setNewProjectDueDate(e.target.value)}
                         type="date" 
-                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-50 border-slate-200 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" 
+                        className="w-full px-3.5 py-2.5 border rounded-xl bg-slate-950 border-slate-700 text-white text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" 
                       />
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-100">
+                  <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-800">
                     <button 
                       type="button" 
                       onClick={() => {
@@ -4197,10 +4191,10 @@
           {/* MODAL 5: ERPNEXT SERVER CONFIGURATION MODAL                  */}
           {/* ============================================================ */}
           {isConfigModalOpen && (
-            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-              <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-fade-in">
+            <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-fade-in text-white">
                 
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">⚙️</span>
                     <div>
@@ -4226,17 +4220,17 @@
                   showToast('ERPNext Server configuration updated!');
                 }} className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">Server URL</label>
+                    <label className="block font-bold text-slate-300 mb-1">Server URL</label>
                     <input name="serverUrl" defaultValue={config.serverUrl} placeholder="http://192.168.101.125:8080" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">API Key</label>
+                      <label className="block font-bold text-slate-300 mb-1">API Key</label>
                       <input name="apiKey" defaultValue={config.apiKey} placeholder="f13b1b924ac9194" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">API Secret</label>
+                      <label className="block font-bold text-slate-300 mb-1">API Secret</label>
                       <input name="apiSecret" defaultValue={config.apiSecret} placeholder="fa26ad1326aef0c" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
                     </div>
                   </div>
@@ -4250,7 +4244,7 @@
                     <div>🟢 <strong>Status:</strong> Live connection active & verified to ERPNext!</div>
                   </div>
 
-                  <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                  <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
                     <button type="button" onClick={() => setIsConfigModalOpen(false)} className="px-4 py-2 border rounded-xl font-bold">Cancel</button>
                     <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-bold rounded-xl shadow-md">Save & Sync</button>
                   </div>
