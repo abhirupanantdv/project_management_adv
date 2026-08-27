@@ -1148,29 +1148,27 @@
       const categoriesList = ["Development", "UI", "Migration", "Testing", "Documentation"];
 
       const categoryData = useMemo(() => {
-        return categoriesList
-          .map(catKey => {
-            const catConfig = CATEGORY_CONFIG[catKey];
-            const tasksInCat = filteredTasks.filter(t => t.category === catKey);
-            const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
-            const totalCount = tasksInCat.length;
-            const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+        return categoriesList.map(catKey => {
+          const catConfig = CATEGORY_CONFIG[catKey];
+          const tasksInCat = filteredTasks.filter(t => t.category === catKey);
+          const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
+          const totalCount = tasksInCat.length;
+          const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
-            return {
-              key: catKey,
-              label: catConfig.label,
-              icon: catConfig.icon,
-              barColor: catConfig.barColor,
-              textColor: catConfig.textColor,
-              bgClass: catConfig.bgClass,
-              tasks: tasksInCat,
-              doneCount,
-              totalCount,
-              pct
-            };
-          })
-          .filter(cat => cat.totalCount > 0); // Hide empty 0-task categories
-      }, [filteredTasks, categoriesList]);
+          return {
+            key: catKey,
+            label: catConfig.label,
+            icon: catConfig.icon,
+            barColor: catConfig.barColor,
+            textColor: catConfig.textColor,
+            bgClass: catConfig.bgClass,
+            tasks: tasksInCat,
+            doneCount,
+            totalCount,
+            pct
+          };
+        });
+      }, [filteredTasks]);
 
       const toggleCategory = (catKey) => {
         setCollapsedCategories(prev => ({ ...prev, [catKey]: !prev[catKey] }));
@@ -1546,18 +1544,17 @@
                     const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
                     const totalCount = tasksInCat.length;
                     const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+                    const isCollapsed = !!collapsedCategories[catKey];
                     const isSelectedCat = taskCategoryFilter === catKey;
 
                     return (
                       <div
                         key={catKey}
-                        onClick={() => setTaskCategoryFilter(prev => prev === catKey ? 'All' : catKey)}
+                        onClick={() => toggleCategory(catKey)}
                         className={`bg-white border rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
-                          isSelectedCat 
-                            ? 'border-blue-600 ring-4 ring-blue-500/25 bg-blue-50/60 shadow-md scale-[1.02]' 
-                            : 'border-slate-200/90 hover:border-slate-300'
+                          isSelectedCat ? 'border-blue-400 ring-2 ring-blue-300' : 'border-slate-200/90'
                         }`}
-                        title={`Click to filter tasks by ${catConfig.label} category across Kanban & Category views`}
+                        title="Click to expand/collapse category tasks"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
@@ -1580,9 +1577,9 @@
 
                         <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5 font-medium">
                           <span>{doneCount}/{totalCount} Done</span>
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                            isSelectedCat ? 'bg-blue-600 text-white' : 'text-slate-500 bg-slate-100'
-                          }`}>{isSelectedCat ? 'Active ✓' : `${totalCount} tasks`}</span>
+                          <span className="text-[10px] text-slate-400 font-bold">
+                            {isCollapsed ? '▲' : '▼'}
+                          </span>
                         </div>
                       </div>
                     );
@@ -4476,77 +4473,3 @@
   </script>
 </body>
 </html>
-                {/* 📊 TASK VIEW B: 5-CATEGORY COLLAPSIBLE ACCORDION GRID */}
-                {taskLayoutMode === 'grid' && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-                      <span className="font-bold text-slate-700">
-                        {taskCategoryFilter !== 'All' ? `Showing only ${taskCategoryFilter} tasks:` : 'Tasks grouped by category (Empty categories hidden):'}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {taskCategoryFilter !== 'All' && (
-                          <button onClick={() => setTaskCategoryFilter('All')} className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md font-bold hover:bg-blue-200 cursor-pointer">
-                            Clear Filter ✕
-                          </button>
-                        )}
-                        <button onClick={expandAll} className="text-blue-600 hover:underline font-bold cursor-pointer">Expand All</button>
-                        <span>•</span>
-                        <button onClick={collapseAll} className="text-slate-500 hover:underline font-medium cursor-pointer">Collapse All</button>
-                      </div>
-                    </div>
-
-                    {categoryData.length === 0 ? (
-                      <div className="p-12 text-center bg-white border border-dashed border-slate-300 rounded-3xl space-y-2">
-                        <div className="text-3xl">📭</div>
-                        <div className="text-sm font-bold text-slate-800">No tasks found in selected category</div>
-                        <button
-                          onClick={() => setTaskCategoryFilter('All')}
-                          className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl mt-2 cursor-pointer"
-                        >
-                          Show All Categories
-                        </button>
-                      </div>
-                    ) : (
-                      categoryData.map(cat => {
-                        const isCollapsed = !!collapsedCategories[cat.key];
-                        return (
-                          <div key={cat.key} className="border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs bg-white">
-                            <div
-                              onClick={() => toggleCategory(cat.key)}
-                              className="p-3.5 sm:p-4 bg-slate-50/80 hover:bg-slate-100/80 transition-all flex items-center justify-between cursor-pointer border-b border-slate-100"
-                            >
-                              <div className="flex items-center gap-2.5">
-                                <span className="text-xs text-slate-400 font-bold">{isCollapsed ? '▶' : '▼'}</span>
-                                <span className={`text-xs font-extrabold px-2.5 py-1 rounded-lg flex items-center gap-1.5 ${cat.bgClass} ${cat.textColor}`}
-                                >
-                                  <span>{cat.icon}</span>
-                                  <span>{cat.label}</span>
-                                </span>
-                                <span className="text-xs font-bold text-slate-600">{cat.totalCount} tasks</span>
-                              </div>
-
-                              <div className="flex items-center gap-3">
-                                <div className="w-24 bg-slate-200 h-1.5 rounded-full overflow-hidden hidden sm:block">
-                                  <div
-                                    className={`h-full rounded-full transition-all duration-300 ${cat.barColor}`}
-                                    style={{ width: `${cat.pct}%` }}
-                                  ></div>
-                                </div>
-                                <span className="font-mono text-xs font-bold text-slate-700">{cat.doneCount}/{cat.totalCount} ({cat.pct}%)</span>
-                              </div>
-                            </div>
-
-                            {!isCollapsed && (
-                              <div className="p-3 sm:p-4 bg-white">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                                  {cat.tasks.map(task => renderTaskCard(task))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                )}
-
