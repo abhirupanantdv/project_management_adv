@@ -1381,567 +1381,409 @@
 
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
             {/* ========================================================================= */}
-            {/* VIEW 0: 🌟 1ST PAGE - EXECUTIVE ANALYTICS DASHBOARD (MATCHING SCREENSHOT)  */}
+            {/* VIEW 1: 🌟 2ND PAGE - EXECUTIVE PROJECT DETAILS OVERVIEW (MATCHING IMAGE 1)*/}
             {/* ========================================================================= */}
-            {currentPage === 'dashboard' && (() => {
-              // Dynamic Calculations for Dashboard
-              const totalProjects = projects.length;
-              const completedProjects = projects.filter(p => p.status === 'Completed' || p.percentCompleted === 100).length;
-              const workingProjects = projects.filter(p => (p.status === 'Working' || p.status === 'In Progress') && p.percentCompleted > 0 && p.percentCompleted < 100).length;
-              const openProjects = totalProjects - completedProjects - workingProjects;
-
-              const ongoingPct = totalProjects > 0 ? Math.round((workingProjects / totalProjects) * 100) : 0;
-              const completedPct = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0;
-              const notStartedPct = totalProjects > 0 ? Math.max(0, 100 - ongoingPct - completedPct) : 0;
-
-              const totalTasksCount = allGlobalTasks.length;
-              const todoTasksCount = allGlobalTasks.filter(t => t.status === 'Open' || t.status === 'Not Started').length;
-
-              // Top 3 Assigned Owners
-              const ownerCounts = {};
-              projects.forEach(p => {
-                const o = p.owner || 'Niranjan Kumar Singh';
-                ownerCounts[o] = (ownerCounts[o] || 0) + 1;
-              });
-              const topOwners = Object.entries(ownerCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 3)
-                .map(([name, count], rank) => {
-                  const emp = employees.find(e => e.name === name) || { avatar: name.slice(0, 2).toUpperCase() };
-                  return { name, count, rank: rank + 1, avatar: emp.avatar };
-                });
-
-              // Top 4 Projects Task by Priority
-              const topProjectsForBars = projects.slice(0, 4).map(p => {
-                const pTasks = p.tasks || [];
-                const urgent = pTasks.filter(t => t.priority === 'Urgent').length;
-                const high = pTasks.filter(t => t.priority === 'High').length;
-                const medium = pTasks.filter(t => t.priority !== 'Urgent' && t.priority !== 'High').length;
-                const total = pTasks.length || 1;
-                return {
-                  id: p.id,
-                  name: formatProfessionalProjectName(p.name),
-                  urgent,
-                  high,
-                  medium,
-                  total
-                };
-              });
-
-              // Category Tasks Breakdown for Donut
-              const categoryBreakdown = categoriesList.map(catKey => {
-                const catConfig = CATEGORY_CONFIG[catKey];
-                const count = allGlobalTasks.filter(t => t.category === catKey).length;
-                const pct = totalTasksCount > 0 ? Math.round((count / totalTasksCount) * 100) : 20;
-                return { key: catKey, label: catConfig.label, count, pct, color: catKey === 'Development' ? '#3b82f6' : catKey === 'UI' ? '#8b5cf6' : catKey === 'Migration' ? '#10b981' : catKey === 'Testing' ? '#f59e0b' : '#ec4899' };
-              });
-
-              // Top 5 Members Weekly Tasks Count
-              const memberCounts = {};
-              allGlobalTasks.forEach(t => {
-                const assignees = t.assignees || [t.assignee || 'Niranjan Kumar Singh'];
-                assignees.forEach(a => {
-                  memberCounts[a] = (memberCounts[a] || 0) + 1;
-                });
-              });
-              const topMembersWeekly = Object.entries(memberCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([name, count]) => ({
-                  name: name.split(' ').map((n, i) => i === 0 ? n : n[0] + '.').join(' '),
-                  count
-                }));
-
-              const maxWeeklyCount = Math.max(...topMembersWeekly.map(m => m.count), 10);
+            {currentPage === 'project_overview' && (() => {
+              const donePct = overallPercent;
+              const resourcePct = 34;
+              const budgetPct = 66;
 
               return (
                 <div className="space-y-6 animate-fade-in font-sans pb-12">
                   
-                  {/* Top Action Header Bar */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                    <div className="space-y-1 relative z-10">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-xs">
-                          ⚡ Executive Analytics
-                        </span>
-                        <span className="text-xs text-blue-100 font-medium flex items-center gap-1">
-                          <span>🟢</span>
-                          <span>Live ERPNext Connected</span>
-                        </span>
-                      </div>
-                      <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white">
-                        Executive Project Cockpit
-                      </h2>
-                      <p className="text-xs sm:text-sm text-blue-100 font-medium">
-                        Real-time enterprise overview of {totalProjects} projects and {totalTasksCount} tasks
-                      </p>
-                    </div>
-
-                    <div className="relative z-10 flex items-center gap-3">
+                  {/* Top Bar with Search, Action Tabs, and Back Button */}
+                  <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    
+                    {/* Left: Back Button & Project Breadcrumb */}
+                    <div className="flex items-center gap-3">
                       <button
                         onClick={() => setCurrentPage('projects_list')}
-                        className="px-6 py-3.5 bg-white hover:bg-slate-100 text-blue-700 hover:text-blue-800 font-black text-sm rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center gap-2 cursor-pointer active:scale-95 group"
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md transition-all active:scale-95 cursor-pointer"
                       >
-                        <span>Open Project List & Cockpit</span>
-                        <span className="transition-transform group-hover:translate-x-1 font-bold">→</span>
+                        <span>←</span>
+                        <span>Back to Projects List</span>
+                      </button>
+
+                      <div className="relative flex-1 min-w-[220px] hidden sm:block">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                        <input
+                          type="text"
+                          placeholder="Search for proposal, projects, tasks..."
+                          value={taskSearchTerm}
+                          onChange={(e) => setTaskSearchTerm(e.target.value)}
+                          className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Center/Right: Action Buttons & Open Tasks Link */}
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                      <button
+                        className="px-4 py-2 text-xs font-black rounded-xl bg-blue-600 text-white shadow-xs flex items-center gap-1.5"
+                      >
+                        <span>📊</span>
+                        <span>Dashboard</span>
+                      </button>
+
+                      <button
+                        onClick={() => setCurrentPage('project_tasks')}
+                        className="px-4 py-2 text-xs font-black rounded-xl bg-slate-900 hover:bg-slate-800 text-white shadow-md transition-all cursor-pointer flex items-center gap-1.5 group"
+                      >
+                        <span>📋</span>
+                        <span>Open Tasks List ({allTasks.length})</span>
+                        <span className="transition-transform group-hover:translate-x-1">→</span>
+                      </button>
+
+                      <button
+                        onClick={() => setIsEmployeeModalOpen(true)}
+                        className="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>👥</span>
+                        <span>Resources</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setTargetProjectForNewTask(currentProj.id);
+                          setAddTaskModalTab('create_new');
+                          setIsNewTaskModalOpen(true);
+                        }}
+                        className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ml-1"
+                      >
+                        <span className="text-sm font-black">+</span>
+                        <span>Add Task</span>
                       </button>
                     </div>
+
                   </div>
 
                   {/* ========================================================================= */}
-                  {/* DASHBOARD GRID 3x3 CARDS MATCHING REFERENCE DESIGN                        */}
+                  {/* MAIN 2-COLUMN LAYOUT: LEFT SIDEBAR + RIGHT EXECUTIVE DASHBOARD (IMAGE 1)   */}
                   {/* ========================================================================= */}
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
                     {/* --------------------------------------------------------------------- */}
-                    {/* TOP ROW: 3 CARDS                                                      */}
+                    {/* LEFT SIDEBAR: PROJECT DETAILS & TEAM (3 COLS)                        */}
                     {/* --------------------------------------------------------------------- */}
-
-                    {/* CARD 1: TASK DEADLINE COUNTDOWN & TARGET DATE (LEFT, 4 COLS) */}
-                    <div className="md:col-span-12 lg:col-span-4 flex flex-col gap-4">
+                    <div className="lg:col-span-4 xl:col-span-3 space-y-5">
                       
-                      {/* Top Part: Countdown Clocks */}
-                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col items-center justify-center text-center space-y-4 flex-1">
-                        <h4 className="text-sm font-extrabold text-slate-800 tracking-tight">
-                          Task deadline countdown
-                        </h4>
-                        
-                        <div className="flex items-center justify-center gap-3">
-                          <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-16 h-16 rounded-2xl bg-blue-600 text-white font-mono text-2xl font-black flex items-center justify-center shadow-md">
-                              04
-                            </div>
-                            <span className="text-xs font-bold text-slate-500">Days</span>
-                          </div>
-
-                          <span className="text-2xl font-black text-blue-600 mb-5">:</span>
-
-                          <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-16 h-16 rounded-2xl bg-blue-600 text-white font-mono text-2xl font-black flex items-center justify-center shadow-md">
-                              18
-                            </div>
-                            <span className="text-xs font-bold text-slate-500">Hours</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Bottom Part: Task Deadline with Flag & Extension */}
-                      <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs flex items-center justify-between">
+                      {/* Project Header Info Card */}
+                      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-5">
                         <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-700">Task Deadline</span>
-                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                              Extension
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3 pt-1">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-black">
-                              🚩
-                            </div>
-                            <span className="text-xl sm:text-2xl font-black font-mono text-slate-900">
-                              2026-09-30
-                            </span>
-                          </div>
+                          <span className="font-mono text-xs font-extrabold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
+                            {currentProj.id}
+                          </span>
+                          <h2 className="text-xl font-black font-display text-slate-900 tracking-tight leading-snug pt-2">
+                            {formatProfessionalProjectName(currentProj.name)}
+                          </h2>
                         </div>
-                      </div>
 
-                    </div>
+                        {/* Project Details Attribute List */}
+                        <div className="space-y-3 pt-3 border-t border-slate-100">
+                          <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                            Project Details
+                          </h4>
+                          
+                          <div className="space-y-2.5 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500 font-medium">Client</span>
+                              <span className="font-bold text-slate-900">{currentProj.company || 'Anantdv Enterprise'}</span>
+                            </div>
 
-                    {/* CARD 2: PROJECT ASSIGNMENT LEADERBOARD (CENTER, 4 COLS) */}
-                    <div className="md:col-span-6 lg:col-span-4 bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4">
-                      <div>
-                        <h4 className="text-sm font-extrabold text-slate-800 tracking-tight">
-                          Project Assignment
-                        </h4>
-                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">Top active project owners & leads</p>
-                      </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500 font-medium">Project Manager</span>
+                              <span className="font-bold text-slate-900">{currentProj.owner || 'Steve Banks'}</span>
+                            </div>
 
-                      <div className="grid grid-cols-3 gap-2 text-center py-2">
-                        {topOwners.map((owner) => (
-                          <div
-                            key={owner.name}
-                            onClick={() => setCurrentPage('projects_list')}
-                            className="flex flex-col items-center space-y-2 p-2.5 rounded-2xl hover:bg-slate-50 transition-all cursor-pointer group"
-                            title={`${owner.name}: ${owner.count} projects`}
-                          >
-                            <div className="relative">
-                              <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-md ring-4 ring-white">
-                                {owner.avatar}
-                              </div>
-                              <span className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full text-white text-[10px] font-black flex items-center justify-center shadow-sm ${
-                                owner.rank === 1 ? 'bg-amber-500' : owner.rank === 2 ? 'bg-slate-400' : 'bg-amber-700'
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500 font-medium">Client Contact</span>
+                              <span className="font-bold text-slate-900">David McPherson</span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500 font-medium">Contract</span>
+                              <span className="font-mono font-bold text-blue-600">NE-UK-C-002</span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500 font-medium">Start Date</span>
+                              <span className="font-mono font-bold text-slate-900">03/01/2026</span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500 font-medium">Duration</span>
+                              <span className="font-bold text-slate-900">18 months</span>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="text-slate-500 font-medium">Status</span>
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                                isProject100Done ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                                isProjectWorking ? 'bg-amber-100 text-amber-900 border border-amber-300' :
+                                'bg-rose-100 text-rose-900 border border-rose-300'
                               }`}>
-                                {owner.rank}
+                                {isProject100Done ? '100% Completed' : isProjectWorking ? 'In Progress' : 'Open / Not Started'}
                               </span>
                             </div>
-
-                            <div className="space-y-0.5 w-full">
-                              <div className="text-[11.5px] font-extrabold text-slate-800 truncate w-full group-hover:text-blue-600">
-                                {owner.name.split(' ')[0]}
-                              </div>
-                              <div className="text-xs font-black text-slate-900 font-mono">
-                                {owner.count}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                        <span>Total Team Leads:</span>
-                        <span className="font-bold text-slate-900">{Object.keys(ownerCounts).length} Staff</span>
-                      </div>
-                    </div>
-
-                    {/* CARD 3: TASK BY PROJECT & PRIORITY (RIGHT, 4 COLS) */}
-                    <div className="md:col-span-6 lg:col-span-4 bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-extrabold text-slate-800 tracking-tight">
-                            Task by project & priority
-                          </h4>
-                        </div>
-                        <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 pt-1">
-                          <span className="flex items-center gap-1 text-rose-600">
-                            <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                            <span>P0 Urgent</span>
-                          </span>
-                          <span className="flex items-center gap-1 text-blue-600">
-                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                            <span>P1 High</span>
-                          </span>
-                          <span className="flex items-center gap-1 text-teal-600">
-                            <span className="w-2 h-2 rounded-full bg-teal-400"></span>
-                            <span>P2 Medium</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        {topProjectsForBars.map(p => {
-                          const uPct = Math.round((p.urgent / p.total) * 100);
-                          const hPct = Math.round((p.high / p.total) * 100);
-                          const mPct = Math.max(0, 100 - uPct - hPct);
-
-                          return (
-                            <div key={p.id} className="space-y-1">
-                              <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-semibold text-slate-700 truncate max-w-[170px]" title={p.name}>
-                                  {p.name}
-                                </span>
-                                <span className="font-mono text-[10px] text-slate-400 font-bold">{p.total} tasks</span>
-                              </div>
-                              <div className="w-full bg-slate-100 h-5 rounded-lg overflow-hidden flex border border-slate-200/60 shadow-inner">
-                                {p.urgent > 0 && (
-                                  <div style={{ width: `${uPct}%` }} className="bg-rose-500 text-white font-mono text-[9px] font-black flex items-center justify-center transition-all" title={`Urgent: ${p.urgent}`}>
-                                    {p.urgent}
-                                  </div>
-                                )}
-                                {p.high > 0 && (
-                                  <div style={{ width: `${hPct}%` }} className="bg-blue-600 text-white font-mono text-[9px] font-black flex items-center justify-center transition-all" title={`High: ${p.high}`}>
-                                    {p.high}
-                                  </div>
-                                )}
-                                {p.medium > 0 && (
-                                  <div style={{ width: `${mPct}%` }} className="bg-teal-400 text-slate-900 font-mono text-[9px] font-black flex items-center justify-center transition-all" title={`Medium/Low: ${p.medium}`}>
-                                    {p.medium}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 pt-1 border-t border-slate-100">
-                        <span>0</span>
-                        <span>10</span>
-                        <span>20</span>
-                        <span>30</span>
-                        <span>40</span>
-                        <span>50+</span>
-                      </div>
-                    </div>
-
-                    {/* --------------------------------------------------------------------- */}
-                    {/* MIDDLE ROW: 3 COLUMNS / 4 CARDS                                       */}
-                    {/* --------------------------------------------------------------------- */}
-
-                    {/* CARD 4A & 4B: TOTAL PROJECT & TO-DO TASK KPI CARDS (LEFT, 4 COLS) */}
-                    <div className="md:col-span-12 lg:col-span-4 grid grid-cols-2 gap-4">
-                      
-                      {/* 4A: Total Project */}
-                      <div
-                        onClick={() => setCurrentPage('projects_list')}
-                        className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-3 cursor-pointer hover:shadow-md hover:border-blue-400 transition-all group"
-                      >
-                        <div className="text-xs font-bold text-slate-600">
-                          Total project
-                        </div>
-                        <div className="text-4xl sm:text-5xl font-black font-display tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-                          {totalProjects}
-                        </div>
-                        <div className="text-[11px] font-bold text-blue-600 flex items-center gap-1">
-                          <span>View All</span>
-                          <span>→</span>
-                        </div>
-                      </div>
-
-                      {/* 4B: To-Do Task */}
-                      <div
-                        onClick={() => setCurrentPage('projects_list')}
-                        className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-3 cursor-pointer hover:shadow-md hover:border-amber-400 transition-all group"
-                      >
-                        <div className="text-xs font-bold text-slate-600">
-                          To-do task
-                        </div>
-                        <div className="text-4xl sm:text-5xl font-black font-display tracking-tight text-amber-500 group-hover:text-amber-600 transition-colors">
-                          {todoTasksCount}
-                        </div>
-                        <div className="text-[11px] font-bold text-amber-600 flex items-center gap-1">
-                          <span>Pending</span>
-                          <span>⚡</span>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* CARD 5: ONGOING PROJECT PERCENTAGE (CENTER, 4 COLS) */}
-                    <div className="md:col-span-6 lg:col-span-4 bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-extrabold text-slate-800 tracking-tight">
-                            Ongoing Project Percentage
-                          </h4>
-                          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                            Extension
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-baseline justify-between pt-1">
-                        <div className="flex items-baseline gap-2 font-mono text-3xl font-black">
-                          <span className="text-amber-500">{workingProjects}</span>
-                          <span className="text-slate-300">|</span>
-                          <span className="text-slate-900">{totalProjects}</span>
-                        </div>
-                        <div className="text-3xl font-black font-display text-slate-900">
-                          {ongoingPct}%
-                        </div>
-                      </div>
-
-                      {/* Smooth Rounded Progress Bar */}
-                      <div className="w-full bg-slate-100 h-5 rounded-full overflow-hidden flex border border-slate-200/60 p-0.5">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500 shadow-sm"
-                          style={{ width: `${Math.max(ongoingPct, 5)}%` }}
-                        ></div>
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-semibold">
-                        <span>{workingProjects} Active Working</span>
-                        <span>{completedProjects} Completed</span>
-                      </div>
-                    </div>
-
-                    {/* CARD 6: PROJECT STATUS OVERVIEW PIE CHART (RIGHT, 4 COLS) */}
-                    <div className="md:col-span-6 lg:col-span-4 bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4">
-                      <div>
-                        <h4 className="text-sm font-extrabold text-slate-800 tracking-tight">
-                          Project status overview
-                        </h4>
-                        <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 pt-1">
-                          <span className="flex items-center gap-1 text-blue-600">
-                            <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                            <span>Ongoing</span>
-                          </span>
-                          <span className="flex items-center gap-1 text-indigo-400">
-                            <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
-                            <span>Not started</span>
-                          </span>
-                          <span className="flex items-center gap-1 text-emerald-500">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                            <span>Completed</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* SVG Pie Chart */}
-                      {(() => {
-                        const total = totalProjects || 1;
-                        const angWork = (workingProjects / total) * 360;
-                        const angOpen = (openProjects / total) * 360;
-                        const angComp = 360 - angWork - angOpen;
-
-                        return (
-                          <div className="flex items-center justify-around py-1 gap-2">
-                            <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
-                              <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#e2e8f0" strokeWidth="20" />
-                                {ongoingPct > 0 && (
-                                  <circle
-                                    cx="50" cy="50" r="40" fill="transparent"
-                                    stroke="#3b82f6" strokeWidth="20"
-                                    strokeDasharray={`${(ongoingPct / 100) * 251.2} 251.2`}
-                                    strokeDashoffset="0"
-                                    className="transition-all duration-500"
-                                  />
-                                )}
-                                {completedPct > 0 && (
-                                  <circle
-                                    cx="50" cy="50" r="40" fill="transparent"
-                                    stroke="#10b981" strokeWidth="20"
-                                    strokeDasharray={`${(completedPct / 100) * 251.2} 251.2`}
-                                    strokeDashoffset={`${-((ongoingPct / 100) * 251.2)}`}
-                                    className="transition-all duration-500"
-                                  />
-                                )}
-                                {notStartedPct > 0 && (
-                                  <circle
-                                    cx="50" cy="50" r="40" fill="transparent"
-                                    stroke="#818cf8" strokeWidth="20"
-                                    strokeDasharray={`${(notStartedPct / 100) * 251.2} 251.2`}
-                                    strokeDashoffset={`${-(((ongoingPct + completedPct) / 100) * 251.2)}`}
-                                    className="transition-all duration-500"
-                                  />
-                                )}
-                              </svg>
-                            </div>
-
-                            <div className="space-y-1.5 text-xs flex-1">
-                              <div className="p-1 px-2 rounded-lg bg-blue-50 text-blue-900 border border-blue-200 text-[11px] font-extrabold flex justify-between">
-                                <span>Ongoing:</span>
-                                <span className="font-mono">{workingProjects} ({ongoingPct}%)</span>
-                              </div>
-                              <div className="p-1 px-2 rounded-lg bg-indigo-50 text-indigo-900 border border-indigo-200 text-[11px] font-extrabold flex justify-between">
-                                <span>Not started:</span>
-                                <span className="font-mono">{openProjects} ({notStartedPct}%)</span>
-                              </div>
-                              <div className="p-1 px-2 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-[11px] font-extrabold flex justify-between">
-                                <span>Completed:</span>
-                                <span className="font-mono">{completedProjects} ({completedPct}%)</span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()}
-
-                    </div>
-
-                    {/* --------------------------------------------------------------------- */}
-                    {/* BOTTOM ROW: 2 WIDE CARDS                                              */}
-                    {/* --------------------------------------------------------------------- */}
-
-                    {/* CARD 7: PROJECT TYPE / CATEGORY BREAKDOWN (LEFT, 6 COLS) */}
-                    <div className="md:col-span-12 lg:col-span-6 bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4">
-                      <div>
-                        <h4 className="text-sm font-extrabold text-slate-800 tracking-tight">
-                          Project type
-                        </h4>
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 pt-1 flex-wrap">
-                          {categoryBreakdown.map(cat => (
-                            <span key={cat.key} className="flex items-center gap-1">
-                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }}></span>
-                              <span>{cat.label}</span>
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-around py-2 gap-4 flex-wrap sm:flex-nowrap">
-                        {/* Center Ring */}
-                        <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
-                          <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="38" fill="transparent" stroke="#f1f5f9" strokeWidth="14" />
-                            {(() => {
-                              let accumulated = 0;
-                              return categoryBreakdown.map(cat => {
-                                const strokeLen = (cat.pct / 100) * 238.7;
-                                const offset = (accumulated / 100) * 238.7;
-                                accumulated += cat.pct;
-                                return (
-                                  <circle
-                                    key={cat.key}
-                                    cx="50" cy="50" r="38"
-                                    fill="transparent"
-                                    stroke={cat.color}
-                                    strokeWidth="14"
-                                    strokeDasharray={`${strokeLen} 238.7`}
-                                    strokeDashoffset={`${-offset}`}
-                                    className="transition-all duration-500"
-                                  />
-                                );
-                              });
-                            })()}
-                          </svg>
-                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                            <span className="font-mono text-xs font-black text-slate-900">{totalTasksCount}</span>
-                            <span className="text-[8px] font-bold text-slate-400">Tasks</span>
                           </div>
                         </div>
 
-                        {/* Category List Stats */}
-                        <div className="grid grid-cols-2 gap-2 text-xs flex-1">
-                          {categoryBreakdown.map(cat => (
-                            <div key={cat.key} className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 space-y-0.5">
-                              <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 truncate">
-                                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: cat.color }}></span>
-                                <span className="truncate">{cat.label}</span>
-                              </div>
-                              <div className="font-mono text-xs font-black text-slate-900">
-                                {cat.count} ({cat.pct}%)
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                        {/* Team Section */}
+                        <div className="space-y-3 pt-3 border-t border-slate-100">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                              Team
+                            </h4>
+                            <span className="text-[11px] font-bold text-slate-400">{employees.slice(0, 5).length} Members</span>
+                          </div>
 
-                    </div>
-
-                    {/* CARD 8: WEEKLY REPORT BY MEMBERS (RIGHT, 6 COLS) */}
-                    <div className="md:col-span-12 lg:col-span-6 bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4">
-                      <div>
-                        <h4 className="text-sm font-extrabold text-slate-800 tracking-tight">
-                          Weekly Report by Members
-                        </h4>
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600 pt-0.5">
-                          <span>● Count</span>
-                          <span className="text-slate-400">• Tasks Distribution Across Active Team</span>
-                        </div>
-                      </div>
-
-                      {/* Vertical Bar Chart */}
-                      <div className="h-36 flex items-end justify-between gap-3 px-2 pt-4 border-b border-slate-200">
-                        {topMembersWeekly.map((m) => {
-                          const barHeight = Math.max(15, Math.round((m.count / maxWeeklyCount) * 100));
-
-                          return (
-                            <div key={m.name} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                              <div className="w-full flex items-end justify-center h-full">
-                                <div
-                                  className="w-full max-w-[42px] bg-blue-600 group-hover:bg-blue-700 rounded-t-xl transition-all flex items-center justify-center text-white font-mono text-[10px] font-black shadow-sm"
-                                  style={{ height: `${barHeight}%` }}
-                                  title={`${m.name}: ${m.count} tasks`}
-                                >
-                                  {m.count}
+                          <div className="space-y-3">
+                            {employees.slice(0, 5).map((emp, i) => {
+                              const roles = ['Project Manager', 'Senior Consultant - Reservoir', 'Principal Engineer - Process', 'Senior Engineer - Process', 'Consultant Engineer - Subsea'];
+                              return (
+                                <div key={emp.name} className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-slate-100">
+                                    {emp.avatar}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="text-xs font-extrabold text-slate-900 truncate">
+                                      {emp.name}
+                                    </div>
+                                    <div className="text-[10px] text-slate-400 truncate">
+                                      {roles[i % roles.length]}
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                              <span className="text-[10px] font-extrabold text-slate-600 truncate w-full text-center group-hover:text-blue-600">
-                                {m.name}
-                              </span>
-                            </div>
-                          );
-                        })}
+                              );
+                            })}
+                          </div>
+
+                          <button
+                            onClick={() => setIsEmployeeModalOpen(true)}
+                            className="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all cursor-pointer text-center mt-2"
+                          >
+                            ... See all members
+                          </button>
+                        </div>
+
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-                        <span>Staff Performance Velocity</span>
-                        <button
-                          onClick={() => setIsEmployeeModalOpen(true)}
-                          className="text-xs font-bold text-blue-600 hover:underline cursor-pointer"
-                        >
-                          View Employee Directory →
-                        </button>
+                    </div>
+
+                    {/* --------------------------------------------------------------------- */}
+                    {/* RIGHT DASHBOARD CONTENT AREA (9 COLS)                                 */}
+                    {/* --------------------------------------------------------------------- */}
+                    <div className="lg:col-span-8 xl:col-span-9 space-y-6">
+                      
+                      {/* TOP 3 PROGRESS METRIC CARDS */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        {/* Card 1: Project Progress */}
+                        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs flex items-center justify-between">
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-black text-slate-800 tracking-tight">Project Progress</h4>
+                            <p className="text-[11px] text-slate-400 leading-tight">Overall task completion rate</p>
+                          </div>
+                          <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
+                            <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
+                              <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                              <circle cx="18" cy="18" r="14" fill="none" stroke="#2563eb" strokeWidth="4" strokeDasharray="88" strokeDashoffset={88 - (88 * donePct) / 100} strokeLinecap="round" />
+                            </svg>
+                            <span className="absolute font-mono text-xs font-black text-slate-900">{donePct}%</span>
+                          </div>
+                        </div>
+
+                        {/* Card 2: Resource Progress */}
+                        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs flex items-center justify-between">
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-black text-slate-800 tracking-tight">Resource Progress</h4>
+                            <p className="text-[11px] text-slate-400 leading-tight">Team capacity allocation</p>
+                          </div>
+                          <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
+                            <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
+                              <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                              <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" strokeWidth="4" strokeDasharray="88" strokeDashoffset={88 - (88 * resourcePct) / 100} strokeLinecap="round" />
+                            </svg>
+                            <span className="absolute font-mono text-xs font-black text-slate-900">{resourcePct}%</span>
+                          </div>
+                        </div>
+
+                        {/* Card 3: Budget Progress */}
+                        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs flex items-center justify-between">
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-black text-slate-800 tracking-tight">Budget Progress</h4>
+                            <p className="text-[11px] text-slate-400 leading-tight">Budget utilization tracking</p>
+                          </div>
+                          <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
+                            <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
+                              <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
+                              <circle cx="18" cy="18" r="14" fill="none" stroke="#10b981" strokeWidth="4" strokeDasharray="88" strokeDashoffset={88 - (88 * budgetPct) / 100} strokeLinecap="round" />
+                            </svg>
+                            <span className="absolute font-mono text-xs font-black text-slate-900">{budgetPct}%</span>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* MIDDLE ROW: 2 WIDE CARDS (Budget & Forecast) */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        {/* Card 4: Budget Stacked Bar Chart */}
+                        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-base font-black text-slate-900 tracking-tight">Budget</h4>
+                              <span className="text-xs">📊</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500">
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-900"></span>Invoiced</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-700"></span>WIP</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-200"></span>Left</span>
+                            </div>
+                          </div>
+
+                          {/* Stacked Bars Visual */}
+                          <div className="h-44 flex items-end justify-around gap-6 pt-4 border-b border-slate-100">
+                            <div className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                              <div className="w-14 rounded-t-xl overflow-hidden flex flex-col justify-end bg-slate-100 shadow-inner" style={{ height: '90%' }}>
+                                <div className="bg-indigo-300 h-[25%] flex items-center justify-center text-[8px] font-bold text-slate-800">$10M</div>
+                                <div className="bg-amber-600 h-[35%] flex items-center justify-center text-[8px] font-bold text-white">$15M</div>
+                                <div className="bg-slate-900 h-[40%] flex items-center justify-center text-[8px] font-bold text-white">$20M</div>
+                              </div>
+                              <span className="text-[10px] font-bold text-slate-500">Phase 1</span>
+                            </div>
+
+                            <div className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                              <div className="w-14 rounded-t-xl overflow-hidden flex flex-col justify-end bg-slate-100 shadow-inner" style={{ height: '70%' }}>
+                                <div className="bg-indigo-300 h-[20%] flex items-center justify-center text-[8px] font-bold text-slate-800">$6M</div>
+                                <div className="bg-amber-600 h-[40%] flex items-center justify-center text-[8px] font-bold text-white">$12M</div>
+                                <div className="bg-slate-900 h-[40%] flex items-center justify-center text-[8px] font-bold text-white">$13M</div>
+                              </div>
+                              <span className="text-[10px] font-bold text-slate-500">Phase 2</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-xs font-bold text-slate-600 pt-1">
+                            <span>Total Contract Value:</span>
+                            <span className="font-mono text-slate-900">$45,000,000</span>
+                          </div>
+                        </div>
+
+                        {/* Card 5: Forecast Multi-Line Trajectory */}
+                        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-base font-black text-slate-900 tracking-tight">Forecast</h4>
+                              <span className="text-xs">📈</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500">
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-900"></span>Monthly</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500"></span>Total</span>
+                            </div>
+                          </div>
+
+                          {/* Multi-Line Graph SVG */}
+                          <div className="h-44 relative flex items-center justify-center">
+                            <svg className="w-full h-full" viewBox="0 0 300 120" preserveAspectRatio="none">
+                              <path d="M0,80 Q50,40 100,60 T200,30 T300,50" fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+                              <path d="M0,100 Q50,70 100,85 T200,55 T300,70" fill="none" stroke="#0f172a" strokeWidth="2.5" />
+                              <circle cx="200" cy="30" r="4" fill="#f59e0b" />
+                              <circle cx="200" cy="55" r="4" fill="#0f172a" />
+                            </svg>
+                            <div className="absolute top-2 right-12 bg-white/90 backdrop-blur-xs border border-slate-200 p-1.5 rounded-lg text-[9px] font-mono shadow-xs">
+                              <div className="font-bold text-slate-900">Plan: $8,000,000</div>
+                              <div className="text-amber-600 font-bold">Actual: $6,000,000</div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-xs font-bold text-slate-600 pt-1 border-t border-slate-100">
+                            <span>Variance Tracking:</span>
+                            <span className="font-mono text-emerald-600">+4.2% On Track</span>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* BOTTOM ROW: 2 WIDE CARDS (Hours & Margin) */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        {/* Card 6: Hours & Workload */}
+                        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-base font-black text-slate-900 tracking-tight">Hours</h4>
+                            <span className="text-xs font-bold text-slate-400">Team Timesheets</span>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2 py-2 overflow-x-auto">
+                            {employees.slice(0, 4).map((emp, i) => (
+                              <div key={emp.name} className="flex flex-col items-center space-y-1 text-center">
+                                <div className="w-11 h-11 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                                  {emp.avatar}
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-700 truncate w-14">{emp.name.split(' ')[0]}</span>
+                                <span className="font-mono text-[9px] font-extrabold text-blue-600">{(i + 1) * 45}h</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Total Hours Progress Bar */}
+                          <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                            <div className="flex items-center justify-between text-xs font-bold">
+                              <span className="text-slate-500">Total Hours</span>
+                              <span className="font-mono text-slate-900">3400 hrs</span>
+                            </div>
+                            <div className="w-full bg-indigo-200 h-4 rounded-lg overflow-hidden flex">
+                              <div style={{ width: '66%' }} className="bg-slate-900 h-full flex items-center justify-center text-[9px] text-white font-bold">Used: 2242</div>
+                            </div>
+                            <div className="flex items-center justify-between text-[11px] text-slate-400">
+                              <span>Used: 2242 hrs</span>
+                              <span>Left: 738 hrs</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Card 7: Margin Performance */}
+                        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-base font-black text-slate-900 tracking-tight">Margin</h4>
+                            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              ● Profitability
+                            </span>
+                          </div>
+
+                          <div className="flex items-baseline justify-between">
+                            <div className="space-y-0.5">
+                              <div className="text-3xl font-black font-display text-slate-900 flex items-center gap-1.5">
+                                <span>24.1%</span>
+                                <span className="text-emerald-500 text-lg">▲</span>
+                              </div>
+                              <div className="text-xs text-slate-400 font-medium">VS Estimated 22.8%</div>
+                            </div>
+
+                            <div className="bg-slate-50 p-2 rounded-xl border border-slate-200 text-[10px] space-y-1 font-mono">
+                              <div className="text-emerald-700 font-bold">Gross: 13.3%</div>
+                              <div className="text-rose-600 font-bold">Net: 12.6%</div>
+                            </div>
+                          </div>
+
+                          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex border border-slate-200/60">
+                            <div className="bg-emerald-500 h-full" style={{ width: '65%' }}></div>
+                            <div className="bg-rose-500 h-full" style={{ width: '20%' }}></div>
+                            <div className="bg-slate-400 h-full" style={{ width: '15%' }}></div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-1">
+                            <span>High Profit Margin</span>
+                            <button
+                              onClick={() => setCurrentPage('project_tasks')}
+                              className="text-xs font-bold text-blue-600 hover:underline cursor-pointer flex items-center gap-1"
+                            >
+                              <span>Open Tasks Breakdown</span>
+                              <span>→</span>
+                            </button>
+                          </div>
+                        </div>
+
                       </div>
 
                     </div>
@@ -1952,735 +1794,401 @@
               );
             })()}
 
-
-
             {/* ========================================================================= */}
-            {/* VIEW 1: DEDICATED PROJECT DETAILS & TASK KANBAN VIEW                      */}
+            {/* VIEW 2: 🌟 3RD PAGE - PREVIOUS CLASSIC PROJECT TASK LIST & KANBAN VIEW     */}
             {/* ========================================================================= */}
-            {/* ========================================================================= */}
-            {/* VIEW 1: 🌟 DEDICATED PROJECT DETAILS (MATCHING REFERENCE DESIGN WITH SIDEBAR) */}
-            {/* ========================================================================= */}
-            {currentPage === 'project_details' ? (
-              (() => {
-                const donePct = overallPercent;
-                const workPct = totalTasksCount > 0 ? Math.round((workingTasksCount / totalTasksCount) * 100) : 0;
-                const openPct = totalTasksCount > 0 ? Math.max(0, 100 - donePct - workPct) : 0;
-                const resourcePct = 34;
-                const budgetPct = 66;
+            {currentPage === 'project_tasks' && (() => {
+              const donePct = overallPercent;
+              const workPct = totalTasksCount > 0 ? Math.round((workingTasksCount / totalTasksCount) * 100) : 0;
+              const openPct = totalTasksCount > 0 ? Math.max(0, 100 - donePct - workPct) : 0;
 
-                return (
-                  <div className="space-y-6 animate-fade-in font-sans pb-12">
-                    
-                    {/* Top Bar with Search, Tabs, and Back Button */}
-                    <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      
-                      {/* Left: Back Button & Search */}
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => setCurrentPage('projects_list')}
-                          className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md transition-all active:scale-95 cursor-pointer"
-                        >
-                          <span className="text-sm">←</span>
-                          <span>Back to Projects List</span>
-                        </button>
+              return (
+                <div className="space-y-5 animate-fade-in font-sans pb-12">
+                  
+                  {/* Top Breadcrumb Header Bar */}
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-200 flex-wrap gap-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => setCurrentPage('projects_list')}
+                        className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all cursor-pointer"
+                      >
+                        <span>←</span>
+                        <span>Projects List</span>
+                      </button>
 
-                        <div className="relative flex-1 min-w-[220px] hidden sm:block">
-                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
-                          <input
-                            type="text"
-                            placeholder="Search for proposal, projects, tasks..."
-                            value={taskSearchTerm}
-                            onChange={(e) => setTaskSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
+                      <button
+                        onClick={() => setCurrentPage('project_overview')}
+                        className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                      >
+                        <span>📊</span>
+                        <span>Project Details & Dashboard</span>
+                      </button>
 
-                      {/* Center/Right: Project Sub-Tabs (Dashboard, Work breakdown, Resources) */}
-                      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                        <button
-                          onClick={() => setProjectDetailsTab('dashboard')}
-                          className={`px-4 py-2 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-                            projectDetailsTab === 'dashboard'
-                              ? 'bg-blue-600 text-white shadow-xs'
-                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                          }`}
-                        >
-                          <span>📊</span>
-                          <span>Dashboard</span>
-                        </button>
-
-                        <button
-                          onClick={() => setProjectDetailsTab('tasks')}
-                          className={`px-4 py-2 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-                            projectDetailsTab === 'tasks'
-                              ? 'bg-blue-600 text-white shadow-xs'
-                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                          }`}
-                        >
-                          <span>📋</span>
-                          <span>Work breakdown ({totalTasksCount})</span>
-                        </button>
-
-                        <button
-                          onClick={() => setProjectDetailsTab('resources')}
-                          className={`px-4 py-2 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
-                            projectDetailsTab === 'resources'
-                              ? 'bg-blue-600 text-white shadow-xs'
-                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                          }`}
-                        >
-                          <span>👥</span>
-                          <span>Resources</span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setTargetProjectForNewTask(currentProj.id);
-                            setAddTaskModalTab('create_new');
-                            setIsNewTaskModalOpen(true);
-                          }}
-                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ml-2"
-                        >
-                          <span className="text-sm font-black">+</span>
-                          <span>Add Task</span>
-                        </button>
-                      </div>
-
+                      <span className="font-mono text-xs font-bold text-blue-600 px-2 py-0.5 bg-blue-50 rounded-md border border-blue-200">
+                        {currentProj.id}
+                      </span>
+                      <span className="text-slate-300">/</span>
+                      <span className="font-semibold text-xs text-slate-700 truncate max-w-sm">
+                        {formatProfessionalProjectName(currentProj.name)}
+                      </span>
                     </div>
 
-                    {/* ========================================================================= */}
-                    {/* MAIN 2-COLUMN LAYOUT: LEFT SIDEBAR + RIGHT EXECUTIVE CONTENT             */}
-                    {/* ========================================================================= */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                      
-                      {/* --------------------------------------------------------------------- */}
-                      {/* LEFT SIDEBAR: PROJECT DETAILS & TEAM MEMBERS (3 COLS)                */}
-                      {/* --------------------------------------------------------------------- */}
-                      <div className="lg:col-span-4 xl:col-span-3 space-y-5">
-                        
-                        {/* Project Header Info Card */}
-                        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-5">
-                          <div className="space-y-1">
-                            <span className="font-mono text-xs font-extrabold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
-                              {currentProj.id}
-                            </span>
-                            <h2 className="text-xl font-black font-display text-slate-900 tracking-tight leading-snug pt-2">
-                              {formatProfessionalProjectName(currentProj.name)}
-                            </h2>
-                          </div>
+                    <button
+                      onClick={() => {
+                        setTargetProjectForNewTask(currentProj.id);
+                        setAddTaskModalTab('create_new');
+                        setIsNewTaskModalOpen(true);
+                      }}
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <span className="text-sm font-black">+</span>
+                      <span>Add / Link Task to {currentProj.id}</span>
+                    </button>
+                  </div>
 
-                          {/* Project Details Attribute List */}
-                          <div className="space-y-3 pt-3 border-t border-slate-100">
-                            <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                              Project Details
-                            </h4>
-                            
-                            <div className="space-y-2.5 text-xs">
-                              <div className="flex items-center justify-between">
-                                <span className="text-slate-500 font-medium">Client</span>
-                                <span className="font-bold text-slate-900">{currentProj.company || 'Star Energy'}</span>
-                              </div>
+                  {/* 🌟 1. UNIQUE EXECUTIVE PROJECT COCKPIT DASHBOARD (PREVIOUS VIEW) */}
+                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white border border-slate-700/80 rounded-3xl p-6 shadow-xl relative overflow-hidden space-y-5">
+                    
+                    {/* Background Ambient Glow */}
+                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                              <div className="flex items-center justify-between">
-                                <span className="text-slate-500 font-medium">Project Manager</span>
-                                <span className="font-bold text-slate-900">{currentProj.owner || 'Steve Banks'}</span>
-                              </div>
-
-                              <div className="flex items-center justify-between">
-                                <span className="text-slate-500 font-medium">Client Contact</span>
-                                <span className="font-bold text-slate-900">David McPherson</span>
-                              </div>
-
-                              <div className="flex items-center justify-between">
-                                <span className="text-slate-500 font-medium">Contract</span>
-                                <span className="font-mono font-bold text-blue-600">NE-UK-C-002</span>
-                              </div>
-
-                              <div className="flex items-center justify-between">
-                                <span className="text-slate-500 font-medium">Start Date</span>
-                                <span className="font-mono font-bold text-slate-900">03/01/2026</span>
-                              </div>
-
-                              <div className="flex items-center justify-between">
-                                <span className="text-slate-500 font-medium">Duration</span>
-                                <span className="font-bold text-slate-900">18 months</span>
-                              </div>
-
-                              <div className="flex items-center justify-between pt-1">
-                                <span className="text-slate-500 font-medium">Status</span>
-                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
-                                  isProject100Done ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
-                                  isProjectWorking ? 'bg-amber-100 text-amber-900 border border-amber-300' :
-                                  'bg-rose-100 text-rose-900 border border-rose-300'
-                                }`}>
-                                  {isProject100Done ? '100% Completed' : isProjectWorking ? 'In Progress' : 'Open / Not Started'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Team Section */}
-                          <div className="space-y-3 pt-3 border-t border-slate-100">
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                                Team
-                              </h4>
-                              <span className="text-[11px] font-bold text-slate-400">{employees.slice(0, 5).length} Members</span>
-                            </div>
-
-                            <div className="space-y-3">
-                              {employees.slice(0, 5).map((emp, i) => {
-                                const roles = ['Project Manager', 'Senior Consultant - Reservoir', 'Principal Engineer - Process', 'Senior Engineer - Process', 'Consultant Engineer - Subsea'];
-                                return (
-                                  <div key={emp.name} className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-slate-100">
-                                      {emp.avatar}
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                      <div className="text-xs font-extrabold text-slate-900 truncate">
-                                        {emp.name}
-                                      </div>
-                                      <div className="text-[10px] text-slate-400 truncate">
-                                        {roles[i % roles.length]}
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            <button
-                              onClick={() => setIsEmployeeModalOpen(true)}
-                              className="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-all cursor-pointer text-center mt-2"
-                            >
-                              ... See all members
-                            </button>
-                          </div>
-
+                    {/* Header Row */}
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-xs font-black px-3 py-1 rounded-lg bg-white/10 text-white border border-white/20 shadow-2xs backdrop-blur-xs">
+                            {currentProj.id}
+                          </span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-black border shadow-2xs ${
+                            isProject100Done
+                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              : isProjectWorking
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                              : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                          }`}>
+                            {isProject100Done ? '🟢 Completed (100%)' : isProjectWorking ? '🟡 In Progress' : '🔴 Open / Not Started'}
+                          </span>
+                          <span className="text-xs text-slate-300 font-medium flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
+                            <span>🏢</span>
+                            <span>{currentProj.company || 'Anantdv Enterprise'}</span>
+                          </span>
                         </div>
 
+                        <h2 className="text-xl sm:text-2xl font-black font-display tracking-tight text-white leading-tight">
+                          {formatProfessionalProjectName(currentProj.name)}
+                        </h2>
                       </div>
 
-                      {/* --------------------------------------------------------------------- */}
-                      {/* RIGHT MAIN CONTENT AREA: DASHBOARD OR WORK BREAKDOWN (9 COLS)         */}
-                      {/* --------------------------------------------------------------------- */}
-                      <div className="lg:col-span-8 xl:col-span-9 space-y-6">
-                        
-                        {/* TAB 1: EXECUTIVE DASHBOARD CHARTS */}
-                        {projectDetailsTab === 'dashboard' && (
-                          <div className="space-y-6">
-                            
-                            {/* TOP 3 PROGRESS METRIC CARDS */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              
-                              {/* Card 1: Project Progress */}
-                              <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs flex items-center justify-between">
-                                <div className="space-y-1">
-                                  <h4 className="text-xs font-black text-slate-800 tracking-tight">Project Progress</h4>
-                                  <p className="text-[11px] text-slate-400 leading-tight">Overall task completion rate</p>
-                                </div>
-                                <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
-                                  <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
-                                    <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                    <circle cx="18" cy="18" r="14" fill="none" stroke="#2563eb" strokeWidth="4" strokeDasharray="88" strokeDashoffset={88 - (88 * donePct) / 100} strokeLinecap="round" />
-                                  </svg>
-                                  <span className="absolute font-mono text-xs font-black text-slate-900">{donePct}%</span>
-                                </div>
-                              </div>
-
-                              {/* Card 2: Resource Progress */}
-                              <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs flex items-center justify-between">
-                                <div className="space-y-1">
-                                  <h4 className="text-xs font-black text-slate-800 tracking-tight">Resource Progress</h4>
-                                  <p className="text-[11px] text-slate-400 leading-tight">Team capacity allocation</p>
-                                </div>
-                                <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
-                                  <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
-                                    <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                    <circle cx="18" cy="18" r="14" fill="none" stroke="#f59e0b" strokeWidth="4" strokeDasharray="88" strokeDashoffset={88 - (88 * resourcePct) / 100} strokeLinecap="round" />
-                                  </svg>
-                                  <span className="absolute font-mono text-xs font-black text-slate-900">{resourcePct}%</span>
-                                </div>
-                              </div>
-
-                              {/* Card 3: Budget Progress */}
-                              <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs flex items-center justify-between">
-                                <div className="space-y-1">
-                                  <h4 className="text-xs font-black text-slate-800 tracking-tight">Budget Progress</h4>
-                                  <p className="text-[11px] text-slate-400 leading-tight">Budget utilization tracking</p>
-                                </div>
-                                <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
-                                  <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
-                                    <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" strokeWidth="4" />
-                                    <circle cx="18" cy="18" r="14" fill="none" stroke="#10b981" strokeWidth="4" strokeDasharray="88" strokeDashoffset={88 - (88 * budgetPct) / 100} strokeLinecap="round" />
-                                  </svg>
-                                  <span className="absolute font-mono text-xs font-black text-slate-900">{budgetPct}%</span>
-                                </div>
-                              </div>
-
-                            </div>
-
-                            {/* MIDDLE ROW: 2 WIDE CARDS (Budget & Forecast) */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                              
-                              {/* Card 4: Budget Stacked Bar Chart */}
-                              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <h4 className="text-base font-black text-slate-900 tracking-tight">Budget</h4>
-                                    <span className="text-xs">📊</span>
-                                  </div>
-                                  <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500">
-                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-900"></span>Invoiced</span>
-                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-700"></span>WIP</span>
-                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-200"></span>Left</span>
-                                  </div>
-                                </div>
-
-                                {/* Stacked Bars Visual */}
-                                <div className="h-44 flex items-end justify-around gap-6 pt-4 border-b border-slate-100">
-                                  <div className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                                    <div className="w-14 rounded-t-xl overflow-hidden flex flex-col justify-end bg-slate-100 shadow-inner" style={{ height: '90%' }}>
-                                      <div className="bg-indigo-300 h-[25%] flex items-center justify-center text-[8px] font-bold text-slate-800">$10M</div>
-                                      <div className="bg-amber-600 h-[35%] flex items-center justify-center text-[8px] font-bold text-white">$15M</div>
-                                      <div className="bg-slate-900 h-[40%] flex items-center justify-center text-[8px] font-bold text-white">$20M</div>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-500">Phase 1</span>
-                                  </div>
-
-                                  <div className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                                    <div className="w-14 rounded-t-xl overflow-hidden flex flex-col justify-end bg-slate-100 shadow-inner" style={{ height: '70%' }}>
-                                      <div className="bg-indigo-300 h-[20%] flex items-center justify-center text-[8px] font-bold text-slate-800">$6M</div>
-                                      <div className="bg-amber-600 h-[40%] flex items-center justify-center text-[8px] font-bold text-white">$12M</div>
-                                      <div className="bg-slate-900 h-[40%] flex items-center justify-center text-[8px] font-bold text-white">$13M</div>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-slate-500">Phase 2</span>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center justify-between text-xs font-bold text-slate-600 pt-1">
-                                  <span>Total Contract Value:</span>
-                                  <span className="font-mono text-slate-900">$45,000,000</span>
-                                </div>
-                              </div>
-
-                              {/* Card 5: Forecast Multi-Line Trajectory */}
-                              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <h4 className="text-base font-black text-slate-900 tracking-tight">Forecast</h4>
-                                    <span className="text-xs">📈</span>
-                                  </div>
-                                  <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500">
-                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-900"></span>Monthly</span>
-                                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500"></span>Total</span>
-                                  </div>
-                                </div>
-
-                                {/* Multi-Line Graph SVG */}
-                                <div className="h-44 relative flex items-center justify-center">
-                                  <svg className="w-full h-full" viewBox="0 0 300 120" preserveAspectRatio="none">
-                                    <path d="M0,80 Q50,40 100,60 T200,30 T300,50" fill="none" stroke="#f59e0b" strokeWidth="2.5" />
-                                    <path d="M0,100 Q50,70 100,85 T200,55 T300,70" fill="none" stroke="#0f172a" strokeWidth="2.5" />
-                                    <circle cx="200" cy="30" r="4" fill="#f59e0b" />
-                                    <circle cx="200" cy="55" r="4" fill="#0f172a" />
-                                  </svg>
-                                  <div className="absolute top-2 right-12 bg-white/90 backdrop-blur-xs border border-slate-200 p-1.5 rounded-lg text-[9px] font-mono shadow-xs">
-                                    <div className="font-bold text-slate-900">Plan: $8,000,000</div>
-                                    <div className="text-amber-600 font-bold">Actual: $6,000,000</div>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center justify-between text-xs font-bold text-slate-600 pt-1 border-t border-slate-100">
-                                  <span>Variance Tracking:</span>
-                                  <span className="font-mono text-emerald-600">+4.2% On Track</span>
-                                </div>
-                              </div>
-
-                            </div>
-
-                            {/* BOTTOM ROW: 2 WIDE CARDS (Hours & Margin) */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                              
-                              {/* Card 6: Hours & Workload */}
-                              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <h4 className="text-base font-black text-slate-900 tracking-tight">Hours</h4>
-                                  <span className="text-xs font-bold text-slate-400">Team Timesheets</span>
-                                </div>
-
-                                <div className="flex items-center justify-between gap-2 py-2 overflow-x-auto">
-                                  {employees.slice(0, 4).map((emp, i) => (
-                                    <div key={emp.name} className="flex flex-col items-center space-y-1 text-center">
-                                      <div className="w-11 h-11 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shadow-xs">
-                                        {emp.avatar}
-                                      </div>
-                                      <span className="text-[10px] font-bold text-slate-700 truncate w-14">{emp.name.split(' ')[0]}</span>
-                                      <span className="font-mono text-[9px] font-extrabold text-blue-600">{(i + 1) * 45}h</span>
-                                    </div>
-                                  ))}
-                                </div>
-
-                                {/* Total Hours Progress Bar */}
-                                <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                                  <div className="flex items-center justify-between text-xs font-bold">
-                                    <span className="text-slate-500">Total Hours</span>
-                                    <span className="font-mono text-slate-900">3400 hrs</span>
-                                  </div>
-                                  <div className="w-full bg-indigo-200 h-4 rounded-lg overflow-hidden flex">
-                                    <div style={{ width: '66%' }} className="bg-slate-900 h-full flex items-center justify-center text-[9px] text-white font-bold">Used: 2242</div>
-                                  </div>
-                                  <div className="flex items-center justify-between text-[11px] text-slate-400">
-                                    <span>Used: 2242 hrs</span>
-                                    <span>Left: 738 hrs</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Card 7: Margin Performance */}
-                              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <h4 className="text-base font-black text-slate-900 tracking-tight">Margin</h4>
-                                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                                    ● Profitability
-                                  </span>
-                                </div>
-
-                                <div className="flex items-baseline justify-between">
-                                  <div className="space-y-0.5">
-                                    <div className="text-3xl font-black font-display text-slate-900 flex items-center gap-1.5">
-                                      <span>24.1%</span>
-                                      <span className="text-emerald-500 text-lg">▲</span>
-                                    </div>
-                                    <div className="text-xs text-slate-400 font-medium">VS Estimated 22.8%</div>
-                                  </div>
-
-                                  <div className="bg-slate-50 p-2 rounded-xl border border-slate-200 text-[10px] space-y-1 font-mono">
-                                    <div className="text-emerald-700 font-bold">Gross: 13.3%</div>
-                                    <div className="text-rose-600 font-bold">Net: 12.6%</div>
-                                  </div>
-                                </div>
-
-                                <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex border border-slate-200/60">
-                                  <div className="bg-emerald-500 h-full" style={{ width: '65%' }}></div>
-                                  <div className="bg-rose-500 h-full" style={{ width: '20%' }}></div>
-                                  <div className="bg-slate-400 h-full" style={{ width: '15%' }}></div>
-                                </div>
-
-                                <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-1">
-                                  <span>High Profit Margin</span>
-                                  <button
-                                    onClick={() => setProjectDetailsTab('tasks')}
-                                    className="text-xs font-bold text-blue-600 hover:underline cursor-pointer"
-                                  >
-                                    Open Tasks Breakdown →
-                                  </button>
-                                </div>
-                              </div>
-
-                            </div>
-
+                      {/* Quick Status KPI Badges */}
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <div className="px-3.5 py-2 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md flex items-center gap-2 shadow-2xs">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                          <div className="text-left leading-tight">
+                            <div className="text-xs font-black text-white">{completedTasksCount} Done</div>
+                            <div className="text-[10px] text-slate-300">Completed</div>
                           </div>
-                        )}
+                        </div>
 
-                        {/* TAB 2: WORK BREAKDOWN (FULL TASKS LIST, KANBAN, AND CATEGORY GRID) */}
-                        {projectDetailsTab === 'tasks' && (
-                          <div className="space-y-6 animate-fade-in">
-                            
-                            {/* 2. 5-CATEGORY PROGRESS SUMMARY STRIP */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                              {categoriesList.map(catKey => {
-                                const catConfig = CATEGORY_CONFIG[catKey] || { label: catKey, icon: '📌', barColor: 'bg-blue-500' };
-                                const tasksInCat = allTasks.filter(t => t.category === catKey);
-                                const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
-                                const totalCount = tasksInCat.length;
-                                const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
-                                const isSelectedCat = taskCategoryFilter === catKey;
-
-                                return (
-                                  <div
-                                    key={catKey}
-                                    onClick={() => setTaskCategoryFilter(prev => prev === catKey ? 'All' : catKey)}
-                                    className={`bg-white border rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
-                                      isSelectedCat 
-                                        ? 'border-blue-600 ring-4 ring-blue-500/25 bg-blue-50/60 shadow-md scale-[1.02]' 
-                                        : 'border-slate-200/90 hover:border-slate-300'
-                                    }`}
-                                    title={`Click to filter tasks by ${catConfig.label} category`}
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="text-xs">{catConfig.icon}</span>
-                                        <span className="text-xs font-black text-slate-800">
-                                          {catConfig.label}
-                                        </span>
-                                      </div>
-                                      <span className="font-mono text-xs font-black text-slate-900">
-                                        {pct}%
-                                      </span>
-                                    </div>
-
-                                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                      <div
-                                        className={`h-full rounded-full transition-all duration-300 ${catConfig.barColor}`}
-                                        style={{ width: `${pct}%` }}
-                                      ></div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5 font-medium">
-                                      <span>{doneCount}/{totalCount} Done</span>
-                                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                                        isSelectedCat ? 'bg-blue-600 text-white' : 'text-slate-500 bg-slate-100'
-                                      }`}>{isSelectedCat ? 'Active ✓' : `${totalCount} tasks`}</span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            {/* 3. TASK CONTROLS & VIEW SWITCHER TOOLBAR */}
-                            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
-                              <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-                                
-                                <div className="relative flex-1 min-w-[200px]">
-                                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
-                                  <input
-                                    type="text"
-                                    placeholder="Search tasks by name, ID, assignee..."
-                                    value={taskSearchTerm}
-                                    onChange={(e) => setTaskSearchTerm(e.target.value)}
-                                    className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  />
-                                  {taskSearchTerm && (
-                                    <button
-                                      onClick={() => setTaskSearchTerm('')}
-                                      className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-slate-600 text-xs"
-                                    >
-                                      ✕
-                                    </button>
-                                  )}
-                                </div>
-
-                                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                                  
-                                  <select
-                                    value={taskPriorityFilter}
-                                    onChange={(e) => setTaskPriorityFilter(e.target.value)}
-                                    className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                                  >
-                                    <option value="All">All Priorities</option>
-                                    <option value="Urgent">🔴 Urgent (P0)</option>
-                                    <option value="High">🟠 High (P1)</option>
-                                    <option value="Medium">🟡 Medium (P2)</option>
-                                    <option value="Low">🟢 Low (P3)</option>
-                                  </select>
-
-                                  <select
-                                    value={taskCategoryFilter}
-                                    onChange={(e) => setTaskCategoryFilter(e.target.value)}
-                                    className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                                  >
-                                    <option value="All">All Categories</option>
-                                    {categoriesList.map(catKey => (
-                                      <option key={catKey} value={catKey}>{CATEGORY_CONFIG[catKey].icon} {CATEGORY_CONFIG[catKey].label}</option>
-                                    ))}
-                                  </select>
-
-                                  <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
-                                    <button
-                                      type="button"
-                                      onClick={() => setTaskLayoutMode('list')}
-                                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                                        taskLayoutMode === 'list' ? 'bg-white shadow-2xs text-blue-600' : 'text-slate-600 hover:text-slate-900'
-                                      }`}
-                                    >
-                                      <span>📋</span>
-                                      <span>All Tasks ({filteredTasks.length})</span>
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => setTaskLayoutMode('kanban')}
-                                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                                        taskLayoutMode === 'kanban' ? 'bg-white shadow-2xs text-blue-600' : 'text-slate-600 hover:text-slate-900'
-                                      }`}
-                                    >
-                                      <span>📌</span>
-                                      <span>Kanban Board</span>
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => setTaskLayoutMode('grid')}
-                                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                                        taskLayoutMode === 'grid' ? 'bg-white shadow-2xs text-blue-600' : 'text-slate-600 hover:text-slate-900'
-                                      }`}
-                                    >
-                                      <span>📊</span>
-                                      <span>Category Grid</span>
-                                    </button>
-                                  </div>
-
-                                </div>
-
-                              </div>
-                            </div>
-
-                            {/* 4. TASK LAYOUT MODES: LIST vs KANBAN vs GRID */}
-                            {taskLayoutMode === 'list' ? (
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-                                  <span className="font-bold text-slate-800">
-                                    Displaying all {filteredTasks.length} tasks for {currentProj.id}:
-                                  </span>
-                                </div>
-
-                                {filteredTasks.length === 0 ? (
-                                  <div className="p-12 text-center bg-white border border-dashed border-slate-300 rounded-3xl space-y-2">
-                                    <div className="text-3xl">📭</div>
-                                    <div className="text-sm font-bold text-slate-800">No tasks match your search or filter</div>
-                                  </div>
-                                ) : (
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                                    {filteredTasks.map(task => renderTaskCard(task))}
-                                  </div>
-                                )}
-                              </div>
-                            ) : taskLayoutMode === 'kanban' ? (
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-                                
-                                {/* 1. Completed Column */}
-                                <div className="bg-emerald-50/50 border border-emerald-200 rounded-3xl p-4 space-y-3">
-                                  <div className="flex items-center justify-between pb-2 border-b border-emerald-200">
-                                    <span className="text-xs font-black text-emerald-950 uppercase">🟢 Completed Tasks</span>
-                                    <span className="px-2 py-0.5 bg-emerald-200 text-emerald-900 rounded-full text-xs font-bold">{taskKanbanColumns.completed.length}</span>
-                                  </div>
-                                  <div className="space-y-3 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
-                                    {taskKanbanColumns.completed.map(task => renderTaskCard(task))}
-                                  </div>
-                                </div>
-
-                                {/* 2. Working Column */}
-                                <div className="bg-amber-50/50 border border-amber-200 rounded-3xl p-4 space-y-3">
-                                  <div className="flex items-center justify-between pb-2 border-b border-amber-200">
-                                    <span className="text-xs font-black text-amber-950 uppercase">🟡 In Progress Tasks</span>
-                                    <span className="px-2 py-0.5 bg-amber-200 text-amber-900 rounded-full text-xs font-bold">{taskKanbanColumns.working.length}</span>
-                                  </div>
-                                  <div className="space-y-3 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
-                                    {taskKanbanColumns.working.map(task => renderTaskCard(task))}
-                                  </div>
-                                </div>
-
-                                {/* 3. Open Column */}
-                                <div className="bg-rose-50/50 border border-rose-200 rounded-3xl p-4 space-y-3">
-                                  <div className="flex items-center justify-between pb-2 border-b border-rose-200">
-                                    <span className="text-xs font-black text-rose-950 uppercase">🔴 Open Tasks</span>
-                                    <span className="px-2 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-bold">{taskKanbanColumns.open.length}</span>
-                                  </div>
-                                  <div className="space-y-3 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
-                                    {taskKanbanColumns.open.map(task => renderTaskCard(task))}
-                                  </div>
-                                </div>
-
-                              </div>
-                            ) : (
-                              /* Category Grid View */
-                              <div className="space-y-4">
-                                {categoryData.map(cat => {
-                                  const isCollapsed = !!collapsedCategories[cat.key];
-                                  return (
-                                    <div key={cat.key} className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs bg-white">
-                                      <div
-                                        onClick={() => toggleCategory(cat.key)}
-                                        className="bg-slate-50/90 px-4 py-3 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/80 transition-colors"
-                                      >
-                                        <div className="flex items-center gap-2.5">
-                                          <span className="text-slate-500 text-xs font-bold">{isCollapsed ? '▶' : '▼'}</span>
-                                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-bold rounded-md border ${cat.bgClass}`}>
-                                            <span>{cat.icon}</span>
-                                            <span>{cat.label}</span>
-                                          </span>
-                                          <span className="text-xs font-bold text-slate-600">{cat.totalCount} tasks</span>
-                                        </div>
-
-                                        <div className="flex items-center gap-3">
-                                          <div className="w-24 bg-slate-200 h-1.5 rounded-full overflow-hidden hidden sm:block">
-                                            <div
-                                              className={`h-full rounded-full transition-all duration-300 ${cat.barColor}`}
-                                              style={{ width: `${cat.pct}%` }}
-                                            ></div>
-                                          </div>
-                                          <span className="font-mono text-xs font-bold text-slate-700">{cat.doneCount}/{cat.totalCount} ({cat.pct}%)</span>
-                                        </div>
-                                      </div>
-
-                                      {!isCollapsed && (
-                                        <div className="p-3 sm:p-4 bg-white">
-                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                                            {cat.tasks.map(task => renderTaskCard(task))}
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-
+                        <div className="px-3.5 py-2 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md flex items-center gap-2 shadow-2xs">
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                          <div className="text-left leading-tight">
+                            <div className="text-xs font-black text-white">{workingTasksCount} Working</div>
+                            <div className="text-[10px] text-slate-300">In Progress</div>
                           </div>
-                        )}
+                        </div>
 
-                        {/* TAB 3: RESOURCES (TEAM DIRECTORY & TASK WORKLOAD) */}
-                        {projectDetailsTab === 'resources' && (
-                          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs space-y-6 animate-fade-in">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h3 className="text-lg font-black text-slate-900 tracking-tight">Team Resources Allocation</h3>
-                                <p className="text-xs text-slate-400 font-medium">Assigned staff members & active workloads</p>
-                              </div>
-                              <button
-                                onClick={() => setIsEmployeeModalOpen(true)}
-                                className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-xs hover:bg-blue-700 cursor-pointer"
-                              >
-                                + Assign Member
-                              </button>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {employees.map((emp) => {
-                                const empTasks = allTasks.filter(t => (t.assignees || [t.assignee]).includes(emp.name));
-                                return (
-                                  <div key={emp.name} className="p-4 rounded-2xl border border-slate-200/90 bg-slate-50/50 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                      <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
-                                        {emp.avatar}
-                                      </div>
-                                      <div>
-                                        <div className="text-sm font-extrabold text-slate-900">{emp.name}</div>
-                                        <div className="text-xs text-slate-400 font-medium">{emp.email}</div>
-                                      </div>
-                                    </div>
-                                    <div className="text-right">
-                                      <span className="font-mono text-xs font-black px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800">
-                                        {empTasks.length} Tasks
-                                      </span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                        <div className="px-3.5 py-2 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md flex items-center gap-2 shadow-2xs">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+                          <div className="text-left leading-tight">
+                            <div className="text-xs font-black text-white">{openTasksCount} Open</div>
+                            <div className="text-[10px] text-slate-300">To Do</div>
                           </div>
-                        )}
+                        </div>
+                      </div>
+                    </div>
 
+                    {/* Progress Bar Strip */}
+                    <div className="space-y-2 relative z-10 pt-2 border-t border-white/10">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-300 font-medium">Overall Project Completion:</span>
+                          <span className="font-mono text-sm font-black text-white">{donePct}%</span>
+                        </div>
+                        <span className="text-slate-400 font-mono text-[11px]">{completedTasksCount} of {totalTasksCount} tasks completed</span>
                       </div>
 
+                      <div className="w-full bg-white/10 h-3.5 rounded-full overflow-hidden flex p-0.5 border border-white/10 shadow-inner">
+                        {donePct > 0 && (
+                          <div
+                            style={{ width: `${donePct}%` }}
+                            className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500 shadow-sm"
+                            title={`Completed: ${donePct}%`}
+                          ></div>
+                        )}
+                        {workPct > 0 && (
+                          <div
+                            style={{ width: `${workPct}%` }}
+                            className="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-500 shadow-sm"
+                            title={`In Progress: ${workPct}%`}
+                          ></div>
+                        )}
+                        {openPct > 0 && (
+                          <div
+                            style={{ width: `${openPct}%` }}
+                            className="bg-gradient-to-r from-rose-500 to-rose-400 h-full rounded-full transition-all duration-500 shadow-sm"
+                            title={`Open: ${openPct}%`}
+                          ></div>
+                        )}
+                      </div>
                     </div>
 
                   </div>
-                );
-              })()
-            ) : (
+
+                  {/* 2. 5-CATEGORY PROGRESS SUMMARY STRIP */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    {categoriesList.map(catKey => {
+                      const catConfig = CATEGORY_CONFIG[catKey] || { label: catKey, icon: '📌', barColor: 'bg-blue-500' };
+                      const tasksInCat = allTasks.filter(t => t.category === catKey);
+                      const doneCount = tasksInCat.filter(t => t.status === 'Completed').length;
+                      const totalCount = tasksInCat.length;
+                      const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+                      const isSelectedCat = taskCategoryFilter === catKey;
+
+                      return (
+                        <div
+                          key={catKey}
+                          onClick={() => setTaskCategoryFilter(prev => prev === catKey ? 'All' : catKey)}
+                          className={`bg-white border rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between space-y-2.5 ${
+                            isSelectedCat 
+                              ? 'border-blue-600 ring-4 ring-blue-500/25 bg-blue-50/60 shadow-md scale-[1.02]' 
+                              : 'border-slate-200/90 hover:border-slate-300'
+                          }`}
+                          title={`Click to filter tasks by ${catConfig.label} category`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs">{catConfig.icon}</span>
+                              <span className="text-xs font-black text-slate-800">
+                                {catConfig.label}
+                              </span>
+                            </div>
+                            <span className="font-mono text-xs font-black text-slate-900">
+                              {pct}%
+                            </span>
+                          </div>
+
+                          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-300 ${catConfig.barColor}`}
+                              style={{ width: `${pct}%` }}
+                            ></div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5 font-medium">
+                            <span>{doneCount}/{totalCount} Done</span>
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                              isSelectedCat ? 'bg-blue-600 text-white' : 'text-slate-500 bg-slate-100'
+                            }`}>{isSelectedCat ? 'Active ✓' : `${totalCount} tasks`}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* 3. TASK CONTROLS & VIEW SWITCHER TOOLBAR */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+                    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+                      
+                      <div className="relative flex-1 min-w-[200px]">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+                        <input
+                          type="text"
+                          placeholder="Search tasks by name, ID, assignee..."
+                          value={taskSearchTerm}
+                          onChange={(e) => setTaskSearchTerm(e.target.value)}
+                          className="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        {taskSearchTerm && (
+                          <button
+                            onClick={() => setTaskSearchTerm('')}
+                            className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-slate-600 text-xs"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        
+                        <select
+                          value={taskPriorityFilter}
+                          onChange={(e) => setTaskPriorityFilter(e.target.value)}
+                          className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        >
+                          <option value="All">All Priorities</option>
+                          <option value="Urgent">🔴 Urgent (P0)</option>
+                          <option value="High">🟠 High (P1)</option>
+                          <option value="Medium">🟡 Medium (P2)</option>
+                          <option value="Low">🟢 Low (P3)</option>
+                        </select>
+
+                        <select
+                          value={taskCategoryFilter}
+                          onChange={(e) => setTaskCategoryFilter(e.target.value)}
+                          className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        >
+                          <option value="All">All Categories</option>
+                          {categoriesList.map(catKey => (
+                            <option key={catKey} value={catKey}>{CATEGORY_CONFIG[catKey].icon} {CATEGORY_CONFIG[catKey].label}</option>
+                          ))}
+                        </select>
+
+                        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+                          <button
+                            type="button"
+                            onClick={() => setTaskLayoutMode('list')}
+                            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                              taskLayoutMode === 'list' ? 'bg-white shadow-2xs text-blue-600' : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <span>📋</span>
+                            <span>All Tasks ({filteredTasks.length})</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setTaskLayoutMode('kanban')}
+                            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                              taskLayoutMode === 'kanban' ? 'bg-white shadow-2xs text-blue-600' : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <span>📌</span>
+                            <span>Kanban Board</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setTaskLayoutMode('grid')}
+                            className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                              taskLayoutMode === 'grid' ? 'bg-white shadow-2xs text-blue-600' : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <span>📊</span>
+                            <span>Category Grid</span>
+                          </button>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 4. TASK LAYOUT MODES: LIST vs KANBAN vs GRID */}
+                  {taskLayoutMode === 'list' ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+                        <span className="font-bold text-slate-800">
+                          Displaying all {filteredTasks.length} tasks for {currentProj.id}:
+                        </span>
+                      </div>
+
+                      {filteredTasks.length === 0 ? (
+                        <div className="p-12 text-center bg-white border border-dashed border-slate-300 rounded-3xl space-y-2">
+                          <div className="text-3xl">📭</div>
+                          <div className="text-sm font-bold text-slate-800">No tasks match your search or filter</div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                          {filteredTasks.map(task => renderTaskCard(task))}
+                        </div>
+                      )}
+                    </div>
+                  ) : taskLayoutMode === 'kanban' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                      
+                      {/* 1. Completed Column */}
+                      <div className="bg-emerald-50/50 border border-emerald-200 rounded-3xl p-4 space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-emerald-200">
+                          <span className="text-xs font-black text-emerald-950 uppercase">🟢 Completed Tasks</span>
+                          <span className="px-2 py-0.5 bg-emerald-200 text-emerald-900 rounded-full text-xs font-bold">{taskKanbanColumns.completed.length}</span>
+                        </div>
+                        <div className="space-y-3 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
+                          {taskKanbanColumns.completed.map(task => renderTaskCard(task))}
+                        </div>
+                      </div>
+
+                      {/* 2. Working Column */}
+                      <div className="bg-amber-50/50 border border-amber-200 rounded-3xl p-4 space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-amber-200">
+                          <span className="text-xs font-black text-amber-950 uppercase">🟡 In Progress Tasks</span>
+                          <span className="px-2 py-0.5 bg-amber-200 text-amber-900 rounded-full text-xs font-bold">{taskKanbanColumns.working.length}</span>
+                        </div>
+                        <div className="space-y-3 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
+                          {taskKanbanColumns.working.map(task => renderTaskCard(task))}
+                        </div>
+                      </div>
+
+                      {/* 3. Open Column */}
+                      <div className="bg-rose-50/50 border border-rose-200 rounded-3xl p-4 space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-rose-200">
+                          <span className="text-xs font-black text-rose-950 uppercase">🔴 Open Tasks</span>
+                          <span className="px-2 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-bold">{taskKanbanColumns.open.length}</span>
+                        </div>
+                        <div className="space-y-3 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar">
+                          {taskKanbanColumns.open.map(task => renderTaskCard(task))}
+                        </div>
+                      </div>
+
+                    </div>
+                  ) : (
+                    /* Category Grid View */
+                    <div className="space-y-4">
+                      {categoryData.map(cat => {
+                        const isCollapsed = !!collapsedCategories[cat.key];
+                        return (
+                          <div key={cat.key} className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs bg-white">
+                            <div
+                              onClick={() => toggleCategory(cat.key)}
+                              className="bg-slate-50/90 px-4 py-3 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/80 transition-colors"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="text-slate-500 text-xs font-bold">{isCollapsed ? '▶' : '▼'}</span>
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-bold rounded-md border ${cat.bgClass}`}>
+                                  <span>{cat.icon}</span>
+                                  <span>{cat.label}</span>
+                                </span>
+                                <span className="text-xs font-bold text-slate-600">{cat.totalCount} tasks</span>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                <div className="w-24 bg-slate-200 h-1.5 rounded-full overflow-hidden hidden sm:block">
+                                  <div
+                                    className={`h-full rounded-full transition-all duration-300 ${cat.barColor}`}
+                                    style={{ width: `${cat.pct}%` }}
+                                  ></div>
+                                </div>
+                                <span className="font-mono text-xs font-bold text-slate-700">{cat.doneCount}/{cat.totalCount} ({cat.pct}%)</span>
+                              </div>
+                            </div>
+
+                            {!isCollapsed && (
+                              <div className="p-3 sm:p-4 bg-white">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                  {cat.tasks.map(task => renderTaskCard(task))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                </div>
+              );
+            })()}
+
             /* VIEW 2: 100% DYNAMIC PROJECTS VIEW WITH SYSTEM KPI OVERVIEW               */
             /* ========================================================================= */
               <div className="space-y-6">
