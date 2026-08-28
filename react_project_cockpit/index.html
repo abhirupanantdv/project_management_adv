@@ -1828,10 +1828,10 @@
                   </div>
                 ) : (
 
-                /* 📋 TASK VIEW B: COMPLETED, WORKING & OPEN STATUS IN LIST VIEW */
+                /* 📋 TASK VIEW B: 1st OPEN, 2nd IN PROGRESS, 3rd COMPLETED STATUS IN LIST VIEW */
                   <div className="space-y-6">
                     
-                    {/* Status Filter Tab Pills */}
+                    {/* Status Filter Tab Pills: 1st All, 2nd Open, 3rd In Progress, 4th Completed */}
                     <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-slate-200">
                       <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
                         <button
@@ -1849,15 +1849,15 @@
 
                         <button
                           type="button"
-                          onClick={() => setTaskListStatusTab('Completed')}
+                          onClick={() => setTaskListStatusTab('Open')}
                           className={`px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
-                            taskListStatusTab === 'Completed'
-                              ? 'bg-emerald-600 text-white shadow-xs'
-                              : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                            taskListStatusTab === 'Open'
+                              ? 'bg-rose-600 text-white shadow-xs'
+                              : 'bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100'
                           }`}
                         >
-                          <span>🟢</span>
-                          <span>Completed ({taskKanbanColumns.completed.length})</span>
+                          <span>🔴</span>
+                          <span>Open / Not Started ({taskKanbanColumns.open.length})</span>
                         </button>
 
                         <button
@@ -1875,15 +1875,15 @@
 
                         <button
                           type="button"
-                          onClick={() => setTaskListStatusTab('Open')}
+                          onClick={() => setTaskListStatusTab('Completed')}
                           className={`px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
-                            taskListStatusTab === 'Open'
-                              ? 'bg-rose-600 text-white shadow-xs'
-                              : 'bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100'
+                            taskListStatusTab === 'Completed'
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
                           }`}
                         >
-                          <span>🔴</span>
-                          <span>Open / Not Started ({taskKanbanColumns.open.length})</span>
+                          <span>🟢</span>
+                          <span>Completed ({taskKanbanColumns.completed.length})</span>
                         </button>
                       </div>
 
@@ -1900,28 +1900,28 @@
                     ) : (
                       <div className="space-y-6">
                         
-                        {/* 1. 🟢 COMPLETED TASKS SECTION */}
-                        {(taskListStatusTab === 'All' || taskListStatusTab === 'Completed') && taskKanbanColumns.completed.length > 0 && (
-                          <div className="bg-emerald-50/40 border border-emerald-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
-                            <div className="flex items-center justify-between pb-2 border-b border-emerald-200">
+                        {/* 1st: 🔴 OPEN / NOT STARTED TASKS SECTION */}
+                        {(taskListStatusTab === 'All' || taskListStatusTab === 'Open') && taskKanbanColumns.open.length > 0 && (
+                          <div className="bg-rose-50/40 border border-rose-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
+                            <div className="flex items-center justify-between pb-2 border-b border-rose-200">
                               <div className="flex items-center gap-2">
-                                <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-[9px] text-white font-black">✓</span>
-                                <h3 className="text-sm font-black text-emerald-950 uppercase tracking-wider">
-                                  Completed Tasks
+                                <span className="w-4 h-4 rounded-full bg-rose-500 flex items-center justify-center text-[9px] text-white font-black">📌</span>
+                                <h3 className="text-sm font-black text-rose-950 uppercase tracking-wider">
+                                  Open / Not Started Tasks
                                 </h3>
                               </div>
-                              <span className="px-2.5 py-0.5 bg-emerald-200 text-emerald-900 rounded-full text-xs font-black">
-                                {taskKanbanColumns.completed.length} Tasks
+                              <span className="px-2.5 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-black">
+                                {taskKanbanColumns.open.length} Tasks
                               </span>
                             </div>
 
                             <div className="space-y-2.5">
-                              {taskKanbanColumns.completed.map(task => renderTaskRow(task))}
+                              {taskKanbanColumns.open.map(task => renderTaskRow(task))}
                             </div>
                           </div>
                         )}
 
-                        {/* 2. 🟡 IN PROGRESS / WORKING TASKS SECTION */}
+                        {/* 2nd: 🟡 IN PROGRESS / WORKING TASKS SECTION */}
                         {(taskListStatusTab === 'All' || taskListStatusTab === 'Working') && taskKanbanColumns.working.length > 0 && (
                           <div className="bg-amber-50/40 border border-amber-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
                             <div className="flex items-center justify-between pb-2 border-b border-amber-200">
@@ -1942,23 +1942,23 @@
                           </div>
                         )}
 
-                        {/* 3. 🔴 OPEN / NOT STARTED TASKS SECTION */}
-                        {(taskListStatusTab === 'All' || taskListStatusTab === 'Open') && taskKanbanColumns.open.length > 0 && (
-                          <div className="bg-rose-50/40 border border-rose-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
-                            <div className="flex items-center justify-between pb-2 border-b border-rose-200">
+                        {/* 3rd: 🟢 COMPLETED TASKS SECTION */}
+                        {(taskListStatusTab === 'All' || taskListStatusTab === 'Completed') && taskKanbanColumns.completed.length > 0 && (
+                          <div className="bg-emerald-50/40 border border-emerald-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
+                            <div className="flex items-center justify-between pb-2 border-b border-emerald-200">
                               <div className="flex items-center gap-2">
-                                <span className="w-4 h-4 rounded-full bg-rose-500 flex items-center justify-center text-[9px] text-white font-black">📌</span>
-                                <h3 className="text-sm font-black text-rose-950 uppercase tracking-wider">
-                                  Open / Not Started Tasks
+                                <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-[9px] text-white font-black">✓</span>
+                                <h3 className="text-sm font-black text-emerald-950 uppercase tracking-wider">
+                                  Completed Tasks
                                 </h3>
                               </div>
-                              <span className="px-2.5 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-black">
-                                {taskKanbanColumns.open.length} Tasks
+                              <span className="px-2.5 py-0.5 bg-emerald-200 text-emerald-900 rounded-full text-xs font-black">
+                                {taskKanbanColumns.completed.length} Tasks
                               </span>
                             </div>
 
                             <div className="space-y-2.5">
-                              {taskKanbanColumns.open.map(task => renderTaskRow(task))}
+                              {taskKanbanColumns.completed.map(task => renderTaskRow(task))}
                             </div>
                           </div>
                         )}
