@@ -318,11 +318,13 @@
         }));
       });
 
-      const [currentPage, setCurrentPage] = useState('projects_list');
+      const initialPage = new URLSearchParams(window.location.search).get('page') || 'projects_list';
+      const [currentPage, setCurrentPage] = useState(initialPage);
       const [projectViewMode, setProjectViewMode] = useState('kanban');
       const [cardCategoryTab, setCardCategoryTab] = useState('notOpen'); // 'notOpen' (Left), 'working' (Middle), 'completed' (Right)
       const [cardLayoutMode, setCardLayoutMode] = useState('list'); // 'list' or 'grid'
-      const [selectedProjectId, setSelectedProjectId] = useState('PROJ-0084');
+      const initialProj = new URLSearchParams(window.location.search).get('proj') || 'PROJ-0084';
+      const [selectedProjectId, setSelectedProjectId] = useState(initialProj);
       const [visibleCount, setVisibleCount] = useState(12);
       const [searchTerm, setSearchTerm] = useState('');
       const [statusFilter, setStatusFilter] = useState('All');
@@ -332,6 +334,7 @@
       const [taskPriorityFilter, setTaskPriorityFilter] = useState('All');
       const [taskCategoryFilter, setTaskCategoryFilter] = useState('All');
       const [taskSearchTerm, setTaskSearchTerm] = useState('');
+      const [taskListStatusTab, setTaskListStatusTab] = useState('All');
 
       const [dragOverColumn, setDragOverColumn] = useState(null);
       const [dragOverProjectColumn, setDragOverProjectColumn] = useState(null);
@@ -1182,6 +1185,123 @@
       };
 
       // RENDER TASK CARD (CLEAN FRONT VIEW: DETAILS SHOWN INSIDE MODAL)
+      // 📋 RENDER TASK ROW FOR STATUS LIST VIEW
+      const renderTaskRow = (task) => {
+        const isCompleted = task.status === 'Completed';
+        const isWorking = task.status === 'Working' || task.status === 'In Progress';
+        const isOpen = !isCompleted && !isWorking;
+
+        const rowBg = isCompleted
+          ? 'bg-white hover:bg-emerald-50/60 border-emerald-200/90 ring-1 ring-emerald-400/20'
+          : isWorking
+          ? 'bg-white hover:bg-amber-50/60 border-amber-200/90 ring-1 ring-amber-400/20'
+          : 'bg-white hover:bg-rose-50/60 border-rose-200/90 ring-1 ring-rose-400/20';
+
+        const catConfig = CATEGORY_CONFIG[task.category] || { label: task.category || 'General', icon: '📌', bgClass: 'bg-slate-100 text-slate-700 border-slate-200' };
+
+        return (
+          <div
+            key={task.id}
+            onClick={() => handleOpenTaskDetails(task)}
+            className={`p-3 sm:p-3.5 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer shadow-2xs hover:shadow-md ${rowBg}`}
+          >
+            {/* Left: Status Dot, ID Badge, Task Title, Sub-tasks */}
+            <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0">
+              <span className={`w-3 h-3 rounded-full mt-1 sm:mt-0 shrink-0 ${
+                isCompleted ? 'bg-emerald-500' : isWorking ? 'bg-amber-400' : 'bg-rose-500'
+              }`}></span>
+
+              <span className={`font-mono text-xs font-black px-2 py-0.5 rounded border shrink-0 ${
+                isCompleted ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                isWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                'bg-rose-100 text-rose-900 border-rose-300'
+              }`}>
+                {task.id}
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 truncate leading-snug">
+                  {task.name}
+                </h4>
+                {task.subtasks && task.subtasks.length > 0 && (() => {
+                  const subDone = task.subtasks.filter(s => s.status === 'Completed').length;
+                  const subTotal = task.subtasks.length;
+                  const subPct = Math.round((subDone / subTotal) * 100);
+                  return (
+                    <div className="text-[10px] text-slate-500 font-bold flex items-center gap-2 pt-0.5">
+                      <span className="text-blue-600">⚡ {subDone}/{subTotal} Sub-tasks ({subPct}%)</span>
+                      <span>•</span>
+                      <span>{task.exp_end_date ? 'Due: ' + task.exp_end_date : 'No due date'}</span>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <span className={`hidden lg:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold border shrink-0 ${catConfig.bgClass}`}>
+                <span>{catConfig.icon}</span>
+                <span>{catConfig.label}</span>
+              </span>
+            </div>
+
+            {/* Right: Priority, Assignees, and 1-Click Status Action Buttons */}
+            <div className="flex items-center gap-2 shrink-0 self-end md:self-auto flex-wrap" onClick={e => e.stopPropagation()}>
+              
+              {/* Priority Pill */}
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${
+                task.priority === 'Urgent' ? 'bg-rose-100 text-rose-900 border-rose-300' :
+                task.priority === 'High' ? 'bg-orange-100 text-orange-900 border-orange-300' :
+                task.priority === 'Medium' ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                'bg-emerald-100 text-emerald-900 border-emerald-300'
+              }`}>
+                {task.priority || 'Medium'}
+              </span>
+
+              {/* Status Change Buttons */}
+              <div className="flex items-center gap-1">
+                {!isCompleted && (
+                  <button
+                    type="button"
+                    onClick={() => handleMoveTaskStatus(task.id, 'Completed')}
+                    className="py-1 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  >
+                    <span>Done ✓</span>
+                  </button>
+                )}
+
+                {!isWorking && (
+                  <button
+                    type="button"
+                    onClick={() => handleMoveTaskStatus(task.id, 'Working')}
+                    className="py-1 px-2 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold text-[11px] rounded-xl transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  >
+                    <span>Work ⚡</span>
+                  </button>
+                )}
+
+                {!isOpen && (
+                  <button
+                    type="button"
+                    onClick={() => handleMoveTaskStatus(task.id, 'Open')}
+                    className="py-1 px-2 bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 font-bold text-[11px] rounded-xl transition-all active:scale-95 cursor-pointer flex items-center gap-1"
+                  >
+                    <span>Reopen 📌</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenTaskDetails(task)}
+                  className="py-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded-xl border border-slate-200 transition-all cursor-pointer"
+                >
+                  Details 🔍
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      };
+
       const renderTaskCard = (task) => {
         const isCompleted = task.status === 'Completed';
         const isWorking = task.status === 'Working' || task.status === 'In Progress';
@@ -1773,14 +1893,67 @@
                   </div>
                 ) : (
 
-                /* 📊 TASK VIEW B: SEAMLESS TASK CARDS GRID VIEW (NO CATEGORY DIVIDERS) */
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-                      <span className="font-bold text-slate-800">
-                        {taskCategoryFilter === 'All'
-                          ? `Displaying all ${filteredTasks.length} tasks for ${currentProj.id}:`
-                          : `Displaying ${filteredTasks.length} ${taskCategoryFilter} tasks for ${currentProj.id}:`
-                        }
+                /* 📋 TASK VIEW B: COMPLETED, WORKING & OPEN STATUS IN LIST VIEW */
+                  <div className="space-y-6">
+                    
+                    {/* Status Filter Tab Pills */}
+                    <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-slate-200">
+                      <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                        <button
+                          type="button"
+                          onClick={() => setTaskListStatusTab('All')}
+                          className={`px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                            taskListStatusTab === 'All'
+                              ? 'bg-slate-900 text-white shadow-xs'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          <span>📋</span>
+                          <span>All Statuses ({filteredTasks.length})</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setTaskListStatusTab('Completed')}
+                          className={`px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                            taskListStatusTab === 'Completed'
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+                          }`}
+                        >
+                          <span>🟢</span>
+                          <span>Completed ({taskKanbanColumns.completed.length})</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setTaskListStatusTab('Working')}
+                          className={`px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                            taskListStatusTab === 'Working'
+                              ? 'bg-amber-600 text-white shadow-xs'
+                              : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
+                          }`}
+                        >
+                          <span>🟡</span>
+                          <span>In Progress ({taskKanbanColumns.working.length})</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setTaskListStatusTab('Open')}
+                          className={`px-3.5 py-1.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                            taskListStatusTab === 'Open'
+                              ? 'bg-rose-600 text-white shadow-xs'
+                              : 'bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100'
+                          }`}
+                        >
+                          <span>🔴</span>
+                          <span>Open / Not Started ({taskKanbanColumns.open.length})</span>
+                        </button>
+                      </div>
+
+                      <span className="text-xs font-bold text-slate-500">
+                        {filteredTasks.length} tasks matching filters
                       </span>
                     </div>
 
@@ -1790,8 +1963,71 @@
                         <div className="text-sm font-bold text-slate-800">No tasks match your search or filter</div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                        {filteredTasks.map(task => renderTaskCard(task))}
+                      <div className="space-y-6">
+                        
+                        {/* 1. 🟢 COMPLETED TASKS SECTION */}
+                        {(taskListStatusTab === 'All' || taskListStatusTab === 'Completed') && taskKanbanColumns.completed.length > 0 && (
+                          <div className="bg-emerald-50/40 border border-emerald-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
+                            <div className="flex items-center justify-between pb-2 border-b border-emerald-200">
+                              <div className="flex items-center gap-2">
+                                <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-[9px] text-white font-black">✓</span>
+                                <h3 className="text-sm font-black text-emerald-950 uppercase tracking-wider">
+                                  Completed Tasks
+                                </h3>
+                              </div>
+                              <span className="px-2.5 py-0.5 bg-emerald-200 text-emerald-900 rounded-full text-xs font-black">
+                                {taskKanbanColumns.completed.length} Tasks
+                              </span>
+                            </div>
+
+                            <div className="space-y-2.5">
+                              {taskKanbanColumns.completed.map(task => renderTaskRow(task))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 2. 🟡 IN PROGRESS / WORKING TASKS SECTION */}
+                        {(taskListStatusTab === 'All' || taskListStatusTab === 'Working') && taskKanbanColumns.working.length > 0 && (
+                          <div className="bg-amber-50/40 border border-amber-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
+                            <div className="flex items-center justify-between pb-2 border-b border-amber-200">
+                              <div className="flex items-center gap-2">
+                                <span className="w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center text-[9px] text-white font-black">⚡</span>
+                                <h3 className="text-sm font-black text-amber-950 uppercase tracking-wider">
+                                  In Progress / Working Tasks
+                                </h3>
+                              </div>
+                              <span className="px-2.5 py-0.5 bg-amber-200 text-amber-900 rounded-full text-xs font-black">
+                                {taskKanbanColumns.working.length} Tasks
+                              </span>
+                            </div>
+
+                            <div className="space-y-2.5">
+                              {taskKanbanColumns.working.map(task => renderTaskRow(task))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 3. 🔴 OPEN / NOT STARTED TASKS SECTION */}
+                        {(taskListStatusTab === 'All' || taskListStatusTab === 'Open') && taskKanbanColumns.open.length > 0 && (
+                          <div className="bg-rose-50/40 border border-rose-200/90 rounded-3xl p-5 space-y-3.5 shadow-xs">
+                            <div className="flex items-center justify-between pb-2 border-b border-rose-200">
+                              <div className="flex items-center gap-2">
+                                <span className="w-4 h-4 rounded-full bg-rose-500 flex items-center justify-center text-[9px] text-white font-black">📌</span>
+                                <h3 className="text-sm font-black text-rose-950 uppercase tracking-wider">
+                                  Open / Not Started Tasks
+                                </h3>
+                              </div>
+                              <span className="px-2.5 py-0.5 bg-rose-200 text-rose-900 rounded-full text-xs font-black">
+                                {taskKanbanColumns.open.length} Tasks
+                              </span>
+                            </div>
+
+                            <div className="space-y-2.5">
+                              {taskKanbanColumns.open.map(task => renderTaskRow(task))}
+                            </div>
+                          </div>
+                        )}
+
                       </div>
                     )}
                   </div>
