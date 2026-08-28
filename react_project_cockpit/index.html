@@ -318,11 +318,13 @@
         }));
       });
 
-      const [currentPage, setCurrentPage] = useState('projects_list');
+      const initialPage = new URLSearchParams(window.location.search).get('page') || 'projects_list';
+      const [currentPage, setCurrentPage] = useState(initialPage);
       const [projectViewMode, setProjectViewMode] = useState('kanban');
       const [cardCategoryTab, setCardCategoryTab] = useState('notOpen'); // 'notOpen' (Left), 'working' (Middle), 'completed' (Right)
       const [cardLayoutMode, setCardLayoutMode] = useState('list'); // 'list' or 'grid'
-      const [selectedProjectId, setSelectedProjectId] = useState('PROJ-0084');
+      const initialProj = new URLSearchParams(window.location.search).get('proj') || 'PROJ-0084';
+      const [selectedProjectId, setSelectedProjectId] = useState(initialProj);
       const [projectDetailsTab, setProjectDetailsTab] = useState('dashboard'); // 'dashboard' | 'tasks' | 'resources'
       const [visibleCount, setVisibleCount] = useState(12);
       const [searchTerm, setSearchTerm] = useState('');
@@ -2188,9 +2190,10 @@
                 </div>
               );
             })()}
-
-            /* VIEW 2: 100% DYNAMIC PROJECTS VIEW WITH SYSTEM KPI OVERVIEW               */
-            /* ========================================================================= */
+            {/* ========================================================================= */}
+            {/* VIEW 3: 🌟 1ST PAGE - PROJECTS COCKPIT & KANBAN VIEW                      */}
+            {/* ========================================================================= */}
+            {currentPage === 'projects_list' && (
               <div className="space-y-6">
                 
                 {/* 🌟 OVERALL COMPLETED & SYSTEM KPI DASHBOARD */}
