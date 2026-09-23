@@ -1,0 +1,10 @@
+{
+  "name": "ai-agent-project-cockpit-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run dev --prefix react_project_cockpit",
+    "dev": "npm run dev --prefix react_project_cockpit",
+    "build": "npm run build --prefix react_project_cockpit"
+  }
+}
