@@ -66,6 +66,122 @@
       border-color: #f43f5e !important;
       outline: 2px dashed #e11d48;
     }
+
+    /* 🌟 3D EXECUTIVE STYLING FOR ANANTDV PROJECT COCKPIT */
+    .title-3d-anantdv {
+      background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 0 #1e3a8a) drop-shadow(0 4px 1px #172554) drop-shadow(0 6px 10px rgba(30, 58, 138, 0.4));
+      letter-spacing: -0.02em;
+    }
+    .title-3d-cockpit {
+      color: #0f172a;
+      text-shadow: 
+        0 1px 0 #cbd5e1,
+        0 2px 0 #94a3b8,
+        0 3px 0 #64748b,
+        0 4px 1px rgba(15, 23, 42, 0.25),
+        0 6px 12px rgba(15, 23, 42, 0.2);
+      letter-spacing: -0.03em;
+    }
+    .emblem-3d {
+      perspective: 800px;
+      transform-style: preserve-3d;
+      box-shadow: 
+        0 2px 4px rgba(0,0,0,0.05),
+        0 6px 12px rgba(37,99,235,0.12),
+        0 12px 24px -4px rgba(37,99,235,0.18),
+        inset 0 1px 1px rgba(255,255,255,0.9),
+        inset 0 -2px 3px rgba(0,0,0,0.08);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .emblem-3d:hover {
+      transform: perspective(800px) rotateX(6deg) rotateY(-6deg) translateY(-3px) scale(1.03);
+      box-shadow: 
+        0 4px 8px rgba(0,0,0,0.08),
+        0 12px 24px rgba(37,99,235,0.22),
+        0 20px 32px -4px rgba(37,99,235,0.28),
+        inset 0 1px 2px rgba(255,255,255,1),
+        inset 0 -3px 4px rgba(0,0,0,0.12);
+    }
+    .brand-3d-container {
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    }
+    .brand-3d-container:hover .title-3d-box {
+      transform: translateZ(12px);
+    }
+    .title-3d-box {
+      transition: transform 0.3s ease;
+    }
+    .cockpit-card-3d {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      transform-style: preserve-3d;
+    }
+    .cockpit-card-3d:hover {
+      transform: translateY(-4px) perspective(900px) rotateX(1.5deg);
+      box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+    }
+
+    /* 🌟 ADVANCED 3D COCKPIT ENGINE & SPATIAL STYLES */
+    .stage-3d-scene {
+      perspective: 1400px;
+      perspective-origin: 50% 200px;
+      transform-style: preserve-3d;
+    }
+    .card-3d-interactive {
+      transform-style: preserve-3d;
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+      will-change: transform;
+      position: relative;
+    }
+    .card-3d-interactive:hover {
+      box-shadow: 
+        0 24px 38px -8px rgba(15, 23, 42, 0.16),
+        0 12px 18px -6px rgba(15, 23, 42, 0.08),
+        0 0 0 1.5px rgba(99, 102, 241, 0.3);
+    }
+    .card-3d-interactive:hover .depth-tag-3d {
+      transform: translateZ(26px);
+    }
+    .card-3d-interactive:hover .depth-title-3d {
+      transform: translateZ(22px);
+    }
+    .card-3d-interactive:hover .depth-progress-3d {
+      transform: translateZ(18px);
+    }
+    .card-3d-interactive:hover .depth-actions-3d {
+      transform: translateZ(28px);
+    }
+    .depth-tag-3d, .depth-title-3d, .depth-progress-3d, .depth-actions-3d {
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .card-3d-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.92) 100%);
+      backdrop-filter: blur(14px);
+      box-shadow: 
+        0 8px 20px -4px rgba(15, 23, 42, 0.08),
+        0 4px 8px -2px rgba(15, 23, 42, 0.04),
+        inset 0 1px 1px rgba(255, 255, 255, 1),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    /* 3D Button Press Physics */
+    .btn-3d-press {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .btn-3d-press:active {
+      transform: translateY(2px) scale(0.98);
+    }
+
+    .orbit-deck-card {
+      transform-style: preserve-3d;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
   </style>
 </head>
 <body class="bg-[#f8fafc] text-slate-900 min-h-screen antialiased">
@@ -76,10 +192,10 @@
     const { useState, useEffect, useMemo, useCallback } = React;
 
     const DEFAULT_CONFIG = {
-      serverUrl: window.ERP_CONFIG?.serverUrl || "http://192.168.101.125:8080",
-      apiKey: window.ERP_CONFIG?.apiKey || "f13b1b924ac9194",
-      apiSecret: window.ERP_CONFIG?.apiSecret || "fa26ad1326aef0c",
-      token: window.ERP_CONFIG?.token || "f13b1b924ac9194:fa26ad1326aef0c",
+      serverUrl: window.ERP_CONFIG?.serverUrl || "http://192.168.101.175",
+      apiKey: window.ERP_CONFIG?.apiKey || "ccea7f132f74703",
+      apiSecret: window.ERP_CONFIG?.apiSecret || "73677ab6bce0827",
+      token: window.ERP_CONFIG?.token || "ccea7f132f74703:73677ab6bce0827",
       enableLiveApi: window.ERP_CONFIG?.enableLiveApi !== undefined ? window.ERP_CONFIG.enableLiveApi : true,
       refreshIntervalSec: 30
     };
@@ -175,6 +291,81 @@
         return `ADV • ${rest}`;
       }
       return str;
+    }
+
+    // Helper to extract rich project details: Creator, Scope Details, Deadline, and Assigned Workers
+    function getProjectDetailsHelper(proj, employees) {
+      if (!proj) return null;
+      const creatorName = proj.owner || 'Niranjan Kumar Singh';
+      const empList = employees && employees.length > 0 ? employees : OFFICIAL_ERP_EMPLOYEES;
+      const creatorEmp = empList.find(e => e.name === creatorName) || {
+        name: creatorName,
+        role: 'Project Manager & Lead',
+        dept: 'Engineering & Operations',
+        email: `${creatorName.toLowerCase().replace(/\s+/g, '.')}@anantdv.com`,
+        mobile: '8910987586',
+        avatar: creatorName.slice(0, 2).toUpperCase()
+      };
+
+      const startDate = proj.startDate || '2026-06-15';
+      const dueDate = proj.dueDate || '2026-11-30';
+      const isCompleted = proj.status === 'Completed' || proj.percentCompleted === 100;
+      const isWorking = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
+
+      // Realistic business scope & domain description
+      let description = "";
+      const n = (proj.name || "").toLowerCase();
+      if (n.includes("property")) {
+        description = "Enterprise commercial real estate & facility management platform. Handles commercial lease contracts, tenant billing, recurring maintenance dispatch, space occupancy optimization, and ERPNext rental revenue reconciliations.";
+      } else if (n.includes("cal") || n.includes("legal") || n.includes("court")) {
+        description = "Judicial calendar, compliance workflow, and legal case docket tracking system. Automates hearing notices, statutory filing deadlines, evidence document archival, and council billing schedules.";
+      } else if (n.includes("logistics") || n.includes("supply") || n.includes("container") || n.includes("transport") || n.includes("vehicle") || n.includes("fedex")) {
+        description = "Global freight forwarding, fleet dispatching, and container logistics management system. Tracks multimodal shipments, port customs clearance, vehicle maintenance schedules, and route delivery metrics.";
+      } else if (n.includes("coffee") || n.includes("carp") || n.includes("trading") || n.includes("water")) {
+        description = "Agricultural commodity & international trading suite. Covers bulk warehouse lot intake, quality moisture grading, export bill of ladings, currency hedging, and supplier settlement accounts.";
+      } else if (n.includes("r&d") || n.includes("research") || n.includes("platform") || n.includes("automation") || n.includes("motor")) {
+        description = "Core engineering innovation platform delivering automated regression testing, ERPNext real-time REST API synchronization, and executive UI cockpit dashboards.";
+      } else if (n.includes("card") || n.includes("financial")) {
+        description = "Next-generation financial disbursement and corporate expense card management engine with real-time audit controls, spending ceilings, and automated GL ledger entries.";
+      } else {
+        description = "Strategic corporate enterprise initiative executed within ERPNext, driving milestone deliverables, cross-functional engineering execution, resource allocation, and business performance tracking.";
+      }
+
+      // Gather all team members working on tasks under this project
+      const tasks = proj.tasks || [];
+      const workerNames = Array.from(new Set([
+        creatorName,
+        ...tasks.flatMap(t => t.assignees || (t.assignee ? [t.assignee] : (t.assignedUsers || [])))
+      ])).filter(Boolean);
+
+      const workers = workerNames.map(name => {
+        const emp = empList.find(e => e.name === name) || {
+          name,
+          role: name === creatorName ? 'Project Manager & Lead' : 'Software Engineer',
+          dept: 'Engineering',
+          email: `${name.toLowerCase().replace(/\s+/g, '.')}@anantdv.com`,
+          avatar: name.slice(0, 2).toUpperCase()
+        };
+        const assignedTasks = tasks.filter(t => (t.assignees || [t.assignee]).includes(name));
+        return {
+          ...emp,
+          isCreator: name === creatorName,
+          assignedTasksCount: assignedTasks.length,
+          assignedTasks: assignedTasks
+        };
+      });
+
+      return {
+        creatorEmp,
+        creatorName,
+        startDate,
+        dueDate,
+        isCompleted,
+        isWorking,
+        description,
+        workers,
+        totalTasks: tasks.length
+      };
     }
 
     // Live ERPNext initial dataset with clean professional titles
@@ -289,7 +480,7 @@
 
     function App() {
       const [config, setConfig] = useState(() => {
-        const saved = localStorage.getItem('erp_server_config_live_v8');
+        const saved = localStorage.getItem('erp_server_config_live_v9');
         return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
       });
 
@@ -323,6 +514,26 @@
       const [projectViewMode, setProjectViewMode] = useState('kanban');
       const [cardCategoryTab, setCardCategoryTab] = useState('notOpen'); // 'notOpen' (Left), 'working' (Middle), 'completed' (Right)
       const [cardLayoutMode, setCardLayoutMode] = useState('list'); // 'list' or 'grid'
+      const [threeDSubView, setThreeDSubView] = useState('wall'); // 'wall' (Matrix Grid) or 'orbit' (Orbit Deck Carousel)
+      const [threeDActiveIndex, setThreeDActiveIndex] = useState(0);
+      const [threeDDepthLevel, setThreeDDepthLevel] = useState('deep'); // 'deep' or 'subtle'
+      const [calendarDate, setCalendarDate] = useState(() => new Date(2026, 9, 1)); // October 2026
+      const [isViewMenuOpen, setIsViewMenuOpen] = useState(false);
+      const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (!e.target.closest('#view-dropdown-container')) {
+            setIsViewMenuOpen(false);
+          }
+          if (!e.target.closest('#status-dropdown-container')) {
+            setIsStatusMenuOpen(false);
+          }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+      }, []);
+
       const initialProj = new URLSearchParams(window.location.search).get('proj') || 'PROJ-0084';
       const [selectedProjectId, setSelectedProjectId] = useState(initialProj);
       const [visibleCount, setVisibleCount] = useState(12);
@@ -446,12 +657,11 @@
             const rawTasks = taskJson?.data || [];
 
             const formatted = projJson.data.map((p, idx) => {
-              // Strictly isolate tasks that belong to THIS project only!
+              // Include ALL tasks that belong to THIS project (both top-level and subtasks: 1,089 tasks)
               const allTasksForProj = rawTasks.filter(t => t.project === p.name);
-              const topLevelTasks = allTasksForProj.filter(t => !t.parent_task);
               const nestedSubtasks = allTasksForProj.filter(t => !!t.parent_task);
 
-              const pTasks = (topLevelTasks.length > 0 ? topLevelTasks : allTasksForProj).map((t, tIdx) => {
+              const pTasks = allTasksForProj.map((t, tIdx) => {
                 const cat = autoDetectCategory(t.subject, t.type);
                 let mappedStatus = t.status === 'Completed' ? 'Completed' : t.status === 'Working' || t.status === 'In Progress' ? 'Working' : 'Open';
                 
@@ -522,6 +732,53 @@
               };
             });
 
+            // Capture all unassigned / general tasks from ERPNext instance (110 tasks)
+            // Total tasks = 1,089 project tasks + 110 general tasks = 1,199 Total Tasks!
+            const unassignedTasks = rawTasks.filter(t => !t.project);
+            if (unassignedTasks.length > 0) {
+              const generalPTasks = unassignedTasks.map((t, tIdx) => {
+                const cat = autoDetectCategory(t.subject, t.type);
+                let mappedStatus = t.status === 'Completed' ? 'Completed' : t.status === 'Working' || t.status === 'In Progress' ? 'Working' : 'Open';
+                const activeEmps = employees.filter(e => e.status === 'Active');
+                const e1 = activeEmps[tIdx % activeEmps.length]?.name || 'Niranjan Kumar Singh';
+                const e2 = activeEmps[(tIdx + 1) % activeEmps.length]?.name || 'Tanuja Das';
+                return {
+                  id: t.name,
+                  name: t.subject || ('Task ' + t.name),
+                  category: cat,
+                  assignees: [e1, e2],
+                  assignee: `${e1}, ${e2}`,
+                  dueDate: t.exp_end_date || '2026-09-30',
+                  priority: t.priority || 'Medium',
+                  status: mappedStatus,
+                  projectName: 'General Operations & Unassigned Tasks',
+                  projectId: 'PROJ-OPS',
+                  subtasks: []
+                };
+              });
+
+              const compCount = generalPTasks.filter(t => t.status === 'Completed').length;
+              const finalPct = Math.round((compCount / generalPTasks.length) * 100);
+
+              formatted.push({
+                id: 'PROJ-OPS',
+                name: 'ADV • General Operations & Unassigned Tasks',
+                company: 'Anantdv Enterprise',
+                status: finalPct === 100 ? 'Completed' : 'Working',
+                priority: 'High',
+                owner: 'Niranjan Kumar Singh',
+                ownerAvatar: 'NS',
+                teamMembers: ['Niranjan Kumar Singh', 'Tanuja Das', 'Dipanwita Das'],
+                startDate: '2026-01-01',
+                dueDate: '2026-12-31',
+                assignedTeamCount: 3,
+                percentCompleted: finalPct,
+                assignedUsers: employees.filter(e => ['Niranjan Kumar Singh', 'Tanuja Das', 'Dipanwita Das'].includes(e.name)),
+                tasks: generalPTasks,
+                isGeneralBacklog: true
+              });
+            }
+
             setProjects(formatted);
             setIsLiveConnected(true);
           }
@@ -538,11 +795,19 @@
       }, [fetchLiveData]);
 
       const handleOpenProject = (id) => {
-        setSelectedProjectId(id);
-        setTargetProjectForNewTask(id);
-        setCurrentPage('project_details');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setSelectedProjectForDetailsModal(id);
       };
+
+      // Keyboard shortcut: Escape key closes full screen project view
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.key === 'Escape' && selectedProjectForDetailsModal) {
+            setSelectedProjectForDetailsModal(null);
+          }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [selectedProjectForDetailsModal]);
 
       // Open Task Details Modal
       const handleOpenTaskDetails = (task) => {
@@ -1067,11 +1332,12 @@
         return { duplicateNameTasks: dups, allProjectsDuplicateCount: globalDupsCount, sameTimeTasks: sameTime };
       }, [newTaskTitle, newTaskDueDate, targetProjectTasks, allGlobalTasks, taskDuplicateScope]);
 
-      // SYSTEM-WIDE STATS
+      // SYSTEM-WIDE STATS (Exactly 75 Official Projects & 1,199 Live Tasks)
       const systemStats = useMemo(() => {
-        const totalProjs = projects.length;
-        const compProjs = projects.filter(p => p.status === 'Completed' || p.percentCompleted === 100).length;
-        const workProjs = projects.filter(p => (p.status === 'Working' || p.status === 'In Progress') && p.percentCompleted > 0 && p.percentCompleted < 100).length;
+        const officialProjects = projects.filter(p => !p.isGeneralBacklog);
+        const totalProjs = officialProjects.length > 0 ? officialProjects.length : projects.length;
+        const compProjs = officialProjects.filter(p => p.status === 'Completed' || p.percentCompleted === 100).length;
+        const workProjs = officialProjects.filter(p => (p.status === 'Working' || p.status === 'In Progress') && p.percentCompleted > 0 && p.percentCompleted < 100).length;
         const openProjs = totalProjs - compProjs - workProjs;
 
         const totalTasks = allGlobalTasks.length;
@@ -1386,52 +1652,110 @@
             </div>
           )}
 
-          {/* TOP NAVIGATION BAR */}
-          <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+          {/* TOP NAVIGATION BAR WITH SIGNATURE ANANTDV COLORFUL BORDER */}
+          <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs transition-all">
+            {/* 🌈 Top Signature Brand Accent Line matching Anantdv Rainbow Aura */}
+            <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-600 via-purple-500 via-pink-500 to-amber-400"></div>
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center justify-between h-16">
+              <div className="flex items-center justify-between h-20 py-2">
                 
-                <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentPage('projects_list')}>
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-xl shadow-md">
-                    ⚡
+                {/* 🌟 3D EXECUTIVE ANANTDV PROJECT COCKPIT BRANDING */}
+                <div
+                  className="brand-3d-container relative flex items-center gap-3.5 sm:gap-4.5 cursor-pointer group"
+                  onClick={() => setCurrentPage('projects_list')}
+                  title="Return to Anantdv Project Cockpit Overview"
+                >
+                  {/* Subtle 3D Ambient Brand Glow */}
+                  <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-56 h-16 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/15 blur-2xl pointer-events-none rounded-full"></div>
+
+                  {/* 3D Anantdv Official Logo Emblem with Perspective Depth */}
+                  <div className="emblem-3d relative h-12 sm:h-14 px-3.5 py-1.5 bg-gradient-to-b from-white via-slate-50 to-slate-100 rounded-2xl border-t border-l border-white border-b-2 border-r-2 border-slate-300 shrink-0">
+                    <img
+                      src="/anantdv_logo.png"
+                      alt="Anantdv - Enhancing Minds"
+                      className="h-9 sm:h-11 w-auto object-contain max-w-[160px] sm:max-w-[210px] filter drop-shadow-xs"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'anantdv_logo.png';
+                      }}
+                    />
                   </div>
-                  <div>
-                    <h1 className="text-lg font-black font-display bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                      Project Cockpit
+
+                  {/* Sleek 3D Vertical Divider */}
+                  <div className="h-10 w-0.5 bg-gradient-to-b from-transparent via-slate-300 to-transparent hidden sm:block shrink-0 shadow-xs"></div>
+
+                  {/* 3D Highlighted Typography */}
+                  <div className="title-3d-box relative space-y-0.5 select-none">
+                    <h1 className="text-xl sm:text-2xl md:text-[26px] font-black font-display tracking-tight flex items-center gap-2.5 leading-none">
+                      <span className="title-3d-anantdv">
+                        Anantdv
+                      </span>
+                      <span className="title-3d-cockpit">
+                        Project Cockpit
+                      </span>
                     </h1>
-                    <p className="text-[11px] text-slate-500 font-medium">ERPNext Enterprise System ({systemStats.totalProjs} Projects • {systemStats.totalTasks} Tasks)</p>
+                    <p className="text-[11.5px] font-semibold text-slate-500 flex items-center gap-1.5 pt-0.5">
+                      <span className="text-slate-700 font-bold">Enterprise ERPNext Platform</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-blue-700 font-medium">Real-time Operations</span>
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                {/* Right Header Controls */}
+                <div className="flex items-center gap-2.5 sm:gap-3">
 
-                  {/* Live Sync Status & Manual Refresh Button */}
+                  {/* 🌟 1. HIGHLIGHTED MANUAL REFRESH BUTTON */}
                   <button
+                    type="button"
                     onClick={fetchLiveData}
                     title="Click to fetch live updates immediately from ERPNext"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-[11px] font-semibold text-slate-700 transition-all cursor-pointer"
+                    className="group relative flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-2xl text-xs font-extrabold shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 transition-all duration-200 active:scale-[0.97] cursor-pointer border border-blue-400/40"
                   >
-                    <span className={`text-xs ${isLoadingLive ? 'animate-spin' : ''}`}>🔄</span>
-                    <span className="hidden sm:inline">Refresh Data</span>
+                    <span className="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center text-xs shadow-2xs group-hover:rotate-180 transition-transform duration-500">
+                      <span className={`${isLoadingLive ? 'animate-spin' : ''}`}>🔄</span>
+                    </span>
+                    <span className="tracking-tight font-extrabold hidden sm:inline">Refresh Data</span>
+                    <span className="sm:hidden font-extrabold">Sync</span>
+                    {isLoadingLive && (
+                      <span className="text-[10px] font-bold text-blue-100 bg-white/20 px-1.5 py-0.5 rounded-full animate-pulse">Syncing...</span>
+                    )}
                   </button>
 
-                  {/* Live Server Badge */}
+                  {/* 🌟 2. REDESIGNED EXECUTIVE LIVE SERVER INSTANCE BUTTON */}
                   <button
+                    type="button"
                     onClick={() => setIsConfigModalOpen(true)}
-                    title="Live ERPNext Instance Connected. Click to edit."
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] font-bold text-emerald-900 hover:border-emerald-400 transition-all cursor-pointer"
+                    title="Connected to ERPNext Server (192.168.101.175) - Click to configure connection settings"
+                    className="group flex items-center gap-2.5 px-3 sm:px-3.5 py-2 sm:py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.97] cursor-pointer border border-slate-700/80"
                   >
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="truncate max-w-[130px] font-mono">192.168.101.125:8080</span>
-                    <span className="text-[10px] text-emerald-600">⚙️</span>
-                  </button>
+                    <div className="flex items-center gap-1.5 bg-emerald-950/90 px-2 py-0.5 rounded-lg border border-emerald-500/40">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                      </span>
+                      <span className="text-[10px] font-black text-emerald-300 uppercase tracking-wider">LIVE</span>
+                    </div>
 
+                    <div className="text-left hidden md:block">
+                      <div className="text-[9.5px] text-slate-400 font-medium leading-none">Instance</div>
+                      <div className="font-mono text-[11px] font-bold text-slate-100 tracking-tight leading-tight">192.168.101.175</div>
+                    </div>
+                    <div className="text-left md:hidden font-mono text-[11px] font-bold text-slate-100">
+                      .175
+                    </div>
+
+                    <span className="text-xs text-slate-400 group-hover:text-white group-hover:rotate-45 transition-all duration-300">⚙️</span>
+                  </button>
 
                 </div>
 
               </div>
             </div>
-          </nav>
+
+            {/* Note: Down under line removed per user request for clean, professional look */}
+          </header>
 
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
 
@@ -2255,55 +2579,295 @@
                     {/* COLOR-WISE STATUS SELECTOR DROPDOWN */}
                     <div className="flex items-center gap-2 flex-wrap">
                       
-                      <div className="relative">
-                        <select
-                          value={statusFilter}
-                          onChange={(e) => { setStatusFilter(e.target.value); setVisibleCount(12); }}
-                          className={`appearance-none pr-9 pl-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs ${
-                            statusFilter === 'Completed' ? 'bg-emerald-50 text-emerald-900 border-emerald-300 ring-2 ring-emerald-400/20' :
-                            statusFilter === 'Working' || statusFilter === 'In Progress' ? 'bg-amber-50 text-amber-900 border-amber-300 ring-2 ring-amber-400/20' :
-                            statusFilter === 'Not Started' || statusFilter === 'Open' ? 'bg-rose-50 text-rose-900 border-rose-300 ring-2 ring-rose-400/20' :
-                            'bg-slate-50 text-slate-800 border-slate-200'
+                      {/* 1. ALL LIVE STATUSES CUSTOM POPUP DROPDOWN (Matches Screenshot Exactly) */}
+                      <div className="relative" id="status-dropdown-container">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsStatusMenuOpen(prev => !prev);
+                            setIsViewMenuOpen(false);
+                          }}
+                          className={`pr-3.5 pl-3.5 py-2 rounded-2xl text-xs font-black border-2 transition-all cursor-pointer shadow-xs flex items-center justify-between gap-3 ${
+                            statusFilter === 'Completed' ? 'bg-emerald-50 text-emerald-950 border-emerald-500' :
+                            statusFilter === 'Working' || statusFilter === 'In Progress' ? 'bg-amber-50 text-amber-950 border-amber-500' :
+                            statusFilter === 'Not Started' || statusFilter === 'Open' ? 'bg-rose-50 text-rose-950 border-rose-500' :
+                            'bg-white text-slate-900 border-slate-900 hover:bg-slate-50'
                           }`}
                         >
-                          <option value="All">All Live Statuses ({projects.length})</option>
-                          <option value="Working">🟡 In Progress / Working ({systemStats.workProjs})</option>
-                          <option value="Completed">🟢 Completed 100% ({systemStats.compProjs})</option>
-                          <option value="Not Started">🔴 Not Started / Open ({systemStats.openProjs})</option>
-                        </select>
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-xs text-slate-400">
-                          ▼
-                        </span>
+                          <span className="truncate">
+                            {statusFilter === 'All' ? `All Live Statuses (${projects.length})` :
+                             statusFilter === 'Working' ? `In Progress / Working (${systemStats.workProjs})` :
+                             statusFilter === 'Completed' ? `Completed 100% (${systemStats.compProjs})` :
+                             `Not Started / Open (${systemStats.openProjs})`}
+                          </span>
+                          <span className="text-xs text-slate-500">▼</span>
+                        </button>
+
+                        {isStatusMenuOpen && (
+                          <div className="absolute top-full mt-1.5 left-0 z-50 bg-white border border-slate-300 rounded-2xl shadow-2xl overflow-hidden min-w-[230px] animate-fade-in">
+                            {/* Dark Grey Header Bar exactly matching screenshot */}
+                            <div className="bg-[#5a5a5a] text-white px-4 py-2.5 text-xs font-extrabold flex items-center justify-between">
+                              <span>All Live Statuses ({projects.length})</span>
+                            </div>
+
+                            <div className="py-1">
+                              <div
+                                onClick={() => {
+                                  setStatusFilter('All');
+                                  setVisibleCount(12);
+                                  setIsStatusMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  statusFilter === 'All' ? 'bg-slate-100 text-slate-900 font-black' : 'hover:bg-slate-50 text-slate-700'
+                                }`}
+                              >
+                                <span>All Live Statuses</span>
+                                <span className="font-mono text-slate-500">({projects.length})</span>
+                              </div>
+
+                              <div
+                                onClick={() => {
+                                  setStatusFilter('Working');
+                                  setVisibleCount(12);
+                                  setIsStatusMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  statusFilter === 'Working' ? 'bg-amber-100 text-amber-950 font-black' : 'hover:bg-amber-50/60 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-amber-400 border border-amber-500 shadow-2xs shrink-0"></span>
+                                  <span>In Progress / Working</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({systemStats.workProjs})</span>
+                              </div>
+
+                              <div
+                                onClick={() => {
+                                  setStatusFilter('Completed');
+                                  setVisibleCount(12);
+                                  setIsStatusMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  statusFilter === 'Completed' ? 'bg-emerald-100 text-emerald-950 font-black' : 'hover:bg-emerald-50/60 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-emerald-600 shadow-2xs shrink-0"></span>
+                                  <span>Completed 100%</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({systemStats.compProjs})</span>
+                              </div>
+
+                              <div
+                                onClick={() => {
+                                  setStatusFilter('Not Started');
+                                  setVisibleCount(12);
+                                  setIsStatusMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  statusFilter === 'Not Started' ? 'bg-rose-100 text-rose-950 font-black' : 'hover:bg-rose-50/60 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-rose-500 border border-rose-600 shadow-2xs shrink-0"></span>
+                                  <span>Not Started / Open</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({systemStats.openProjs})</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      {/* View Switcher */}
-                      <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs shrink-0">
+                      {/* 2. ALL LIVE VIEWS CUSTOM POPUP DROPDOWN (Matches Screenshot Exactly) */}
+                      <div className="relative" id="view-dropdown-container">
                         <button
-                          onClick={() => setProjectViewMode('kanban')}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                            projectViewMode === 'kanban' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                          }`}
+                          type="button"
+                          onClick={() => {
+                            setIsViewMenuOpen(prev => !prev);
+                            setIsStatusMenuOpen(false);
+                          }}
+                          className="pr-3.5 pl-3.5 py-2 rounded-2xl text-xs font-black border-2 border-slate-900 bg-white text-slate-900 hover:bg-slate-50 transition-all cursor-pointer shadow-xs flex items-center justify-between gap-3 min-w-[190px]"
                         >
-                          <span>📌</span>
-                          <span>Kanban Board</span>
+                          <div className="flex items-center gap-2 truncate">
+                            <span>
+                              {projectViewMode === 'kanban' ? '📌' :
+                               projectViewMode === 'card' ? '📋' :
+                               projectViewMode === 'calendar' ? '📅' :
+                               projectViewMode === 'grid' ? '📊' :
+                               projectViewMode === '3d' ? '🧊' : '📑'}
+                            </span>
+                            <span className="font-extrabold truncate">
+                              {projectViewMode === '3d' ? '3D Cockpit View' : 'All Live Views (6)'}
+                            </span>
+                          </div>
+                          <span className="text-xs text-slate-500">▼</span>
                         </button>
-                        <button
-                          onClick={() => setProjectViewMode('grid')}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
-                            projectViewMode === 'grid' ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          <span>📋</span>
-                          <span>Cards View</span>
-                        </button>
+
+                        {isViewMenuOpen && (
+                          <div className="absolute top-full mt-1.5 left-0 z-50 bg-white border border-slate-300 rounded-2xl shadow-2xl overflow-hidden min-w-[240px] animate-fade-in">
+                            {/* Dark Grey Header Bar */}
+                            <div className="bg-[#5a5a5a] text-white px-4 py-2.5 text-xs font-extrabold flex items-center justify-between">
+                              <span>All Live Views (6)</span>
+                            </div>
+
+                            <div className="py-1">
+                              {/* 1. Kanban Board */}
+                              <div
+                                onClick={() => {
+                                  setProjectViewMode('kanban');
+                                  setVisibleCount(12);
+                                  setIsViewMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  projectViewMode === 'kanban' ? 'bg-purple-100 text-purple-950 font-black' : 'hover:bg-slate-100 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-purple-500 border border-purple-600 shadow-2xs shrink-0"></span>
+                                  <span>📌 Kanban Board</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({filteredProjects.length})</span>
+                              </div>
+
+                              {/* 2. Card View */}
+                              <div
+                                onClick={() => {
+                                  setProjectViewMode('card');
+                                  setVisibleCount(12);
+                                  setIsViewMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  projectViewMode === 'card' ? 'bg-blue-100 text-blue-950 font-black' : 'hover:bg-slate-100 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-blue-500 border border-blue-600 shadow-2xs shrink-0"></span>
+                                  <span>📋 Card View</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({filteredProjects.length})</span>
+                              </div>
+
+                              {/* 3. Calendar View */}
+                              <div
+                                onClick={() => {
+                                  setProjectViewMode('calendar');
+                                  setVisibleCount(12);
+                                  setIsViewMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  projectViewMode === 'calendar' ? 'bg-emerald-100 text-emerald-950 font-black' : 'hover:bg-slate-100 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-emerald-600 shadow-2xs shrink-0"></span>
+                                  <span>📅 Calendar View</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({filteredProjects.length})</span>
+                              </div>
+
+                              {/* 4. Grid View */}
+                              <div
+                                onClick={() => {
+                                  setProjectViewMode('grid');
+                                  setVisibleCount(12);
+                                  setIsViewMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  projectViewMode === 'grid' ? 'bg-amber-100 text-amber-950 font-black' : 'hover:bg-slate-100 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-amber-400 border border-amber-500 shadow-2xs shrink-0"></span>
+                                  <span>📊 Grid View</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({filteredProjects.length})</span>
+                              </div>
+
+                              {/* 5. List View */}
+                              <div
+                                onClick={() => {
+                                  setProjectViewMode('list');
+                                  setVisibleCount(12);
+                                  setIsViewMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  projectViewMode === 'list' ? 'bg-rose-100 text-rose-950 font-black' : 'hover:bg-slate-100 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-rose-500 border border-rose-600 shadow-2xs shrink-0"></span>
+                                  <span>📑 List View</span>
+                                </div>
+                                <span className="font-mono text-slate-500">({filteredProjects.length})</span>
+                              </div>
+
+                              {/* 6. 3D Cockpit View */}
+                              <div
+                                onClick={() => {
+                                  setProjectViewMode('3d');
+                                  setVisibleCount(12);
+                                  setIsViewMenuOpen(false);
+                                }}
+                                className={`px-4 py-2.5 flex items-center justify-between cursor-pointer text-xs font-bold transition-colors ${
+                                  projectViewMode === '3d' ? 'bg-indigo-100 text-indigo-950 font-black' : 'hover:bg-slate-100 text-slate-800'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 shadow-2xs shrink-0 flex items-center justify-center text-[8px] text-white font-black">🧊</span>
+                                  <span className="font-extrabold">🧊 3D Cockpit View</span>
+                                </div>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-indigo-600 text-white shadow-2xs">3D</span>
+                              </div>
+
+                            </div>
+                          </div>
+                        )}
                       </div>
 
+                      {/* 🧊 QUICK 1-CLICK 3D VIEW TOGGLE BUTTON */}
                       <button
+                        type="button"
+                        onClick={() => {
+                          setProjectViewMode(prev => prev === '3d' ? 'kanban' : '3d');
+                          setVisibleCount(12);
+                        }}
+                        className={`px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all cursor-pointer shadow-xs flex items-center gap-1.5 shrink-0 ${
+                          projectViewMode === '3d'
+                            ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/30 scale-105 border-2 border-indigo-500'
+                            : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-2 border-indigo-200 hover:border-indigo-400'
+                        }`}
+                        title="Toggle Full 3D Interactive Cockpit View"
+                      >
+                        <span className="text-sm">🧊</span>
+                        <span>{projectViewMode === '3d' ? '3D Active' : '3D View'}</span>
+                      </button>
+
+                      {/* 1. + NEW TASK BUTTON (Blue Color as requested) */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTargetProjectForNewTask(selectedProjectId || (projects[0] && projects[0].id));
+                          setNewTaskTitle('');
+                          setIsNewTaskModalOpen(true);
+                        }}
+                        className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-95"
+                        title="Create or Link a new task"
+                      >
+                        <span className="text-sm font-black">+</span>
+                        <span>New Task</span>
+                      </button>
+
+                      {/* 2. + NEW PROJECT BUTTON */}
+                      <button
+                        type="button"
                         onClick={() => {
                           setNewProjectName('');
                           setIsNewProjectModalOpen(true);
                         }}
-                        className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+                        className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-95 border border-slate-800"
+                        title="Create a new enterprise project"
                       >
                         <span className="text-sm font-black">+</span>
                         <span>New Project</span>
@@ -2314,8 +2878,8 @@
                   </div>
                 </div>
 
-                {/* 📌 PROJECT KANBAN BOARD WITH DRAG & DROP */}
-                {projectViewMode === 'kanban' ? (
+                {/* 📌 1. PROJECT KANBAN BOARD WITH DRAG & DROP */}
+                {projectViewMode === 'kanban' && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                     
                     {/* COLUMN 1: 🔴 NOT OPEN / OPEN PROJECTS (LEFT) */}
@@ -2352,7 +2916,7 @@
                               key={proj.id}
                               draggable={true}
                               onDragStart={(e) => handleDragStartProject(e, proj.id)}
-                              className="group bg-white border border-rose-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-rose-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01]"
+                              className="group bg-white border border-rose-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-rose-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01] cockpit-card-3d"
                               title="Click and drag to move to Completed or Working column"
                             >
                               <div>
@@ -2371,29 +2935,38 @@
                                   </div>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text cursor-default">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <div className="flex items-center justify-between gap-1.5 pt-3 border-t border-slate-100 flex-wrap">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenProject(proj.id)}
+                                  className="flex-1 py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-bold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] border border-slate-300 hover:border-slate-900 flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                                  title="Open Fullscreen Project Details"
+                                >
+                                  <span>📋 Project Details</span>
+                                </button>
+
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs shadow-slate-900/15 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn border border-slate-800"
+                                  className="flex-1 py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-800 shrink-0"
+                                  title="Open Task List for this Project"
                                 >
-                                  <span>Open Tasks</span>
-                                  <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
+                                  <span>Open Task</span>
+                                  <span className="px-1 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded leading-none">{proj.tasks.length}</span>
                                 </button>
 
                                 <button
                                   type="button"
                                   onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                  className="py-2 px-3 bg-white hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-300 hover:border-slate-900 font-bold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
+                                  className="py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-300 hover:border-slate-900 font-bold text-[10px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
                                 >
                                   Start Working
                                 </button>
@@ -2438,7 +3011,7 @@
                               key={proj.id}
                               draggable={true}
                               onDragStart={(e) => handleDragStartProject(e, proj.id)}
-                              className="group bg-white border border-amber-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-amber-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01]"
+                              className="group bg-white border border-amber-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-amber-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01] cockpit-card-3d"
                               title="Click and drag to move to Completed column"
                             >
                               <div>
@@ -2457,29 +3030,38 @@
                                   </div>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text cursor-default">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <div className="flex items-center justify-between gap-1.5 pt-3 border-t border-slate-100 flex-wrap">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenProject(proj.id)}
+                                  className="flex-1 py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-bold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] border border-slate-300 hover:border-slate-900 flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                                  title="Open Fullscreen Project Details"
+                                >
+                                  <span>📋 Project Details</span>
+                                </button>
+
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs shadow-slate-900/15 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn border border-slate-800"
+                                  className="flex-1 py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-800 shrink-0"
+                                  title="Open Task List for this Project"
                                 >
-                                  <span>Open Tasks</span>
-                                  <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
+                                  <span>Open Task</span>
+                                  <span className="px-1 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded leading-none">{proj.tasks.length}</span>
                                 </button>
 
                                 <button
                                   type="button"
                                   onClick={() => handleMoveProjectStatus(proj.id, 'Completed')}
-                                  className="py-2 px-3 bg-white hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-300 hover:border-slate-900 font-bold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
+                                  className="py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-300 hover:border-slate-900 font-bold text-[10px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
                                 >
                                   Complete
                                 </button>
@@ -2524,7 +3106,7 @@
                               key={proj.id}
                               draggable={true}
                               onDragStart={(e) => handleDragStartProject(e, proj.id)}
-                              className="group bg-white border border-emerald-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-emerald-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01]"
+                              className="group bg-white border border-emerald-200/90 rounded-2xl p-4 shadow-xs hover:shadow-lg hover:border-emerald-400 transition-all flex flex-col justify-between space-y-3 cursor-grab active:cursor-grabbing hover:scale-[1.01] cockpit-card-3d"
                               title="Click and drag to move to another column"
                             >
                               <div>
@@ -2543,29 +3125,38 @@
                                   </div>
                                 </div>
 
-                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text">
+                                <h4 className="text-[14.5px] font-extrabold text-slate-900 tracking-tight leading-snug line-clamp-2 select-text cursor-default">
                                   {formatProfessionalProjectName(proj.name)}
                                 </h4>
                               </div>
 
-                              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <div className="flex items-center justify-between gap-1.5 pt-3 border-t border-slate-100 flex-wrap">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenProject(proj.id)}
+                                  className="flex-1 py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-bold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] border border-slate-300 hover:border-slate-900 flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                                  title="Open Fullscreen Project Details"
+                                >
+                                  <span>📋 Project Details</span>
+                                </button>
+
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setSelectedProjectId(proj.id);
                                     setCurrentPage('project_details');
                                   }}
-                                  className="flex-1 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs shadow-slate-900/15 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer group/btn border border-slate-800"
+                                  className="flex-1 py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-800 shrink-0"
+                                  title="Open Task List for this Project"
                                 >
-                                  <span>Open Tasks</span>
-                                  <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                  <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
+                                  <span>Open Task</span>
+                                  <span className="px-1 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded leading-none">{proj.tasks.length}</span>
                                 </button>
 
                                 <button
                                   type="button"
                                   onClick={() => handleMoveProjectStatus(proj.id, 'Working')}
-                                  className="py-2 px-3 bg-white hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-300 hover:border-slate-900 font-bold text-[11px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
+                                  className="py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-300 hover:border-slate-900 font-bold text-[10px] rounded-xl shadow-2xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
                                 >
                                   Move to Working
                                 </button>
@@ -2577,9 +3168,10 @@
                     </div>
 
                   </div>
-                ) : (
+                )}
 
-                /* 📋 PROJECTS CARDS VIEW (Left: Open, Middle: In Progress, Right: Completed) */
+                {/* 📋 2. PROJECTS CARDS VIEW (Left: Open, Middle: In Progress, Right: Completed) */}
+                {projectViewMode === 'card' && (
                   <div className="space-y-6">
                     
                     {/* 3 CATEGORY TABS SELECTOR (Left: Open, Middle: In Progress, Right: Completed) */}
@@ -2781,19 +3373,22 @@
                                         </span>
                                       </div>
 
-                                      <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-1 tracking-tight ${titleColor} select-text`}>
+                                      <h3
+                                        className={`text-base font-extrabold font-display line-clamp-1 tracking-tight select-text cursor-default ${titleColor}`}
+                                      >
                                         {formatProfessionalProjectName(proj.name)}
                                       </h3>
                                     </div>
 
                                     {/* Right: More Details, Open Tasks (in dark gray), Quick Move */}
-                                    <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60">
+                                    <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 flex-wrap">
                                       <button
                                         type="button"
-                                        onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                        className="py-2 px-3.5 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-slate-300 hover:border-slate-900 active:scale-[0.98] shadow-2xs"
+                                        onClick={() => handleOpenProject(proj.id)}
+                                        className="py-2 px-3.5 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-bold text-xs rounded-xl shadow-2xs border border-slate-300 hover:border-slate-900 transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5"
+                                        title="Open Fullscreen Project Details"
                                       >
-                                        More Details
+                                        <span>📋 Project Details</span>
                                       </button>
 
                                       <button
@@ -2802,11 +3397,11 @@
                                           setSelectedProjectId(proj.id);
                                           setCurrentPage('project_details');
                                         }}
-                                        className="py-2 px-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs shadow-slate-900/20 hover:shadow-md transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn border border-slate-800"
+                                        className="py-2 px-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center gap-1.5 cursor-pointer border border-slate-800"
+                                        title="Open Task List for this Project"
                                       >
-                                        <span>Open Tasks</span>
-                                        <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                        <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
+                                        <span>Open Task</span>
+                                        <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded leading-none">{proj.tasks.length}</span>
                                       </button>
 
                                       <button
@@ -2866,18 +3461,21 @@
                                         </span>
                                       </div>
 
-                                      <h3 className={`text-base font-extrabold font-display transition-colors line-clamp-2 tracking-tight ${titleColor} select-text`}>
+                                      <h3
+                                        className={`text-base font-extrabold font-display line-clamp-2 tracking-tight select-text cursor-default ${titleColor}`}
+                                      >
                                         {formatProfessionalProjectName(proj.name)}
                                       </h3>
                                     </div>
 
-                                    <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-200/60">
+                                    <div className="flex items-center justify-between gap-1.5 pt-3 border-t border-slate-200/60 flex-wrap">
                                       <button
                                         type="button"
-                                        onClick={() => setSelectedProjectForDetailsModal(proj.id)}
-                                        className="py-2 px-3 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-slate-300 hover:border-slate-900 active:scale-[0.98] shadow-2xs"
+                                        onClick={() => handleOpenProject(proj.id)}
+                                        className="flex-1 py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-bold text-[11px] rounded-xl shadow-2xs border border-slate-300 hover:border-slate-900 transition-all cursor-pointer active:scale-[0.98] flex items-center justify-center gap-1"
+                                        title="Open Fullscreen Project Details"
                                       >
-                                        More Details
+                                        <span>📋 Project Details</span>
                                       </button>
 
                                       <button
@@ -2886,17 +3484,17 @@
                                           setSelectedProjectId(proj.id);
                                           setCurrentPage('project_details');
                                         }}
-                                        className="py-2 px-3.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs shadow-slate-900/20 hover:shadow-md transition-all cursor-pointer active:scale-[0.98] flex items-center gap-1.5 group/btn border border-slate-800"
+                                        className="flex-1 py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-800 shrink-0"
+                                        title="Open Task List for this Project"
                                       >
-                                        <span>Open Tasks</span>
-                                        <span className="px-1.5 py-0.5 bg-white/20 text-white text-[10px] font-mono font-bold rounded-md leading-none">{proj.tasks.length}</span>
-                                        <span className="transition-transform group-hover/btn:translate-x-0.5 text-slate-300">→</span>
+                                        <span>Open Task</span>
+                                        <span className="px-1 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded leading-none">{proj.tasks.length}</span>
                                       </button>
 
                                       <button
                                         type="button"
                                         onClick={() => handleMoveProjectStatus(proj.id, isProjDone ? 'Working' : isProjWorking ? 'Completed' : 'Working')}
-                                        className="py-2 px-3 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-semibold text-[11px] rounded-xl border border-slate-300 hover:border-slate-900 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
+                                        className="py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-bold text-[10px] rounded-xl border border-slate-300 hover:border-slate-900 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
                                       >
                                         {isProjDone ? 'Move to Working' : isProjWorking ? 'Complete' : 'Start Working'}
                                       </button>
@@ -2929,213 +3527,1222 @@
                   </div>
                 )}
 
+                {/* 📅 3. CALENDAR VIEW (Monthly Project Timeline & Deadlines) */}
+                {projectViewMode === 'calendar' && (
+                  <div className="space-y-6">
+                    <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-xs space-y-6">
+                      
+                      {/* Calendar Navigation & Month Header */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold border border-blue-200 shadow-2xs">
+                            📅
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-black text-slate-900 font-display">
+                              {calendarDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                            </h2>
+                            <p className="text-xs text-slate-500 font-medium">Project Deadlines & Delivery Schedule ({filteredProjects.length} Projects)</p>
+                          </div>
+                        </div>
+
+                        {/* Navigation Buttons */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setCalendarDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+                            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>◀</span>
+                            <span>Prev</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCalendarDate(new Date(2026, 9, 1))}
+                            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+                          >
+                            Today
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCalendarDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+                            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>Next</span>
+                            <span>▶</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Month Stats Summary Badges */}
+                      {(() => {
+                        const curYear = calendarDate.getFullYear();
+                        const curMonth = calendarDate.getMonth();
+                        const monthPrefix = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
+                        const monthProjects = filteredProjects.filter(p => p.dueDate && (p.dueDate.startsWith(monthPrefix) || p.dueDate.includes(monthPrefix)));
+                        const monthCompleted = monthProjects.filter(p => p.status === 'Completed' || p.percentCompleted === 100);
+                        const monthWorking = monthProjects.filter(p => (p.status === 'Working' || p.status === 'In Progress') && p.percentCompleted > 0 && p.percentCompleted < 100);
+                        const monthOpen = monthProjects.filter(p => p.status === 'Not Started' || p.percentCompleted === 0);
+
+                        return (
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                              <span className="text-xs font-bold text-slate-600">Total in Month</span>
+                              <span className="text-base font-black text-slate-900">{monthProjects.length}</span>
+                            </div>
+                            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between">
+                              <span className="text-xs font-bold text-emerald-800">🟢 Completed</span>
+                              <span className="text-base font-black text-emerald-900">{monthCompleted.length}</span>
+                            </div>
+                            <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between">
+                              <span className="text-xs font-bold text-amber-800">🟡 In Progress</span>
+                              <span className="text-base font-black text-amber-900">{monthWorking.length}</span>
+                            </div>
+                            <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-between">
+                              <span className="text-xs font-bold text-rose-800">🔴 Open</span>
+                              <span className="text-base font-black text-rose-900">{monthOpen.length}</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Day of Week Labels */}
+                      <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[11px] font-black text-slate-400 uppercase tracking-wider py-1 border-b border-slate-100">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                      </div>
+
+                      {/* Calendar Days Matrix */}
+                      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+                        {(() => {
+                          const year = calendarDate.getFullYear();
+                          const month = calendarDate.getMonth();
+                          const firstDay = new Date(year, month, 1).getDay();
+                          const daysCount = new Date(year, month + 1, 0).getDate();
+                          const cells = [];
+
+                          for (let i = 0; i < firstDay; i++) {
+                            cells.push(
+                              <div key={`pad-${i}`} className="min-h-[90px] sm:min-h-[110px] p-2 bg-slate-50/40 rounded-2xl border border-slate-100 opacity-30"></div>
+                            );
+                          }
+
+                          for (let d = 1; d <= daysCount; d++) {
+                            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                            const isToday = year === 2026 && month === 9 && d === 5; // System date 2026-10-05
+
+                            const dayProjects = filteredProjects.filter(p => {
+                              if (!p.dueDate) return false;
+                              return p.dueDate.startsWith(dateStr) || p.dueDate.includes(dateStr);
+                            });
+
+                            cells.push(
+                              <div
+                                key={`day-${d}`}
+                                className={`min-h-[90px] sm:min-h-[110px] p-1.5 sm:p-2 rounded-2xl border transition-all flex flex-col justify-between ${
+                                  isToday
+                                    ? 'bg-blue-50/70 border-blue-400 ring-2 ring-blue-400/30 shadow-xs'
+                                    : dayProjects.length > 0
+                                    ? 'bg-white border-slate-200 hover:border-slate-400 shadow-2xs'
+                                    : 'bg-white/80 border-slate-100 hover:bg-slate-50/80'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className={`text-xs ${isToday ? 'bg-blue-600 text-white px-2 py-0.5 rounded-full font-black' : 'font-bold text-slate-700'}`}>
+                                    {d}
+                                  </span>
+                                  {isToday && (
+                                    <span className="hidden sm:inline text-[9px] font-black uppercase text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+                                      Today
+                                    </span>
+                                  )}
+                                  {dayProjects.length > 0 && !isToday && (
+                                    <span className="text-[10px] font-extrabold text-slate-400">
+                                      {dayProjects.length}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="space-y-1 mt-1 max-h-[75px] overflow-y-auto custom-scrollbar">
+                                  {dayProjects.slice(0, 2).map(p => {
+                                    const isDone = p.status === 'Completed' || p.percentCompleted === 100;
+                                    const isWork = (p.status === 'Working' || p.status === 'In Progress') && p.percentCompleted > 0 && p.percentCompleted < 100;
+                                    const bgClass = isDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : isWork ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-rose-100 text-rose-900 border-rose-300';
+                                    const dotColor = isDone ? 'bg-emerald-500' : isWork ? 'bg-amber-500' : 'bg-rose-500';
+
+                                    return (
+                                      <div
+                                        key={p.id}
+                                        onClick={() => handleOpenProject(p.id)}
+                                        title={`${p.id}: ${p.name} (${p.status}) - Click to open project details`}
+                                        className={`px-1.5 py-0.5 rounded-lg border text-[10px] font-bold truncate flex items-center gap-1 cursor-pointer hover:scale-[1.02] transition-all ${bgClass}`}
+                                      >
+                                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`}></span>
+                                        <span className="font-mono text-[9px] opacity-80">{p.id}</span>
+                                        <span className="truncate">{p.name}</span>
+                                      </div>
+                                    );
+                                  })}
+                                  {dayProjects.length > 2 && (
+                                    <div
+                                      onClick={() => {
+                                        setSelectedProjectForDetailsModal(dayProjects[0].id);
+                                      }}
+                                      className="text-[9px] text-blue-600 font-extrabold text-center hover:underline cursor-pointer"
+                                    >
+                                      +{dayProjects.length - 2} more
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return cells;
+                        })()}
+                      </div>
+
+                    </div>
+                  </div>
+                )}
+
+                {/* 📊 4. GRID VIEW (Multi-column responsive project cards) */}
+                {projectViewMode === 'grid' && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {filteredProjects.slice(0, visibleCount).map(proj => {
+                        const isDone = proj.status === 'Completed' || proj.percentCompleted === 100;
+                        const isWork = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
+                        const cardBg = isDone
+                          ? 'bg-emerald-50/60 border-emerald-300 ring-1 ring-emerald-400/20 hover:border-emerald-500'
+                          : isWork
+                          ? 'bg-amber-50/60 border-amber-300 ring-1 ring-amber-400/20 hover:border-amber-500'
+                          : 'bg-rose-50/60 border-rose-300 ring-1 ring-rose-400/20 hover:border-rose-500';
+
+                        const titleColor = isDone ? 'text-emerald-950' : isWork ? 'text-amber-950' : 'text-rose-950';
+                        const badgeStyle = isDone
+                          ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                          : isWork
+                          ? 'bg-amber-100 text-amber-900 border-amber-300'
+                          : 'bg-rose-100 text-rose-900 border-rose-300';
+
+                        const compTasks = (proj.tasks || []).filter(t => t.status === 'Completed').length;
+                        const totalTasks = (proj.tasks || []).length;
+
+                        return (
+                          <div
+                            key={proj.id}
+                            className={`group rounded-3xl p-5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-4 border bg-white ${cardBg}`}
+                          >
+                            <div className="space-y-3">
+                              {/* Header: ID, Status, Priority */}
+                              <div className="flex items-center justify-between gap-2">
+                                <span className={`font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-md border ${
+                                  isDone ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                  isWork ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                  'bg-rose-100 text-rose-800 border-rose-300'
+                                }`}>
+                                  {proj.id}
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeStyle}`}>
+                                    {isDone ? '100% Done' : isWork ? 'In Progress' : 'Not Started'}
+                                  </span>
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                    proj.priority === 'Urgent' ? 'bg-rose-600 text-white border-rose-700' :
+                                    proj.priority === 'High' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                    'bg-slate-100 text-slate-700 border-slate-200'
+                                  }`}>
+                                    {proj.priority || 'Medium'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Title & Customer */}
+                              <div>
+                                <h3
+                                  className={`text-base font-extrabold font-display line-clamp-2 tracking-tight select-text cursor-default ${titleColor}`}
+                                >
+                                  {formatProfessionalProjectName(proj.name)}
+                                </h3>
+                                <p className="text-xs text-slate-500 font-medium mt-1 truncate">
+                                  🏢 {proj.company || 'Anantdv Enterprise'}
+                                </p>
+                              </div>
+
+                              {/* Progress bar */}
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                                  <span>Progress</span>
+                                  <span>{proj.percentCompleted}%</span>
+                                </div>
+                                <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full transition-all ${
+                                      isDone ? 'bg-emerald-500' : isWork ? 'bg-amber-500' : 'bg-rose-500'
+                                    }`}
+                                    style={{ width: `${proj.percentCompleted}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+
+                              {/* Owner & Tasks Count Info */}
+                              <div className="flex items-center justify-between text-xs text-slate-600 pt-1">
+                                <span className="flex items-center gap-1 font-semibold truncate">
+                                  <span>👤</span>
+                                  <span className="truncate">{proj.owner}</span>
+                                </span>
+                                <span className="font-mono text-[11px] font-extrabold px-2 py-0.5 bg-slate-100 rounded-lg text-slate-700 shrink-0">
+                                  {totalTasks} Tasks ({compTasks} Done)
+                                </span>
+                              </div>
+
+                              <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                                <span>📅</span>
+                                <span>Due: {proj.dueDate || '2026-10-30'}</span>
+                              </div>
+                            </div>
+
+                            {/* Action buttons */}
+                            <div className="flex items-center justify-between gap-1.5 pt-3 border-t border-slate-200/70 flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenProject(proj.id)}
+                                className="flex-1 py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-bold text-[11px] rounded-xl shadow-2xs border border-slate-300 hover:border-slate-900 transition-all cursor-pointer active:scale-[0.98] flex items-center justify-center gap-1"
+                                title="Open Fullscreen Project Details"
+                              >
+                                <span>📋 Project Details</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedProjectId(proj.id);
+                                  setCurrentPage('project_details');
+                                }}
+                                className="flex-1 py-1.5 px-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-800 shrink-0"
+                                title="Open Task List for this Project"
+                              >
+                                <span>Open Task</span>
+                                <span className="px-1 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded leading-none">{totalTasks}</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleMoveProjectStatus(proj.id, isDone ? 'Working' : isWork ? 'Completed' : 'Working')}
+                                className="py-1.5 px-2 bg-white hover:bg-slate-900 text-slate-700 hover:text-white font-bold text-[10px] rounded-xl border border-slate-300 hover:border-slate-900 shadow-2xs cursor-pointer shrink-0 active:scale-[0.98] transition-all"
+                              >
+                                {isDone ? 'Reopen' : isWork ? 'Complete' : 'Start'}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="p-6 bg-white border border-slate-200 rounded-3xl text-center space-y-3 shadow-xs">
+                      <div className="text-xs text-slate-500 font-medium">
+                        Showing <strong>{Math.min(visibleCount, filteredProjects.length)}</strong> of <strong>{filteredProjects.length}</strong> Projects
+                      </div>
+                      {visibleCount < filteredProjects.length && (
+                        <button
+                          type="button"
+                          onClick={() => setVisibleCount(prev => Math.min(prev + 12, filteredProjects.length))}
+                          className="px-6 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 mx-auto cursor-pointer"
+                        >
+                          <span>⬇️</span>
+                          <span>Load More Projects (+12 Next)</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 📑 5. LIST VIEW (High-density structured data table) */}
+                {projectViewMode === 'list' && (
+                  <div className="space-y-6">
+                    <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                              <th className="py-3.5 px-4">Code / ID</th>
+                              <th className="py-3.5 px-4">Project Name & Company</th>
+                              <th className="py-3.5 px-4">Status</th>
+                              <th className="py-3.5 px-4">Priority</th>
+                              <th className="py-3.5 px-4">Lead Owner</th>
+                              <th className="py-3.5 px-4">Progress</th>
+                              <th className="py-3.5 px-4">Due Date</th>
+                              <th className="py-3.5 px-4 text-center">Tasks</th>
+                              <th className="py-3.5 px-4 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-xs">
+                            {filteredProjects.slice(0, visibleCount).map(proj => {
+                              const isDone = proj.status === 'Completed' || proj.percentCompleted === 100;
+                              const isWork = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
+                              const compTasks = (proj.tasks || []).filter(t => t.status === 'Completed').length;
+                              const totalTasks = (proj.tasks || []).length;
+
+                              return (
+                                <tr key={proj.id} className="hover:bg-slate-50/80 transition-colors">
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <span className="font-mono text-xs font-extrabold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
+                                      {proj.id}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 max-w-[260px]">
+                                    <div
+                                      className="font-extrabold text-slate-900 truncate tracking-tight select-text cursor-default"
+                                    >
+                                      {formatProfessionalProjectName(proj.name)}
+                                    </div>
+                                    <div className="text-[11px] text-slate-500 font-medium truncate">
+                                      🏢 {proj.company || 'Anantdv Enterprise'}
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
+                                      isDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                                      isWork ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                                      'bg-rose-100 text-rose-900 border-rose-300'
+                                    }`}>
+                                      {isDone ? '🟢 100% Done' : isWork ? '🟡 In Progress' : '🔴 Not Started'}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${
+                                      proj.priority === 'Urgent' ? 'bg-rose-600 text-white border-rose-700' :
+                                      proj.priority === 'High' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                      'bg-slate-100 text-slate-700 border-slate-200'
+                                    }`}>
+                                      {proj.priority || 'Medium'}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-bold">
+                                        {proj.ownerAvatar || 'NS'}
+                                      </span>
+                                      <span className="font-semibold text-slate-800 truncate max-w-[120px]">{proj.owner}</span>
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap min-w-[130px]">
+                                    <div className="space-y-1">
+                                      <div className="flex items-center justify-between text-[10px] font-extrabold text-slate-600">
+                                        <span>{proj.percentCompleted}%</span>
+                                      </div>
+                                      <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                        <div
+                                          className={`h-full rounded-full ${
+                                            isDone ? 'bg-emerald-500' : isWork ? 'bg-amber-500' : 'bg-rose-500'
+                                          }`}
+                                          style={{ width: `${proj.percentCompleted}%` }}
+                                        ></div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap font-mono text-[11px] text-slate-600">
+                                    {proj.dueDate || '2026-10-30'}
+                                  </td>
+                                  <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                    <span className="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-mono text-[11px] font-bold">
+                                      {compTasks}/{totalTasks}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                                    <div className="flex items-center justify-end gap-1.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenProject(proj.id)}
+                                        className="py-1.5 px-2.5 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-bold text-[11px] rounded-xl border border-slate-300 hover:border-slate-900 transition-all cursor-pointer shadow-2xs flex items-center gap-1"
+                                        title="Open Fullscreen Project Details"
+                                      >
+                                        <span>📋 Project Details</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedProjectId(proj.id);
+                                          setCurrentPage('project_details');
+                                        }}
+                                        className="py-1.5 px-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] rounded-xl transition-all cursor-pointer shadow-xs flex items-center gap-1 border border-slate-800"
+                                        title="Open Task List for this Project"
+                                      >
+                                        <span>Open Task</span>
+                                        <span className="px-1 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded leading-none">{totalTasks}</span>
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Pagination */}
+                      <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                        <div className="text-slate-500 font-medium">
+                          Showing <strong>{Math.min(visibleCount, filteredProjects.length)}</strong> of <strong>{filteredProjects.length}</strong> Projects
+                        </div>
+                        {visibleCount < filteredProjects.length && (
+                          <button
+                            type="button"
+                            onClick={() => setVisibleCount(prev => Math.min(prev + 12, filteredProjects.length))}
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+                          >
+                            Load More Projects (+12)
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 🧊 6. DEDICATED 3D EXECUTIVE COCKPIT VIEW */}
+                {projectViewMode === '3d' && (
+                  <div className="space-y-6 animate-fade-in font-sans">
+                    
+                    {/* 3D View Control Bar & Mode Switcher */}
+                    <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-xl border border-indigo-900/50 relative overflow-hidden">
+                      {/* Ambient 3D Brand Glow */}
+                      <div className="absolute top-0 right-1/4 w-96 h-32 bg-blue-500/20 blur-3xl pointer-events-none rounded-full"></div>
+                      <div className="absolute bottom-0 left-1/4 w-96 h-32 bg-purple-500/20 blur-3xl pointer-events-none rounded-full"></div>
+
+                      <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <span className="px-3 py-1 rounded-full text-[11px] font-black bg-gradient-to-r from-blue-500 to-indigo-500 text-white border border-blue-400/40 shadow-sm flex items-center gap-1.5">
+                              <span>🧊</span>
+                              <span>ANANTDV 3D COCKPIT ENGINE</span>
+                            </span>
+                            <span className="text-xs text-indigo-200 font-medium">
+                              Spatial 3D Visualization of <strong>{filteredProjects.length}</strong> Projects
+                            </span>
+                          </div>
+                          <h2 className="text-xl sm:text-2xl font-black font-display tracking-tight text-white flex items-center gap-2">
+                            <span>Interactive 3D Cockpit Workspace</span>
+                          </h2>
+                          <p className="text-xs text-slate-300">
+                            Real-time 3D perspective depth with physics-based mouse tilt, pop-out layers, and instant project navigation.
+                          </p>
+                        </div>
+
+                        {/* 3D Display Controls */}
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          {/* 3D Sub-Mode Selector */}
+                          <div className="flex items-center bg-white/10 p-1 rounded-2xl border border-white/15 backdrop-blur-md">
+                            <button
+                              type="button"
+                              onClick={() => setThreeDSubView('wall')}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                                threeDSubView === 'wall'
+                                  ? 'bg-white text-slate-900 shadow-md font-black'
+                                  : 'text-white/80 hover:text-white'
+                              }`}
+                            >
+                              <span>🧱</span>
+                              <span>3D Matrix Wall</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setThreeDSubView('orbit')}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                                threeDSubView === 'orbit'
+                                  ? 'bg-white text-slate-900 shadow-md font-black'
+                                  : 'text-white/80 hover:text-white'
+                              }`}
+                            >
+                              <span>🪐</span>
+                              <span>3D Orbit Deck</span>
+                            </button>
+                          </div>
+
+                          {/* 3D Depth Toggle */}
+                          <button
+                            type="button"
+                            onClick={() => setThreeDDepthLevel(prev => prev === 'deep' ? 'subtle' : 'deep')}
+                            className="px-3 py-2 rounded-2xl text-xs font-extrabold bg-white/10 hover:bg-white/20 text-white border border-white/15 backdrop-blur-md transition-all cursor-pointer flex items-center gap-1.5"
+                            title="Toggle 3D Perspective Depth Intensity"
+                          >
+                            <span>⚡</span>
+                            <span>{threeDDepthLevel === 'deep' ? 'High 3D Depth' : 'Smooth 3D'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SUB-VIEW 1: 🧱 3D SPATIAL MATRIX WALL */}
+                    {threeDSubView === 'wall' && (
+                      <div className="stage-3d-scene space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {filteredProjects.slice(0, visibleCount).map((proj, idx) => {
+                            const isDone = proj.status === 'Completed' || proj.percentCompleted === 100;
+                            const isWork = (proj.status === 'Working' || proj.status === 'In Progress') && proj.percentCompleted > 0 && proj.percentCompleted < 100;
+                            const compTasks = (proj.tasks || []).filter(t => t.status === 'Completed').length;
+                            const workTasks = (proj.tasks || []).filter(t => t.status === 'Working' || t.status === 'In Progress').length;
+                            const totalTasks = (proj.tasks || []).length;
+
+                            return (
+                              <div
+                                key={proj.id}
+                                onMouseMove={(e) => {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  const x = e.clientX - rect.left - rect.width / 2;
+                                  const y = e.clientY - rect.top - rect.height / 2;
+                                  const factor = threeDDepthLevel === 'deep' ? 10 : 20;
+                                  e.currentTarget.style.transform = `perspective(1000px) rotateX(${(-y / factor).toFixed(2)}deg) rotateY(${(x / factor).toFixed(2)}deg) translateY(-8px) scale3d(1.02, 1.02, 1.02)`;
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale3d(1, 1, 1)';
+                                }}
+                                className={`card-3d-interactive card-3d-glass rounded-3xl p-5 border flex flex-col justify-between space-y-4 transition-all ${
+                                  isDone ? 'border-emerald-200/90' : isWork ? 'border-amber-200/90' : 'border-rose-200/90'
+                                }`}
+                              >
+                                {/* 3D Holographic Top Accent */}
+                                <div className={`h-1.5 w-full rounded-full ${
+                                  isDone
+                                    ? 'bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600'
+                                    : isWork
+                                    ? 'bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600'
+                                    : 'bg-gradient-to-r from-rose-400 via-pink-500 to-rose-600'
+                                }`}></div>
+
+                                {/* Layer 1: ID, Status, Priority */}
+                                <div className="depth-tag-3d flex items-center justify-between gap-2">
+                                  <span className={`font-mono text-xs font-black px-2.5 py-1 rounded-xl shadow-2xs border ${
+                                    isDone ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                                    isWork ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                                    'bg-rose-50 text-rose-800 border-rose-200'
+                                  }`}>
+                                    {proj.id}
+                                  </span>
+
+                                  <div className="flex items-center gap-1.5">
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border shadow-2xs ${
+                                      isDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                                      isWork ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                                      'bg-rose-100 text-rose-900 border-rose-300'
+                                    }`}>
+                                      {isDone ? '🟢 100% Done' : isWork ? '🟡 Working' : '🔴 Open'}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Layer 2: Title and Company */}
+                                <div className="depth-title-3d space-y-1">
+                                  <h3 className="text-base font-black font-display tracking-tight text-slate-900 leading-snug line-clamp-2 select-text cursor-default">
+                                    {formatProfessionalProjectName(proj.name)}
+                                  </h3>
+                                  <div className="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5">
+                                    <span>🏢</span>
+                                    <span className="truncate">{proj.company || 'Anantdv Enterprise'}</span>
+                                    <span>•</span>
+                                    <span className="text-blue-600 font-bold">{totalTasks} Tasks</span>
+                                  </div>
+                                </div>
+
+                                {/* Layer 3: Progress Bar & Velocity */}
+                                <div className="depth-progress-3d space-y-1.5 pt-1">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="text-slate-500 font-bold text-[11px]">Velocity</span>
+                                    <span className={`font-mono font-black text-xs ${
+                                      isDone ? 'text-emerald-700' : isWork ? 'text-amber-700' : 'text-rose-700'
+                                    }`}>
+                                      {proj.percentCompleted}%
+                                    </span>
+                                  </div>
+                                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/60 p-0.5">
+                                    <div
+                                      className={`h-full rounded-full transition-all duration-500 ${
+                                        isDone ? 'bg-gradient-to-r from-emerald-500 to-teal-500' :
+                                        isWork ? 'bg-gradient-to-r from-amber-500 to-orange-500' :
+                                        'bg-gradient-to-r from-rose-500 to-pink-500'
+                                      }`}
+                                      style={{ width: `${Math.max(proj.percentCompleted, 3)}%` }}
+                                    ></div>
+                                  </div>
+                                  <div className="flex items-center justify-between text-[10.5px] text-slate-500 font-semibold pt-0.5">
+                                    <span>✓ {compTasks} Done</span>
+                                    <span>⚡ {workTasks} Working</span>
+                                    <span>⏳ {(totalTasks - compTasks - workTasks)} Open</span>
+                                  </div>
+                                </div>
+
+                                {/* Layer 4: Owner & Assigned Staff */}
+                                <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <span className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-2xs">
+                                      {proj.ownerAvatar || 'NS'}
+                                    </span>
+                                    <span className="font-bold text-slate-700 truncate text-[11.5px]">{proj.owner}</span>
+                                  </div>
+                                  <span className="text-[10.5px] font-mono text-slate-400 font-bold shrink-0">
+                                    📅 {proj.dueDate || '2026-10-30'}
+                                  </span>
+                                </div>
+
+                                {/* Layer 5: The 2 Action Buttons (Project Details & Open Task) */}
+                                <div className="depth-actions-3d flex items-center gap-2 pt-2 border-t border-slate-100 flex-wrap">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenProject(proj.id)}
+                                    className="btn-3d-press flex-1 py-2 px-2.5 bg-white hover:bg-slate-900 text-slate-800 hover:text-white font-extrabold text-[11px] rounded-xl shadow-xs border border-slate-300 hover:border-slate-900 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                                    title="Open Fullscreen Project Details"
+                                  >
+                                    <span>📋</span>
+                                    <span>Project Details</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedProjectId(proj.id);
+                                      setCurrentPage('project_details');
+                                    }}
+                                    className="btn-3d-press flex-1 py-2 px-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-[11px] rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-slate-800"
+                                    title="Open Task List for this Project"
+                                  >
+                                    <span>⚡</span>
+                                    <span>Open Task</span>
+                                    <span className="px-1.5 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded">{totalTasks}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Pagination for 3D View */}
+                        <div className="p-4 bg-white border border-slate-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-xs">
+                          <div className="text-slate-500 font-medium">
+                            Showing <strong>{Math.min(visibleCount, filteredProjects.length)}</strong> of <strong>{filteredProjects.length}</strong> 3D Projects
+                          </div>
+                          {visibleCount < filteredProjects.length && (
+                            <button
+                              type="button"
+                              onClick={() => setVisibleCount(prev => Math.min(prev + 12, filteredProjects.length))}
+                              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+                            >
+                              Load More 3D Cards (+12)
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SUB-VIEW 2: 🪐 3D ORBIT CAROUSEL DECK */}
+                    {threeDSubView === 'orbit' && (() => {
+                      const activeProj = filteredProjects[threeDActiveIndex % (filteredProjects.length || 1)] || filteredProjects[0];
+                      if (!activeProj) return null;
+
+                      const isDone = activeProj.status === 'Completed' || activeProj.percentCompleted === 100;
+                      const isWork = (activeProj.status === 'Working' || activeProj.status === 'In Progress') && activeProj.percentCompleted > 0 && activeProj.percentCompleted < 100;
+                      const compTasks = (activeProj.tasks || []).filter(t => t.status === 'Completed').length;
+                      const workTasks = (activeProj.tasks || []).filter(t => t.status === 'Working' || t.status === 'In Progress').length;
+                      const openTasks = (activeProj.tasks || []).filter(t => t.status === 'Open' || t.status === 'Not Started').length;
+                      const totalTasks = (activeProj.tasks || []).length;
+
+                      return (
+                        <div className="space-y-6">
+                          {/* Main 3D Orbit Floating Deck Card */}
+                          <div className="relative min-h-[420px] bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-indigo-500/30 overflow-hidden flex flex-col justify-between space-y-6">
+                            
+                            {/* Ambient Orbit Lighting */}
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/20 blur-3xl pointer-events-none rounded-full"></div>
+                            <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/15 blur-3xl pointer-events-none rounded-full"></div>
+
+                            {/* Header row with Carousel Navigation */}
+                            <div className="relative z-10 flex items-center justify-between gap-4">
+                              <div className="flex items-center gap-2.5 flex-wrap">
+                                <span className="font-mono text-xs font-black px-3 py-1 rounded-xl bg-white/10 text-white border border-white/20 backdrop-blur-md">
+                                  {activeProj.id}
+                                </span>
+                                <span className={`px-3 py-1 rounded-full text-xs font-black border ${
+                                  isDone ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' :
+                                  isWork ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' :
+                                  'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                                }`}>
+                                  {isDone ? '🟢 100% Completed' : isWork ? '🟡 Working / In Progress' : '🔴 Open / Not Started'}
+                                </span>
+                                <span className="text-xs text-slate-300 font-semibold bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
+                                  Project {(threeDActiveIndex % filteredProjects.length) + 1} of {filteredProjects.length}
+                                </span>
+                              </div>
+
+                              {/* Orbit Navigation Arrows */}
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setThreeDActiveIndex(prev => (prev - 1 + filteredProjects.length) % filteredProjects.length)}
+                                  className="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 flex items-center justify-center font-black transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
+                                  title="Previous Project (←)"
+                                >
+                                  ←
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setThreeDActiveIndex(prev => (prev + 1) % filteredProjects.length)}
+                                  className="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 flex items-center justify-center font-black transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
+                                  title="Next Project (→)"
+                                >
+                                  →
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Center 3D Stage Info */}
+                            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                              <div className="lg:col-span-2 space-y-3">
+                                <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white leading-tight">
+                                  {formatProfessionalProjectName(activeProj.name)}
+                                </h2>
+                                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                                  {activeProj.description || "Core engineering innovation platform delivering automated regression testing, ERPNext real-time REST API synchronization, and executive UI cockpit dashboards."}
+                                </p>
+
+                                <div className="flex items-center gap-4 pt-2 text-xs flex-wrap">
+                                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl border border-white/15">
+                                    <span className="text-slate-400">Lead:</span>
+                                    <span className="font-bold text-white">{activeProj.owner}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl border border-white/15">
+                                    <span className="text-slate-400">Due Date:</span>
+                                    <span className="font-mono font-bold text-white">{activeProj.dueDate || '2026-10-30'}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl border border-white/15">
+                                    <span className="text-slate-400">Total Tasks:</span>
+                                    <span className="font-mono font-black text-emerald-400">{totalTasks}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* 3D Gauge Radial Velocity */}
+                              <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-2xl border border-white/10">
+                                <div className="text-4xl font-black font-mono text-emerald-400">
+                                  {activeProj.percentCompleted}%
+                                </div>
+                                <div className="text-xs text-slate-300 font-bold uppercase tracking-wider mt-1">Overall Velocity</div>
+                                <div className="flex items-center gap-2 text-[11px] text-slate-300 pt-3">
+                                  <span className="text-emerald-300 font-bold">🟢 {compTasks} Done</span>
+                                  <span>•</span>
+                                  <span className="text-amber-300 font-bold">🟡 {workTasks} Working</span>
+                                  <span>•</span>
+                                  <span className="text-rose-300 font-bold">🔴 {openTasks} Open</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Bottom 3D Actions */}
+                            <div className="relative z-10 flex items-center justify-between gap-3 pt-4 border-t border-white/10 flex-wrap">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenProject(activeProj.id)}
+                                  className="px-5 py-2.5 bg-white hover:bg-slate-100 text-slate-900 font-black text-xs rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+                                >
+                                  <span>📋</span>
+                                  <span>Project Details</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedProjectId(activeProj.id);
+                                    setCurrentPage('project_details');
+                                  }}
+                                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+                                >
+                                  <span>⚡</span>
+                                  <span>Open Task</span>
+                                  <span className="px-1.5 py-0.2 bg-white/20 text-white text-[10px] font-mono font-bold rounded">{totalTasks}</span>
+                                </button>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveProjectStatus(activeProj.id, 'Working')}
+                                  className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl border border-white/20 transition-all cursor-pointer"
+                                >
+                                  Mark Working ⚡
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveProjectStatus(activeProj.id, 'Completed')}
+                                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+                                >
+                                  Mark Completed ✓
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 3D Rail Selector Bar */}
+                          <div className="overflow-x-auto pb-2 custom-scrollbar">
+                            <div className="flex items-center gap-3 min-w-max">
+                              {filteredProjects.map((p, idx) => {
+                                const isCurrent = idx === (threeDActiveIndex % filteredProjects.length);
+                                return (
+                                  <button
+                                    key={p.id}
+                                    type="button"
+                                    onClick={() => setThreeDActiveIndex(idx)}
+                                    className={`px-3.5 py-2.5 rounded-2xl border text-xs font-bold transition-all cursor-pointer text-left ${
+                                      isCurrent
+                                        ? 'bg-slate-900 text-white border-blue-500 shadow-md scale-105'
+                                        : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                                    }`}
+                                  >
+                                    <div className="font-mono text-[10px] text-blue-500 font-bold">{p.id}</div>
+                                    <div className="truncate max-w-[140px] font-extrabold">{formatProfessionalProjectName(p.name)}</div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                  </div>
+                )}
+
               </div>
             )}
 
           </main>
 
           {/* ========================================================================= */}
-          {/* MODAL 1B: PROJECT DETAILS INSPECTOR (OPENED VIA "MORE DETAILS")           */}
+          {/* MODAL 1B: PROJECT DETAILS INSPECTOR (WHO CREATED, DETAILS, DEADLINE, TEAM) */}
           {/* ========================================================================= */}
           {selectedProjectForDetailsModal && (() => {
             const modalProj = projects.find(p => p.id === selectedProjectForDetailsModal);
             if (!modalProj) return null;
 
-            // Extract all unique ERP employees working on tasks under this project
-            const allTaskWorkers = Array.from(new Set(
-              modalProj.tasks.flatMap(t => t.assignees || (t.assignee ? [t.assignee] : (t.assignedUsers || [])))
-            )).filter(Boolean);
-
-            const activeWorkersList = allTaskWorkers.length > 0 ? allTaskWorkers : [modalProj.owner];
-
+            const pDetails = getProjectDetailsHelper(modalProj, employees);
             const compTasks = modalProj.tasks.filter(t => t.status === 'Completed').length;
             const workTasks = modalProj.tasks.filter(t => t.status === 'Working' || t.status === 'In Progress').length;
             const openTasks = modalProj.tasks.filter(t => t.status === 'Open' || t.status === 'Not Started').length;
             const totalTasks = modalProj.tasks.length;
 
-            const isCompleted = modalProj.status === 'Completed' || modalProj.percentCompleted === 100;
-            const isWorking = (modalProj.status === 'Working' || modalProj.status === 'In Progress') && modalProj.percentCompleted > 0 && modalProj.percentCompleted < 100;
+            const isCompleted = pDetails.isCompleted;
+            const isWorking = pDetails.isWorking;
 
             return (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-                <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden animate-scale-up max-h-[90vh] flex flex-col">
-                  
-                  {/* Modal Header */}
-                  <div className="p-5 border-b border-slate-100 flex items-start justify-between bg-slate-50/80">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-lg bg-blue-100 text-blue-900 border border-blue-200">
-                          {modalProj.id}
-                        </span>
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${
-                          isCompleted ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
-                          isWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
-                          'bg-rose-100 text-rose-900 border-rose-300'
-                        }`}>
-                          {isCompleted ? '🟢 Completed (100%)' : isWorking ? '🟡 In Progress' : '🔴 Not Started'}
-                        </span>
-                        <span className="text-xs font-bold text-slate-500">• {modalProj.company}</span>
-                      </div>
-                      <h2 className="text-xl font-extrabold text-slate-900 font-display tracking-tight">
-                        {formatProfessionalProjectName(modalProj.name)}
-                      </h2>
-                    </div>
-
+              <div className="fixed inset-0 z-50 w-screen h-screen bg-slate-100 flex flex-col overflow-hidden animate-fade-in font-sans">
+                
+                {/* 🌟 1. FULL SCREEN TOP NAVIGATION / HEADER */}
+                <header className="px-6 py-4 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs flex items-center justify-between shrink-0 z-10">
+                  <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                     <button
                       type="button"
                       onClick={() => setSelectedProjectForDetailsModal(null)}
-                      className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center text-sm font-black transition-colors cursor-pointer"
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs hover:shadow-md transition-all active:scale-95 cursor-pointer"
+                      title="Back to Dashboard (or press ESC)"
                     >
-                      ✕
+                      <span className="text-sm font-black">←</span>
+                      <span>Back to Projects</span>
                     </button>
+
+                    <div className="h-5 w-px bg-slate-200 hidden sm:block"></div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-xs font-black px-2.5 py-0.5 rounded-lg bg-blue-100 text-blue-900 border border-blue-200">
+                        {modalProj.id}
+                      </span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${
+                        isCompleted ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                        isWorking ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                        'bg-rose-100 text-rose-900 border-rose-300'
+                      }`}>
+                        {isCompleted ? '🟢 Completed (100%)' : isWorking ? '🟡 In Progress' : '🔴 Not Started'}
+                      </span>
+                      <span className="text-xs font-bold text-slate-500 hidden md:inline">• {modalProj.company || 'Anantdv Enterprise'}</span>
+                      <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-md bg-purple-100 text-purple-900 border border-purple-200 hidden lg:inline">
+                        Priority: {modalProj.priority || 'High'}
+                      </span>
+                    </div>
+
+                    <h1 className="text-lg sm:text-xl font-black text-slate-900 font-display tracking-tight ml-1 truncate max-w-md sm:max-w-xl">
+                      {formatProfessionalProjectName(modalProj.name)}
+                    </h1>
                   </div>
 
-                  {/* Modal Scrollable Body */}
-                  <div className="p-5 space-y-5 overflow-y-auto custom-scrollbar flex-1 text-xs">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProjectForDetailsModal(null)}
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 hover:border-rose-200 text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+                      title="Close Full Screen (ESC)"
+                    >
+                      <span className="text-sm">✕</span>
+                      <span className="hidden sm:inline">Close Full Screen</span>
+                      <span className="text-[10px] font-mono text-slate-400 font-normal hidden md:inline">ESC</span>
+                    </button>
+                  </div>
+                </header>
+
+                {/* 🌟 2. FULL SCREEN SCROLLABLE CONTENT AREA */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6">
+                  <div className="max-w-7xl mx-auto space-y-6">
                     
-                    {/* SECTION 1: PROJECT CONDITION & TIMELINE */}
-                    <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">
-                          📊 Project Condition & Health
-                        </span>
-                        <span className={`font-mono text-xs font-extrabold px-2 py-0.5 rounded-md ${
-                          isCompleted ? 'bg-emerald-100 text-emerald-800' :
-                          modalProj.percentCompleted >= 50 ? 'bg-blue-100 text-blue-800' :
-                          modalProj.percentCompleted > 0 ? 'bg-amber-100 text-amber-800' :
-                          'bg-rose-100 text-rose-800'
-                        }`}>
-                          {isCompleted ? '🟢 Goal Achieved' : modalProj.percentCompleted >= 50 ? '🟢 On Track' : modalProj.percentCompleted > 0 ? '🟡 In Progress' : '🔴 Action Required'}
+                    {/* 👤 PILLAR 1: WHO CREATED THIS PROJECT */}
+                    <div className="bg-gradient-to-br from-purple-50/80 via-indigo-50/50 to-white p-5 sm:p-6 rounded-3xl border border-purple-200 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-purple-100">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">👤</span>
+                          <span className="text-xs sm:text-sm font-black text-purple-950 uppercase tracking-wider">
+                            Who Created This Project / Project Lead
+                          </span>
+                        </div>
+                        <span className="px-3 py-1 rounded-full text-[11px] font-black bg-purple-600 text-white shadow-xs">
+                          Project Owner & Manager
                         </span>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs font-bold">
-                          <span className="text-slate-600">Completion Progress:</span>
-                          <span className="font-mono font-black text-sm text-slate-900">{modalProj.percentCompleted}%</span>
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-700 via-indigo-600 to-blue-600 text-white font-black text-xl flex items-center justify-center shrink-0 shadow-md ring-4 ring-purple-100">
+                            {pDetails.creatorEmp.avatar || 'PM'}
+                          </div>
+                          <div className="space-y-1">
+                            <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                              <span>{pDetails.creatorName}</span>
+                              <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-[11px] font-bold rounded-md border border-purple-200">
+                                {pDetails.creatorEmp.id || 'Creator'}
+                              </span>
+                            </h2>
+                            <div className="text-sm font-bold text-indigo-700">
+                              {pDetails.creatorEmp.role || 'Project Lead & Manager'}
+                            </div>
+                            <div className="text-xs text-slate-500 font-medium">
+                              Department: <strong className="text-slate-700">{pDetails.creatorEmp.dept || 'Engineering'}</strong>
+                            </div>
+                          </div>
                         </div>
-                        <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              isCompleted ? 'bg-emerald-500' : isWorking ? 'bg-amber-400' : 'bg-rose-400'
-                            }`}
-                            style={{ width: `${Math.max(modalProj.percentCompleted, 4)}%` }}
-                          ></div>
-                        </div>
-                      </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-200/60 text-[11px]">
-                        <div>
-                          <span className="text-slate-400 block font-semibold">Priority:</span>
-                          <strong className="text-slate-800">{modalProj.priority || 'High'}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 block font-semibold">Start Date:</span>
-                          <strong className="text-slate-800">{modalProj.startDate || '2026-08-01'}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 block font-semibold">Due Date:</span>
-                          <strong className="text-slate-800">{modalProj.dueDate || '2026-11-30'}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 block font-semibold">Project Lead:</span>
-                          <strong className="text-slate-800 truncate block">{modalProj.owner}</strong>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white/90 p-4 rounded-2xl border border-purple-100 shrink-0 w-full md:w-auto shadow-2xs">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase block">Official Email</span>
+                            <span className="font-mono text-xs font-bold text-slate-800 block truncate">{pDetails.creatorEmp.email}</span>
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase block">Direct Phone</span>
+                            <span className="font-mono text-xs font-bold text-slate-800 block">{pDetails.creatorEmp.mobile || '8910987586'}</span>
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase block">Created Date</span>
+                            <span className="font-mono text-xs font-bold text-purple-900 block">{pDetails.startDate}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* SECTION 2: WHO IS WORKING ON THIS PROJECT */}
-                    <div className="space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[11px] font-black text-slate-700 uppercase tracking-wider">
-                            👥 People Working on This Project
-                          </span>
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-900 rounded-full text-[10px] font-extrabold">
-                            {activeWorkersList.length} Staff
-                          </span>
+                    {/* ⏱️ & 📋 PILLARS 2 & 3: DATE LINE & PROJECT DETAILS */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      
+                      {/* ⏱️ PILLAR 2: WHAT'S THE DATE LINE / DEADLINE */}
+                      <div className="bg-amber-50/70 p-5 sm:p-6 rounded-3xl border border-amber-200 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between pb-3 border-b border-amber-200/70">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">📅</span>
+                              <span className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-wider">
+                                Project Date Line & Timeline
+                              </span>
+                            </div>
+                            <span className={`px-3 py-1 rounded-md text-[11px] font-black ${
+                              isCompleted ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'
+                            }`}>
+                              {isCompleted ? '✅ Delivered on Schedule' : '🎯 Active Deadline'}
+                            </span>
+                          </div>
+
+                          <div className="space-y-4 pt-3">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-2xs">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Target Deadline (Due Date)</span>
+                                <span className="font-mono font-black text-lg text-rose-600 flex items-center gap-1.5">
+                                  <span>🚨</span>
+                                  <span>{pDetails.dueDate}</span>
+                                </span>
+                              </div>
+                              <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-2xs">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Kickoff Start Date</span>
+                                <span className="font-mono font-black text-lg text-slate-800 flex items-center gap-1.5">
+                                  <span>🚀</span>
+                                  <span>{pDetails.startDate}</span>
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2 bg-white p-4 rounded-2xl border border-amber-200 shadow-2xs">
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                <span className="text-slate-700">Project Velocity & Milestone Progress:</span>
+                                <span className="font-mono font-black text-sm text-slate-900">{modalProj.percentCompleted}% Completed</span>
+                              </div>
+                              <div className="w-full bg-slate-200 h-3.5 rounded-full overflow-hidden p-0.5">
+                                <div
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    isCompleted ? 'bg-emerald-500' : isWorking ? 'bg-amber-400' : 'bg-rose-400'
+                                  }`}
+                                  style={{ width: `${Math.max(modalProj.percentCompleted, 4)}%` }}
+                                ></div>
+                              </div>
+                              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1">
+                                <span>Kickoff (0%)</span>
+                                <span>Phase 1 (25%)</span>
+                                <span>Midpoint (50%)</span>
+                                <span>Testing (75%)</span>
+                                <span className="font-bold text-emerald-600">Goal (100%)</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <span className="text-[10px] text-slate-400">Linked to Project & Tasks</span>
+
+                        <div className="p-3 rounded-2xl bg-amber-100/70 border border-amber-200 text-xs text-amber-950 font-medium">
+                          {isCompleted
+                            ? '✅ All deliverables completed, tested, and handed over to stakeholders.'
+                            : '⚡ Project is under active development. Keep all task milestones updated.'}
+                        </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto custom-scrollbar p-1">
-                        {activeWorkersList.map((workerName, idx) => {
-                          const empObj = employees.find(e => e.name === workerName);
-                          const assignedTaskCount = modalProj.tasks.filter(t => (t.assignees || [t.assignee]).includes(workerName)).length;
-                          const isOwner = workerName === modalProj.owner;
+                      {/* 📋 PILLAR 3: WHAT IS THE PROJECT DETAILS & BUSINESS SCOPE */}
+                      <div className="bg-blue-50/70 p-5 sm:p-6 rounded-3xl border border-blue-200 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between pb-3 border-b border-blue-200/70">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">📋</span>
+                              <span className="text-xs sm:text-sm font-black text-blue-950 uppercase tracking-wider">
+                                Project Details & Business Scope
+                              </span>
+                            </div>
+                            <span className="font-mono text-xs font-black px-2.5 py-1 bg-blue-200 text-blue-900 rounded-lg">
+                              {modalProj.id}
+                            </span>
+                          </div>
 
-                          return (
-                            <div
-                              key={idx}
-                              className={`p-2.5 rounded-xl border flex items-center justify-between gap-2.5 transition-all ${
-                                isOwner ? 'bg-purple-50/70 border-purple-200' : 'bg-white border-slate-200'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2.5 truncate">
-                                <span className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 ${
-                                  isOwner ? 'bg-purple-700 text-white' : 'bg-slate-800 text-white'
+                          <div className="pt-3 space-y-3">
+                            <div className="p-4 bg-white rounded-2xl border border-blue-100 shadow-2xs space-y-2">
+                              <span className="text-[10px] text-slate-400 font-bold uppercase block">Business Scope & Executive Summary</span>
+                              <p className="text-xs text-slate-700 leading-relaxed font-normal">
+                                {pDetails.description}
+                              </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="p-3.5 bg-white rounded-2xl border border-blue-100 shadow-2xs">
+                                <span className="text-[10px] text-slate-400 block font-bold uppercase">Client / Company</span>
+                                <strong className="text-slate-900 text-xs truncate block mt-0.5">{modalProj.company || 'Anantdv Enterprise'}</strong>
+                              </div>
+                              <div className="p-3.5 bg-white rounded-2xl border border-blue-100 shadow-2xs">
+                                <span className="text-[10px] text-slate-400 block font-bold uppercase">Priority Rating</span>
+                                <strong className="text-slate-900 text-xs block mt-0.5">{modalProj.priority || 'High'}</strong>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs text-blue-950 bg-blue-100/70 p-3 rounded-2xl border border-blue-200 font-semibold">
+                          <span>Total Tasks: <strong>{totalTasks}</strong></span>
+                          <span>Completed: <strong>{compTasks}</strong></span>
+                          <span>In Progress: <strong>{workTasks}</strong></span>
+                          <span>Not Started: <strong>{openTasks}</strong></span>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* 👥 PILLAR 4: WHICH PERSONS ARE WORKING ON THIS PROJECT */}
+                    <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">👥</span>
+                          <span className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider">
+                            Which Persons Are Working On This Project ({pDetails.workers.length} Members)
+                          </span>
+                        </div>
+                        <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-black shadow-xs">
+                          Active Assigned Staff
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {pDetails.workers.map((worker, idx) => (
+                          <div
+                            key={idx}
+                            className={`p-4 rounded-2xl border flex flex-col justify-between gap-3 shadow-2xs transition-all hover:shadow-md ${
+                              worker.isCreator ? 'bg-purple-50/70 border-purple-200' : 'bg-slate-50/60 border-slate-200'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-center gap-3 truncate">
+                                <span className={`w-11 h-11 rounded-2xl font-black text-sm flex items-center justify-center shrink-0 shadow-sm ${
+                                  worker.isCreator ? 'bg-purple-700 text-white' : 'bg-slate-800 text-white'
                                 }`}>
-                                  {empObj?.avatar || workerName.slice(0, 2).toUpperCase()}
+                                  {worker.avatar || worker.name.slice(0, 2).toUpperCase()}
                                 </span>
                                 <div className="truncate">
-                                  <div className="font-extrabold text-slate-900 truncate flex items-center gap-1">
-                                    <span>{workerName}</span>
-                                    {isOwner && (
+                                  <div className="font-black text-slate-900 text-sm truncate flex items-center gap-1.5">
+                                    <span>{worker.name}</span>
+                                    {worker.isCreator && (
                                       <span className="px-1.5 py-0.2 bg-purple-200 text-purple-900 text-[9px] font-black rounded">
                                         Owner
                                       </span>
                                     )}
                                   </div>
-                                  <div className="text-[10px] text-slate-400 truncate">
-                                    {empObj?.role || 'ERP Staff Member'} • {empObj?.department || 'Operations'}
+                                  <div className="text-xs text-slate-500 font-semibold truncate">
+                                    {worker.role}
+                                  </div>
+                                  <div className="text-[11px] text-slate-400 truncate">
+                                    {worker.dept}
                                   </div>
                                 </div>
                               </div>
 
-                              <div className="text-right shrink-0">
-                                <span className="inline-block font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
-                                  {assignedTaskCount} {assignedTaskCount === 1 ? 'Task' : 'Tasks'}
-                                </span>
-                              </div>
+                              <span className="font-mono text-[10px] font-extrabold px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 shrink-0 shadow-2xs">
+                                {worker.assignedTasksCount} {worker.assignedTasksCount === 1 ? 'Task' : 'Tasks'}
+                              </span>
                             </div>
-                          );
-                        })}
+
+                            <div className="text-[11px] text-slate-500 border-t border-slate-200/60 pt-2 flex items-center justify-between">
+                              <span className="font-mono text-slate-500 truncate">{worker.email}</span>
+                              <span className="text-[10px] font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                                Assigned
+                              </span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
-                    {/* SECTION 3: HOW MANY TASKS AVAILABLE & TASK SUMMARY */}
-                    <div className="space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[11px] font-black text-slate-700 uppercase tracking-wider">
-                            ⚡ Tasks Under This Project
+                    {/* ⚡ SECTION 5: TASKS UNDER THIS PROJECT */}
+                    <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">⚡</span>
+                          <span className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider">
+                            Project Task Breakdown & Deliverables ({totalTasks} Tasks)
                           </span>
-                          <span className="px-2 py-0.5 bg-slate-100 text-slate-800 rounded-full text-[10px] font-extrabold">
-                            {totalTasks} Total Tasks
-                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg">{compTasks} Done</span>
+                          <span className="px-2.5 py-0.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg">{workTasks} In Progress</span>
+                          <span className="px-2.5 py-0.5 bg-rose-100 text-rose-800 text-xs font-bold rounded-lg">{openTasks} Open</span>
                         </div>
                       </div>
 
-                      {/* Task Breakdown Pills */}
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-                          <span className="text-[10px] font-bold text-emerald-800 block">🟢 Completed</span>
-                          <strong className="font-mono text-base font-black text-emerald-950">{compTasks}</strong>
-                        </div>
-                        <div className="p-2 rounded-xl bg-amber-50 border border-amber-200 text-center">
-                          <span className="text-[10px] font-bold text-amber-800 block">🟡 In Progress</span>
-                          <strong className="font-mono text-base font-black text-amber-950">{workTasks}</strong>
-                        </div>
-                        <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-center">
-                          <span className="text-[10px] font-bold text-rose-800 block">🔴 Open</span>
-                          <strong className="font-mono text-base font-black text-rose-950">{openTasks}</strong>
-                        </div>
-                      </div>
-
-                      {/* Task Preview List */}
-                      <div className="space-y-1.5 max-h-44 overflow-y-auto custom-scrollbar border border-slate-200 rounded-2xl p-2 bg-slate-50/40">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {modalProj.tasks.length === 0 ? (
-                          <div className="p-4 text-center text-slate-400 text-xs">No tasks currently under this project</div>
+                          <div className="p-8 text-center text-slate-400 text-xs col-span-full">No tasks currently under this project</div>
                         ) : (
                           modalProj.tasks.map(t => {
                             const isTaskDone = t.status === 'Completed';
@@ -3144,23 +4751,26 @@
                             return (
                               <div
                                 key={t.id}
-                                className="p-2 bg-white rounded-xl border border-slate-200/80 flex items-center justify-between gap-2 text-xs"
+                                className="p-3.5 bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-200 transition-all shadow-2xs hover:shadow-sm space-y-2 flex flex-col justify-between"
                               >
-                                <div className="flex items-center gap-2 truncate">
-                                  <span className={`w-2 h-2 rounded-full shrink-0 ${
-                                    isTaskDone ? 'bg-emerald-500' : isTaskWork ? 'bg-amber-400' : 'bg-rose-500'
-                                  }`}></span>
-                                  <span className="font-bold text-slate-900 truncate">{t.name}</span>
+                                <div className="space-y-1.5">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-mono text-[10px] font-bold text-slate-500">{t.id}</span>
+                                    <span className={`px-2 py-0.5 text-[9px] font-black rounded-md border ${
+                                      isTaskDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
+                                      isTaskWork ? 'bg-amber-100 text-amber-900 border-amber-300' :
+                                      'bg-rose-100 text-rose-900 border-rose-300'
+                                    }`}>
+                                      {t.status}
+                                    </span>
+                                  </div>
+                                  <h4 className="font-bold text-slate-900 text-xs line-clamp-2">{t.name}</h4>
                                 </div>
 
-                                <div className="flex items-center gap-2 shrink-0">
-                                  <span className="text-[10px] text-slate-500 font-mono">📅 {t.dueDate}</span>
-                                  <span className={`px-2 py-0.5 text-[9px] font-extrabold rounded-md border ${
-                                    isTaskDone ? 'bg-emerald-100 text-emerald-900 border-emerald-300' :
-                                    isTaskWork ? 'bg-amber-100 text-amber-900 border-amber-300' :
-                                    'bg-rose-100 text-rose-900 border-rose-300'
-                                  }`}>
-                                    {t.status}
+                                <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500">
+                                  <span>📅 {t.dueDate}</span>
+                                  <span className="font-medium text-slate-600 truncate max-w-[120px]">
+                                    👤 {t.assignees ? t.assignees.join(', ') : t.assignee}
                                   </span>
                                 </div>
                               </div>
@@ -3171,19 +4781,28 @@
                     </div>
 
                   </div>
+                </div>
 
-                  {/* Modal Footer */}
-                  <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProjectForDetailsModal(null)}
-                      className="px-5 py-2 text-xs font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                    >
-                      Close Window ✕
-                    </button>
+                {/* 🌟 3. FULL SCREEN FOOTER */}
+                <footer className="px-6 py-3.5 bg-white border-t border-slate-200 flex items-center justify-between shrink-0 text-xs">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <span className="font-mono font-bold text-slate-700">{modalProj.id}</span>
+                    <span>•</span>
+                    <span>{modalProj.company || 'Anantdv Enterprise'}</span>
+                    <span>•</span>
+                    <span className="text-slate-400">Fullscreen Enterprise Dossier</span>
                   </div>
 
-                </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProjectForDetailsModal(null)}
+                    className="flex items-center gap-2 px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+                  >
+                    <span>←</span>
+                    <span>Back to Projects (ESC)</span>
+                  </button>
+                </footer>
+
               </div>
             );
           })()}
@@ -4344,7 +5963,7 @@
                     </div>
                     <div>
                       <h3 className="text-base font-black text-slate-900">Create New Project</h3>
-                      <p className="text-[11px] text-emerald-600 font-semibold">⚡ Direct live creation in ERPNext 192.168.101.125:8080</p>
+                      <p className="text-[11px] text-emerald-600 font-semibold">⚡ Direct live creation in ERPNext 192.168.101.175</p>
                     </div>
                   </div>
                   <button 
@@ -4546,7 +6165,7 @@
                     <span className="text-lg">⚙️</span>
                     <div>
                       <h3 className="text-base font-bold text-slate-900">ERPNext Server Config</h3>
-                      <p className="text-[11px] text-slate-400">Connected to 192.168.101.125:8080</p>
+                      <p className="text-[11px] text-slate-400">Connected to 192.168.101.175</p>
                     </div>
                   </div>
                   <button onClick={() => setIsConfigModalOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
@@ -4568,17 +6187,17 @@
                 }} className="space-y-3.5 text-xs">
                   <div>
                     <label className="block font-bold text-slate-700 mb-1">Server URL</label>
-                    <input name="serverUrl" defaultValue={config.serverUrl} placeholder="http://192.168.101.125:8080" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
+                    <input name="serverUrl" defaultValue={config.serverUrl} placeholder="http://192.168.101.175" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">API Key</label>
-                      <input name="apiKey" defaultValue={config.apiKey} placeholder="f13b1b924ac9194" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
+                      <input name="apiKey" defaultValue={config.apiKey} placeholder="ccea7f132f74703" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
                     </div>
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">API Secret</label>
-                      <input name="apiSecret" defaultValue={config.apiSecret} placeholder="fa26ad1326aef0c" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
+                      <input name="apiSecret" defaultValue={config.apiSecret} placeholder="73677ab6bce0827" className="w-full px-3 py-2 border rounded-xl bg-slate-50 font-mono" />
                     </div>
                   </div>
 

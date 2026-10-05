@@ -29,10 +29,10 @@ export default function App() {
   const [apiConfig, setApiConfig] = useState(() => {
     const saved = localStorage.getItem('erpnext_api_config');
     return saved ? JSON.parse(saved) : {
-      baseUrl: 'http://192.168.101.125',
-      apiKey: '',
-      apiSecret: '',
-      isLive: false
+      baseUrl: 'http://192.168.101.175',
+      apiKey: 'ccea7f132f74703',
+      apiSecret: '73677ab6bce0827',
+      isLive: true
     };
   });
 
@@ -508,24 +508,33 @@ export default function App() {
       />
 
       {/* Top Main Navigation Bar */}
-      <nav className="sticky top-0 z-40 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 shadow-xs">
+      <nav className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xs">
+        {/* 🌈 Top Signature Brand Accent Line */}
+        <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-600 via-purple-500 via-pink-500 to-amber-400"></div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
             
             {/* Brand Logo & View Switcher */}
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentPage('projects_list')}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-xl shadow-md shadow-indigo-500/25">
-                ⚡
+            <div className="flex items-center gap-3 sm:gap-3.5 cursor-pointer group" onClick={() => setCurrentPage('projects_list')} title="Return to Projects Overview">
+              <div className="h-10 sm:h-11 px-2 py-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs flex items-center justify-center shrink-0 group-hover:border-indigo-400 transition-all">
+                <img
+                  src="/anantdv_logo.png"
+                  alt="Anantdv"
+                  className="h-7 sm:h-8 w-auto object-contain max-w-[120px] sm:max-w-[150px]"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'anantdv_logo.png';
+                  }}
+                />
               </div>
+
+              <div className="h-7 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block shrink-0"></div>
+
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg md:text-xl font-black font-display tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Project Cockpit
-                  </h1>
-                  <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-md">
-                    Enterprise
-                  </span>
-                </div>
+                <h1 className="text-base sm:text-lg font-black font-display tracking-tight text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
+                  Anantdv Project Cockpit
+                </h1>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
                   Modern Project Management & Daily Urgent Task Reminder System
                 </p>

@@ -2,21 +2,21 @@
  * ============================================================================
  * ERPNEXT DYNAMIC SERVER CONFIGURATION
  * ============================================================================
- * Connected to live ERPNext Server: http://192.168.101.125:8080
+ * Connected to live ERPNext Server: http://192.168.101.175
  */
 
 window.ERP_CONFIG = {
   // 1. ERPNext Server Base URL
-  serverUrl: "http://192.168.101.125:8080",
+  serverUrl: "http://192.168.101.175",
 
   // 2. ERPNext API Key
-  apiKey: "f13b1b924ac9194",
+  apiKey: "ccea7f132f74703",
 
   // 3. ERPNext API Secret
-  apiSecret: "fa26ad1326aef0c",
+  apiSecret: "73677ab6bce0827",
 
   // 4. Combined Authorization Token (format: "apiKey:apiSecret")
-  token: "f13b1b924ac9194:fa26ad1326aef0c",
+  token: "ccea7f132f74703:73677ab6bce0827",
 
   // 5. Enable Dynamic REST API Synchronization
   enableLiveApi: true,

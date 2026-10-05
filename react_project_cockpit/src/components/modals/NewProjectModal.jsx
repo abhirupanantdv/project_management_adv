@@ -153,7 +153,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
               type="text"
               value={serverIp}
               onChange={(e) => setServerIp(e.target.value)}
-              placeholder="e.g. http://192.168.101.125 or dev.anantdv.com"
+              placeholder="e.g. http://192.168.101.175 or dev.anantdv.com"
               className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white"
             />
           </div>

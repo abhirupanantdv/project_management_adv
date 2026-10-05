@@ -1,9 +1,9 @@
 // ERPNext Configuration for Modular React build
 export const ERP_CONFIG = {
   serverUrl: "http://192.168.101.175",
-  apiKey: "56d7e5504ef6796",
-  apiSecret: "9d6e53480ab4aa9",
-  token: "56d7e5504ef6796:9d6e53480ab4aa9",
+  apiKey: "ccea7f132f74703",
+  apiSecret: "73677ab6bce0827",
+  token: "ccea7f132f74703:73677ab6bce0827",
   enableLiveApi: true,
   refreshIntervalSec: 30
 };

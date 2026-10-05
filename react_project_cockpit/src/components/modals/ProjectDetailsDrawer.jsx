@@ -34,7 +34,7 @@ export default function ProjectDetailsDrawer({
     return matchSearch && matchCat;
   });
 
-  const deskUrl = `${(apiConfig?.baseUrl || 'http://192.168.101.125').replace(/\/$/, '')}/app/project/${encodeURIComponent(project.id)}`;
+  const deskUrl = `${(apiConfig?.baseUrl || 'http://192.168.101.175').replace(/\/$/, '')}/app/project/${encodeURIComponent(project.id)}`;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">

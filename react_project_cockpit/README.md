@@ -79,7 +79,7 @@ Dedicated category progress tracking for all 5 required domains:
 ## 🌐 ERPNext REST API Integration
 The dashboard can connect directly to your live ERPNext instance or run in offline/mock mode:
 1. Click the **ERPNext Settings (⚙️)** button in the top navigation bar.
-2. Enter your ERPNext Host URL (e.g., `http://192.168.101.125` or `https://erp.yourcompany.com`).
+2. Enter your ERPNext Host URL (e.g., `http://192.168.101.175` or `https://erp.yourcompany.com`).
 3. Enter your **API Key** & **API Secret**.
 4. Click **⚡ Test Connection** or **Save & Sync Now**.
 5. Check "Enable Live Remote Sync" to persist all task updates to the live ERPNext DocTypes (`/api/resource/Project` and `/api/resource/Task`).

@@ -11,24 +11,33 @@ export default function Header({
   onManualSync
 }) {
   return (
-    <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xs transition-colors">
+      {/* 🌈 Top Signature Brand Accent Line matching Anantdv Rainbow Aura */}
+      <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-600 via-purple-500 via-pink-500 to-amber-400"></div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
           {/* Logo & Title */}
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-indigo-500/20">
-              ⚡
+          <div className="flex items-center space-x-3 group cursor-pointer">
+            <div className="h-10 sm:h-11 px-2.5 py-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs flex items-center justify-center shrink-0">
+              <img
+                src="/anantdv_logo.png"
+                alt="Anantdv"
+                className="h-7 w-auto object-contain max-w-[130px]"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'anantdv_logo.png';
+                }}
+              />
             </div>
+
+            <div className="h-7 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
             <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="text-lg font-bold font-display text-slate-900 dark:text-white leading-none">
-                  ERPNext Project Cockpit
-                </h1>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300">
-                  v2.4 PRO
-                </span>
-              </div>
+              <h1 className="text-base sm:text-lg font-black font-display text-slate-900 dark:text-white leading-none">
+                Anantdv Project Cockpit
+              </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Executive Tracking & Task Rollup Dashboard
               </p>
@@ -38,29 +47,32 @@ export default function Header({
           {/* Quick Actions & Status */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             
-            {/* Live API Sync Status Badge */}
+            {/* Redesigned Executive Live Server Instance Button */}
             <button
               onClick={() => setIsApiConfigModalOpen(true)}
-              className={`inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                apiConfig.isLive
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800 hover:bg-emerald-100'
-                  : 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-200'
-              }`}
-              title="Click to configure ERPNext REST API connection"
+              className="group flex items-center gap-2 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition-all active:scale-[0.97] border border-slate-700/80 cursor-pointer"
+              title="Connected to ERPNext Server Instance - Click to configure"
             >
-              <span className={`w-2 h-2 rounded-full ${apiConfig.isLive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
-              <span className="hidden sm:inline">{apiConfig.isLive ? 'ERPNext Live' : 'Demo / Mock Mode'}</span>
-              <span className="text-slate-400 dark:text-slate-500">⚙️</span>
+              <div className="flex items-center gap-1.5 bg-emerald-950/90 px-1.5 py-0.5 rounded-md border border-emerald-500/40">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                </span>
+                <span className="text-[9px] font-black text-emerald-300 uppercase tracking-wider">LIVE</span>
+              </div>
+              <span className="truncate max-w-[120px] font-mono text-[11px] font-bold text-slate-100 hidden sm:inline">192.168.101.175</span>
+              <span className="text-xs text-slate-400 group-hover:text-white group-hover:rotate-45 transition-transform duration-300">⚙️</span>
             </button>
 
-            {/* Refresh / Sync Button */}
+            {/* Highlighted Manual Refresh Button */}
             <button
               onClick={onManualSync}
               disabled={isSyncing}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition"
-              title="Refresh / Recompute Data"
+              className="group relative flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl text-xs font-extrabold shadow-md shadow-blue-500/25 transition-all active:scale-[0.97] border border-blue-400/40 cursor-pointer"
+              title="Refresh / Fetch Live ERPNext Updates"
             >
-              <span className={`inline-block ${isSyncing ? 'animate-spin' : ''}`}>🔄</span>
+              <span className={`text-xs ${isSyncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>🔄</span>
+              <span className="hidden sm:inline font-bold">Refresh Data</span>
             </button>
 
             {/* Dark Mode Toggle */}

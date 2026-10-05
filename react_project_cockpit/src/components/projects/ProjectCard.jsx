@@ -26,8 +26,7 @@ export default function ProjectCard({
 
   return (
     <div
-      onClick={() => onOpenProject && onOpenProject(project.id)}
-      className={`group bg-white dark:bg-slate-900 border rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 ${
+      className={`group bg-white dark:bg-slate-900 border rounded-2xl p-5 shadow-xs hover:shadow-lg transition-all duration-200 flex flex-col justify-between space-y-4 ${
         isUrgent 
           ? 'border-rose-300 dark:border-rose-800 ring-2 ring-rose-500/20 hover:border-rose-500 hover:ring-rose-500/40' 
           : 'border-slate-200/90 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600'
@@ -57,8 +56,8 @@ export default function ProjectCard({
           </span>
         </div>
 
-        {/* Project Name */}
-        <h3 className="text-base font-bold font-display text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+        {/* Project Name (Inert - No click action) */}
+        <h3 className="text-base font-bold font-display text-slate-900 dark:text-white line-clamp-2 select-text cursor-default">
           {project.name}
         </h3>
 
@@ -131,12 +130,28 @@ export default function ProjectCard({
         </div>
       </div>
 
-      {/* Open Details Action */}
-      <div className="pt-1 text-right">
-        <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 group-hover:underline flex items-center justify-end gap-1">
-          <span>Open Project Details</span>
-          <span>→</span>
-        </span>
+      {/* Action Buttons: 1. Project Details & 2. Open Task */}
+      <div className="pt-2 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={() => onOpenProject && onOpenProject(project.id, 'details')}
+          className="flex-1 py-1.5 px-2 bg-white dark:bg-slate-800 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl border border-slate-300 dark:border-slate-700 shadow-2xs transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1"
+          title="Open Fullscreen Project Details"
+        >
+          <span>📋 Project Details</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onOpenProject && onOpenProject(project.id, 'tasks')}
+          className="flex-1 py-1.5 px-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1"
+          title="Open Task List for this Project"
+        >
+          <span>Open Task</span>
+          <span className="px-1 py-0.2 bg-white/20 text-white text-[9px] font-mono font-bold rounded leading-none">
+            {project.tasks?.length || 0}
+          </span>
+        </button>
       </div>
     </div>
   );

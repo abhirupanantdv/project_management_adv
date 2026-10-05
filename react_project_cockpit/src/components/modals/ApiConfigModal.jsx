@@ -8,10 +8,10 @@ export default function ApiConfigModal({
   onTestConnection,
   connectionStatus
 }) {
-  const [baseUrl, setBaseUrl] = useState(apiConfig.baseUrl || 'http://192.168.101.125');
-  const [apiKey, setApiKey] = useState(apiConfig.apiKey || '');
-  const [apiSecret, setApiSecret] = useState(apiConfig.apiSecret || '');
-  const [isLive, setIsLive] = useState(apiConfig.isLive || false);
+  const [baseUrl, setBaseUrl] = useState(apiConfig.baseUrl || 'http://192.168.101.175');
+  const [apiKey, setApiKey] = useState(apiConfig.apiKey || '56d7e5504ef6796');
+  const [apiSecret, setApiSecret] = useState(apiConfig.apiSecret || 'cf053576fefffd4');
+  const [isLive, setIsLive] = useState(apiConfig.isLive !== undefined ? apiConfig.isLive : true);
   const [isTesting, setIsTesting] = useState(false);
 
   if (!isOpen) return null;
@@ -55,7 +55,7 @@ export default function ApiConfigModal({
               type="url"
               value={baseUrl}
               onChange={(e) => setBaseUrl(e.target.value)}
-              placeholder="http://192.168.101.125 or https://erp.yourdomain.com"
+              placeholder="http://192.168.101.175 or https://erp.yourdomain.com"
               className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white font-mono"
               required
             />
