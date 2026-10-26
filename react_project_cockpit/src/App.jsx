@@ -1,3 +1,4 @@
+import LoginPage from "./components/auth/LoginPage.jsx";
 import React, { useState, useEffect, useMemo } from 'react';
 import { initialProjects, initialActivities, calculateProjectProgress, flattenTasks } from './data/initialData.js';
 import ProjectCard from './components/projects/ProjectCard.jsx';
@@ -25,6 +26,37 @@ export default function App() {
     const saved = localStorage.getItem('erpnext_activities_40_v1');
     return saved ? JSON.parse(saved) : initialActivities;
   });
+  // Authentication & Session State
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('erp_auth_user') || sessionStorage.getItem('erp_auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const handleLogin = (authUser, remember = true) => {
+    setCurrentUser(authUser);
+    try {
+      if (remember) {
+        localStorage.setItem('erp_auth_user', JSON.stringify(authUser));
+      } else {
+        sessionStorage.setItem('erp_auth_user', JSON.stringify(authUser));
+      }
+    } catch (e) {}
+    showToast(`Welcome back, ${authUser.fullName || authUser.username}!`);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('erp_auth_user');
+      sessionStorage.removeItem('erp_auth_user');
+    } catch (e) {}
+    showToast('Logged out successfully.');
+  };
+
 
   const [apiConfig, setApiConfig] = useState(() => {
     const saved = localStorage.getItem('erpnext_api_config');
@@ -457,6 +489,19 @@ export default function App() {
     return { total, completed, inProgress, notStarted, allTasksCount, compTasksCount, overallProgress };
   }, [projects]);
 
+  
+  // Authentication Gate: Render LoginPage if user is not authenticated
+  if (!currentUser) {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        apiConfig={apiConfig}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 antialiased font-sans pb-16">
       
@@ -609,6 +654,36 @@ export default function App() {
               >
                 {darkMode ? '☀️' : '🌙'}
               </button>
+
+              {/* User Profile & Logout */}
+              {currentUser && (
+                <div className="flex items-center gap-1.5 pl-2 sm:pl-3 border-l border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+                      {(currentUser.fullName || currentUser.username || 'A').charAt(0).toUpperCase()}
+                    </div>
+                    <div className="hidden xl:block text-left max-w-[120px]">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">
+                        {currentUser.fullName || currentUser.username}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-mono truncate">
+                        {currentUser.role || 'Member'}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      title="Sign Out of Cockpit"
+                      className="p-1 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+
             </div>
 
           </div>
