@@ -82,6 +82,7 @@ export default function App() {
 
   // Global Filters & Modals
   const [searchTerm, setSearchTerm] = useState('');
+  const [userScopeFilter, setUserScopeFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
   const [notification, setNotification] = useState(null);
@@ -443,8 +444,11 @@ export default function App() {
     showToast(`Project ${newId} created successfully!`);
   };
 
-  // Filtered Projects List
+  // Filtered Projects List (Personalized to Particular User ID)
   const filteredProjects = useMemo(() => {
+    const curName = (currentUser?.fullName || currentUser?.username || '').toLowerCase();
+    const curId = (currentUser?.username || '').toLowerCase();
+
     return projects.filter(p => {
       const matchSearch = !searchTerm || 
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -455,9 +459,15 @@ export default function App() {
       const matchStatus = statusFilter === 'All' || p.status === statusFilter;
       const matchPriority = priorityFilter === 'All' || p.priority === priorityFilter;
 
-      return matchSearch && matchStatus && matchPriority;
+      // Filter by particular logged-in user
+      const matchUserScope = userScopeFilter === 'All' || !currentUser ||
+        (p.owner && (p.owner.toLowerCase().includes(curId) || p.owner.toLowerCase().includes(curName))) ||
+        (p.assignedUsers && p.assignedUsers.some(u => u.name && (u.name.toLowerCase().includes(curId) || u.name.toLowerCase().includes(curName)))) ||
+        (p.tasks && p.tasks.some(t => t.assignee?.name && (t.assignee.name.toLowerCase().includes(curId) || t.assignee.name.toLowerCase().includes(curName))));
+
+      return matchSearch && matchStatus && matchPriority && matchUserScope;
     });
-  }, [projects, searchTerm, statusFilter, priorityFilter]);
+  }, [projects, searchTerm, statusFilter, priorityFilter, userScopeFilter, currentUser]);
 
   // Paginated Projects
   const visibleProjects = useMemo(() => {
@@ -725,7 +735,41 @@ export default function App() {
                     📧
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                                      {/* Particular User vs All Projects Scope Filter */}
+                  {currentUser && (
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserScopeFilter('All');
+                          setVisibleCount(10);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          userScopeFilter === 'All'
+                            ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        All ({projects.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserScopeFilter('My');
+                          setVisibleCount(10);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                          userScopeFilter === 'My'
+                            ? 'bg-indigo-600 text-white shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+                        }`}
+                      >
+                        <span>?? My Work</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2">
                       <h3 className="text-sm sm:text-base font-black text-rose-950 dark:text-rose-200">
                         {urgentTasks.length} Active Open/Working Urgent Tasks
                       </h3>
