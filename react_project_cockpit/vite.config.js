@@ -7,6 +7,11 @@ export default defineConfig({
     port: 3000,
     open: false,
     proxy: {
+      '/api/method': {
+        target: 'http://192.168.101.175',
+        changeOrigin: true,
+        secure: false
+      },
       '/api/erpnext': {
         target: 'http://192.168.101.175',
         changeOrigin: true,

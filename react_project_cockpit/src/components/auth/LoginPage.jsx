@@ -68,13 +68,13 @@ export default function LoginPage({ onLogin, apiConfig = {}, darkMode = false, s
   // Select a preset user from the list
   const handleSelectUser = (user) => {
     setUsername(user.id);
-    setPassword('????????');
+    setPassword('');
     setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const cleanUser = username.trim().toLowerCase();
+    const cleanUser = username.trim();
 
     if (!cleanUser) {
       setError('Please enter your User ID or Email.');
@@ -82,7 +82,7 @@ export default function LoginPage({ onLogin, apiConfig = {}, darkMode = false, s
     }
 
     if (!password) {
-      setError('Please enter your password.');
+      setError('Please enter your password. Only authentic 192.168.101.175 passwords are accepted.');
       return;
     }
 
@@ -91,94 +91,65 @@ export default function LoginPage({ onLogin, apiConfig = {}, darkMode = false, s
 
     const cleanServer = (serverUrl || '').trim().replace(/\/+$/, '');
 
-    try {
-      // 1. Try ERPNext live session authentication via proxy
-      const loginEndpoints = [
-        '/api/erpnext/method/login',
-        `${cleanServer}/api/method/login`
-      ];
+    // Secure ERPNext session authentication endpoints (Vite proxy, same-origin, or direct)
+    const loginEndpoints = [
+      '/api/method/login',
+      '/api/erpnext/method/login',
+      `${cleanServer}/api/method/login`
+    ];
 
-      for (const endpoint of loginEndpoints) {
-        try {
-          const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-              usr: username.trim(),
-              pwd: password,
-              device: 'desktop'
-            })
-          });
+    let lastErrorMessage = '';
+    let authenticated = false;
 
-          const data = await res.json().catch(() => ({}));
-          if (res.ok && (data.message === 'Logged In' || data.home_page)) {
-            const authUser = {
-              username: username.trim(),
-              fullName: data.full_name || (cleanUser === 'administrator' ? 'System Administrator' : username.trim()),
-              email: username.includes('@') ? username.trim() : `${cleanUser}@anantdv.com`,
-              serverUrl: cleanServer,
-              role: cleanUser === 'administrator' ? 'System Manager' : 'Project Manager',
-              avatar: (username.trim().charAt(0) || 'U').toUpperCase(),
-              loggedInAt: new Date().toISOString(),
-              isLiveSession: true
-            };
-            onLogin(authUser, rememberMe);
-            return;
-          }
-        } catch (callErr) {
-          // Continue to next check
+    for (const endpoint of loginEndpoints) {
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            usr: cleanUser,
+            pwd: password,
+            device: 'desktop'
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && (data.message === 'Logged In' || data.home_page)) {
+          const matchedProfile = KNOWN_USERS.find(
+            u => u.id.toLowerCase() === cleanUser.toLowerCase() || u.name.toLowerCase() === cleanUser.toLowerCase()
+          );
+          const authUser = {
+            username: cleanUser,
+            fullName: data.full_name || (matchedProfile ? matchedProfile.fullName : (cleanUser.toLowerCase() === 'administrator' ? 'System Administrator' : cleanUser)),
+            email: cleanUser.includes('@') ? cleanUser : (matchedProfile ? matchedProfile.email : `${cleanUser}@anantdv.com`),
+            serverUrl: cleanServer,
+            role: cleanUser.toLowerCase() === 'administrator' ? 'System Manager' : (matchedProfile ? matchedProfile.role : 'Project Member'),
+            avatar: (cleanUser.charAt(0) || 'U').toUpperCase(),
+            loggedInAt: new Date().toISOString(),
+            isLiveSession: true
+          };
+          onLogin(authUser, rememberMe);
+          authenticated = true;
+          return;
+        } else if (res.status === 401 || data.message === 'Invalid login credentials' || (data.exc_type && data.exc_type.includes('AuthenticationError'))) {
+          lastErrorMessage = 'Invalid login credentials! Please enter the correct password for 192.168.101.175 site administrator or user.';
+          break;
+        } else if (data.message && typeof data.message === 'string') {
+          lastErrorMessage = data.message;
         }
+      } catch (callErr) {
+        // Continue to next endpoint
       }
-    } catch (netErr) {
-      console.warn('Network call to ERPNext server failed:', netErr);
     }
 
-    // 2. Validate against Known Directory or accept User ID credentials
-    const matchedProfile = KNOWN_USERS.find(
-      u => u.id.toLowerCase() === cleanUser || u.name.toLowerCase() === cleanUser || u.fullName.toLowerCase().includes(cleanUser)
-    );
-
-    if (matchedProfile) {
-      const authUser = {
-        username: matchedProfile.id,
-        fullName: matchedProfile.fullName,
-        email: matchedProfile.email,
-        serverUrl: cleanServer,
-        role: matchedProfile.role,
-        avatar: matchedProfile.avatar,
-        color: matchedProfile.color,
-        loggedInAt: new Date().toISOString(),
-        isDirectLogin: true
-      };
-      setTimeout(() => {
-        onLogin(authUser, rememberMe);
-      }, 350);
-      return;
-    }
-
-    // 3. Any custom User ID with at least 2 characters
-    if (cleanUser.length >= 2) {
-      const authUser = {
-        username: cleanUser,
-        fullName: username.trim().charAt(0).toUpperCase() + username.trim().slice(1),
-        email: cleanUser.includes('@') ? cleanUser : `${cleanUser}@anantdv.com`,
-        serverUrl: cleanServer,
-        role: 'Project Member',
-        avatar: (cleanUser.charAt(0) || 'U').toUpperCase(),
-        loggedInAt: new Date().toISOString(),
-        isCustomUser: true
-      };
-      setTimeout(() => {
-        onLogin(authUser, rememberMe);
-      }, 350);
-      return;
-    }
-
-    setError('Invalid credentials. Please enter a valid User ID.');
     setIsLoading(false);
+    if (!authenticated) {
+      setError(lastErrorMessage || 'Invalid password! Access denied. Only valid 192.168.101.175 administrator or user passwords can open this page.');
+    }
   };
 
   return (

@@ -3373,8 +3373,14 @@
 
       const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!username.trim()) {
+        const cleanUser = username.trim();
+        if (!cleanUser) {
           setError('Please enter your username or email.');
+          return;
+        }
+
+        if (!password) {
+          setError('Please enter your password. Only authentic 192.168.101.175 passwords are accepted.');
           return;
         }
 
@@ -3382,67 +3388,62 @@
         setError(null);
         const cleanServer = (serverUrl || '').trim().replace(/\/+$/, '');
 
-        try {
-          // Attempt native ERPNext session login
-          const res = await fetch(`${cleanServer}/api/method/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-              usr: username.trim(),
-              pwd: password,
-              device: 'desktop'
-            })
-          });
+        // Secure candidate authentication endpoints (Vite proxy, same-origin app, or direct 175)
+        const endpoints = [
+          '/api/method/login',
+          '/api/erpnext/method/login',
+          `${cleanServer}/api/method/login`
+        ];
 
-          const data = await res.json().catch(() => ({}));
-          if (res.ok && (data.message === 'Logged In' || data.home_page)) {
-            const authUser = {
-              username: username.trim(),
-              fullName: data.full_name || (username.toLowerCase() === 'administrator' ? 'Administrator' : username),
-              email: username.includes('@') ? username : `${username}@anantdv.com`,
-              serverUrl: cleanServer,
-              role: username.toLowerCase() === 'administrator' ? 'System Manager' : 'Project Member',
-              loggedInAt: new Date().toISOString()
-            };
-            onLogin(authUser, rememberMe);
-            return;
+        let authSuccess = false;
+        let lastErrorMessage = '';
+
+        for (const ep of endpoints) {
+          try {
+            const res = await fetch(ep, {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                usr: cleanUser,
+                pwd: password,
+                device: 'desktop'
+              })
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (res.ok && (data.message === 'Logged In' || data.home_page)) {
+              const authUser = {
+                username: cleanUser,
+                fullName: data.full_name || (cleanUser.toLowerCase() === 'administrator' ? 'System Administrator' : cleanUser),
+                email: cleanUser.includes('@') ? cleanUser : `${cleanUser}@anantdv.com`,
+                serverUrl: cleanServer,
+                role: cleanUser.toLowerCase() === 'administrator' ? 'System Manager' : 'Project Member',
+                loggedInAt: new Date().toISOString(),
+                isLiveSession: true
+              };
+              onLogin(authUser, rememberMe);
+              authSuccess = true;
+              return;
+            } else if (res.status === 401 || data.message === 'Invalid login credentials' || (data.exc_type && data.exc_type.includes('AuthenticationError'))) {
+              lastErrorMessage = 'Invalid login credentials! Please enter the correct password for 192.168.101.175 site administrator or user.';
+              break;
+            } else if (data.message && typeof data.message === 'string') {
+              lastErrorMessage = data.message;
+            }
+          } catch (netErr) {
+            // Try next candidate endpoint
           }
-        } catch (netErr) {
-          console.warn('Network call to ERPNext server failed:', netErr);
         }
 
-        // Local development / offline fallback
-        if (username.trim().length >= 3) {
-          const authUser = {
-            username: username.trim(),
-            fullName: username.toLowerCase() === 'administrator' ? 'System Administrator' : username,
-            email: username.includes('@') ? username : `${username}@anantdv.com`,
-            serverUrl: cleanServer,
-            role: username.toLowerCase() === 'administrator' ? 'System Manager' : 'Project Lead',
-            loggedInAt: new Date().toISOString(),
-            isLocalSession: true
-          };
-          onLogin(authUser, rememberMe);
-        } else {
-          setError('Invalid username or password. Please try again.');
-          setIsLoading(false);
+        setIsLoading(false);
+        if (!authSuccess) {
+          setError(lastErrorMessage || 'Invalid password! Access denied. Only valid 192.168.101.175 administrator or user passwords can open this page.');
         }
-      };
-
-      const handleQuickLogin = (roleName, userLogin) => {
-        const authUser = {
-          username: userLogin,
-          fullName: roleName,
-          email: `${userLogin}@anantdv.com`,
-          serverUrl: serverUrl,
-          role: roleName,
-          loggedInAt: new Date().toISOString(),
-          isQuickLogin: true
-        };
-        onLogin(authUser, true);
       };
 
       return (
@@ -3581,26 +3582,11 @@
                 </button>
               </form>
 
-              {/* Quick Demo Login */}
-              <div className="mt-6 pt-5 border-t border-slate-800/80">
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center mb-3">
-                  Instant Demo Access
-                </div>
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin('Administrator', 'administrator')}
-                    className="py-2 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 text-xs font-bold text-slate-200 hover:text-white transition-all cursor-pointer"
-                  >
-                    ? Admin
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin('Project Manager', 'pm_lead')}
-                    className="py-2 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 text-xs font-bold text-slate-200 hover:text-white transition-all cursor-pointer"
-                  >
-                    ?? Manager
-                  </button>
+              {/* Secure Notice */}
+              <div className="mt-6 pt-5 border-t border-slate-800/80 text-center">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/60 border border-slate-700/60 text-[11px] font-medium text-slate-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>Direct ERPNext 192.168.101.175 Password Verification</span>
                 </div>
               </div>
 
