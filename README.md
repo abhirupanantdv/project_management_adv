@@ -84,6 +84,25 @@ project_management_adv/
 
 ---
 
+## Frappe Custom App (dv_project)
+
+A production-ready Frappe custom app installable directly onto any **Frappe Bench**:
+- **Route**: Accessible at \/adv-project- **Dynamic Login**: Accessible at \/adv-login\ (auto-redirects unauthenticated users)
+- **Shared Session**: Seamlessly shares active sessions with ERPNext Desk (\/app\)
+
+### Install to Frappe Bench
+\\ash
+# 1. From bench directory:
+bench get-app https://github.com/tanujaanantdv/project_management_adv.git --branch main
+
+# 2. Install app to site:
+bench --site <your-site> install-app adv_project
+bench --site <your-site> migrate
+bench --site <your-site> clear-cache
+\
+
+---
+
 ## Quick Start & Running
 
 ### Option 1: Instant 1-Click Launch (Zero Dependencies)
@@ -94,7 +113,8 @@ react_project_cockpit/index.html
 Double-click index.html or drag it into Chrome, Edge, Firefox, or Safari.
 
 ### Option 2: Lightweight PowerShell Server
-From eact_project_cockpit/:
+From 
+eact_project_cockpit/:
 `powershell
 .\serve.ps1
 `

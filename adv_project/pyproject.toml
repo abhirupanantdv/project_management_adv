@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adv_project"
+authors = [
+    { name = "Anantdv", email = "info@anantdv.com"}
+]
+description = "Advanced Project Management and Tracking Cockpit for ERPNext"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = []
+
+[tool.flit.metadata]
+module = "adv_project"
+author = "Anantdv"
