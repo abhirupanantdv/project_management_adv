@@ -30,8 +30,8 @@ export default function App() {
     const saved = localStorage.getItem('erpnext_api_config');
     return saved ? JSON.parse(saved) : {
       baseUrl: 'http://192.168.101.175',
-      apiKey: 'ccea7f132f74703',
-      apiSecret: '73677ab6bce0827',
+      apiKey: 'f8d6e08a0be3b07',
+      apiSecret: 'e5b48db47aa5e3a',
       isLive: true
     };
   });
@@ -543,7 +543,7 @@ export default function App() {
 
             {/* Global Actions & Urgent Notifications Bell */}
             <div className="flex items-center gap-2 sm:gap-3">
-              
+
               {/* SMTP Mail Server Settings Button */}
               <button
                 onClick={() => setIsSmtpModalOpen(true)}

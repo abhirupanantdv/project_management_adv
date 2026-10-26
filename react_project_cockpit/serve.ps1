@@ -33,7 +33,7 @@ $mimeTypes = @{
 
 # Live ERPNext Target Instance and Token
 $erpBaseUrl = "http://192.168.101.175"
-$erpToken = "56d7e5504ef6796:cf053576fefffd4"
+$erpToken = "f8d6e08a0be3b07:e5b48db47aa5e3a"
 
 while ($listener.IsListening) {
     try {

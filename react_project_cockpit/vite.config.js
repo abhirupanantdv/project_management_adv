@@ -12,7 +12,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/erpnext/, '/api'),
         headers: {
-          'Authorization': 'token ccea7f132f74703:73677ab6bce0827'
+          'Authorization': 'token f8d6e08a0be3b07:e5b48db47aa5e3a'
         }
       }
     }

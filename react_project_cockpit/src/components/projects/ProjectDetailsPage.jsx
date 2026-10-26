@@ -206,9 +206,9 @@ export default function ProjectDetailsPage({
                 Overall Completion: <strong className="font-black text-slate-900 dark:text-white">{overallPercent}%</strong>
               </span>
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">{completedTasksCount} Done</span>
-                <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">{workingTasksCount} Working</span>
                 <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">{openTasksCount} Open</span>
+                <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">{workingTasksCount} Working</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">{completedTasksCount} Done</span>
               </div>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
