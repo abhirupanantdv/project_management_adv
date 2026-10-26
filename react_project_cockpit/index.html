@@ -3615,6 +3615,7 @@
 
 
     function App() {
+      const [darkMode, setDarkMode] = useState(false);
       const [config, setConfig] = useState(() => {
         const saved = localStorage.getItem('erp_server_config_live_v10');
         return saved ? JSON.parse(saved) : DEFAULT_CONFIG;

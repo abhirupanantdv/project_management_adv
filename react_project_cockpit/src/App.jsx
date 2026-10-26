@@ -721,10 +721,7 @@ export default function App() {
             apiConfig={apiConfig}
           />
         ) : (
-
-        /* ============================================================ */}
-        /* VIEW 2: PROJECT LIST PAGE (40 PROJECTS WITH LOAD MORE)       */}
-        /* ============================================================ */
+          /* VIEW 2: PROJECT LIST PAGE (40 PROJECTS WITH LOAD MORE) */
           <div className="space-y-6">
             
             {/* 🚨 URGENT TASKS DAILY REMINDER BANNER */}
@@ -904,6 +901,40 @@ export default function App() {
                     <button onClick={() => setSearchTerm('')} className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">✕</button>
                   )}
                 </div>
+
+                {/* Particular User Scope Filter */}
+                {currentUser && (
+                  <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserScopeFilter('All');
+                        setVisibleCount(10);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        userScopeFilter === 'All'
+                          ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      All ({projects.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserScopeFilter('My');
+                        setVisibleCount(10);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                        userScopeFilter === 'My'
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+                      }`}
+                    >
+                      <span>?? My Work</span>
+                    </button>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2">
                   <select
