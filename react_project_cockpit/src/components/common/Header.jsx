@@ -22,23 +22,17 @@ export default function Header({
           
           {/* Logo & Title */}
           <div className="flex items-center space-x-3 group cursor-pointer shrink-0">
-            <div className="h-10 sm:h-11 px-2.5 py-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs flex items-center justify-center shrink-0">
-              <img
-                src={darkMode ? "/anantdv_logo_dark.png" : "/anantdv_logo.png"}
-                alt="Anantdv"
-                className="h-7 w-auto object-contain max-w-[130px]"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/anantdv_logo.png';
-                }}
-              />
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/25 shrink-0">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
             </div>
 
             <div className="h-7 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
             <div>
               <h1 className="text-base sm:text-lg font-black font-display text-slate-900 dark:text-white leading-none">
-                Anantdv Project Cockpit
+                Project Cockpit
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Executive Tracking &amp; Task Rollup Dashboard

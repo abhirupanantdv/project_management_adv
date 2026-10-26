@@ -175,11 +175,13 @@ export default function LoginPage({ onLogin, apiConfig = {}, darkMode = false, s
         
         {/* Brand Header */}
         <div className="text-center mb-6 flex flex-col items-center">
-          <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-2xl mb-3 transform hover:scale-105 transition-transform">
-            <AnantdvLogo darkMode={true} size="lg" />
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-indigo-500/30 mb-3 transform hover:scale-105 transition-transform">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white">
-            Project Cockpit Sign In
+            Project Cockpit
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 font-medium">
             Enter your User ID and password to access your Projects &amp; Tasks
