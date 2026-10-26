@@ -110,31 +110,35 @@ export default function Header({
               <span>Project</span>
             </button>
 
-            {/* User Profile & Logout */}
+            {/* Prominent User Profile & High-Visibility Logout Button */}
             {user && (
-              <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 via-indigo-600 to-purple-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
                     {(user.fullName || user.username || 'A').charAt(0).toUpperCase()}
                   </div>
-                  <div className="hidden xl:block text-left max-w-[100px]">
-                    <div className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate leading-tight">
+                  <div className="text-left max-w-[130px]">
+                    <div className="text-xs font-black text-slate-800 dark:text-slate-100 truncate leading-tight">
                       {user.fullName || user.username}
                     </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold truncate">
+                      {user.role || 'Member'}
+                    </div>
                   </div>
-                  {onLogout && (
-                    <button
-                      type="button"
-                      onClick={onLogout}
-                      title="Sign Out of Cockpit"
-                      className="p-1 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                    </button>
-                  )}
                 </div>
+                {onLogout && (
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    title="Log Out of Project Cockpit"
+                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/25 transition-all cursor-pointer"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
+                  </button>
+                )}
               </div>
             )}
 
