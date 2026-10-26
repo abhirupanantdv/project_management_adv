@@ -727,6 +727,7 @@ export default function App() {
             onNotifyAssignee={handleNotifyPerson}
             onSendEmailReminder={handleOpenEmailReminder}
             apiConfig={apiConfig}
+            onLogout={handleLogout}
           />
         ) : (
           /* VIEW 2: PROJECT LIST PAGE (40 PROJECTS WITH LOAD MORE) */
