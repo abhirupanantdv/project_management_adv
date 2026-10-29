@@ -6,10 +6,10 @@ import ProjectDetailsPage from './components/projects/ProjectDetailsPage.jsx';
 import UrgentNotificationDrawer from './components/notifications/UrgentNotificationDrawer.jsx';
 import EmailReminderModal from './components/modals/EmailReminderModal.jsx';
 import SmtpConfigModal from './components/modals/SmtpConfigModal.jsx';
-import { 
-  getPersonEmail, 
-  getDailyReminderStatus, 
-  markDailyReminderSent, 
+import {
+  getPersonEmail,
+  getDailyReminderStatus,
+  markDailyReminderSent,
   logReminderDispatch,
   sendDailyBatchViaBackend
 } from './services/reminderEmailService.js';
@@ -49,7 +49,7 @@ export default function App() {
       if (remember) {
         localStorage.setItem('erp_auth_user', JSON.stringify(authUser));
       }
-    } catch (e) {}
+    } catch (e) { }
     showToast(`Welcome back, ${authUser.fullName || authUser.username}!`);
   };
 
@@ -58,7 +58,7 @@ export default function App() {
     try {
       localStorage.removeItem('erp_auth_user');
       sessionStorage.removeItem('erp_auth_user');
-    } catch (e) {}
+    } catch (e) { }
     showToast('Logged out successfully. Please sign in again.');
   };
 
@@ -74,8 +74,8 @@ export default function App() {
   });
 
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark' || 
-           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    return localStorage.getItem('theme') === 'dark' ||
+      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
 
   // Navigation State: 'projects_list' | 'project_details'
@@ -96,7 +96,7 @@ export default function App() {
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isUrgentDrawerOpen, setIsUrgentDrawerOpen] = useState(false);
   const [isSmtpModalOpen, setIsSmtpModalOpen] = useState(false);
-  
+
   // Email Reminder Modal State
   const [emailModalData, setEmailModalData] = useState(null); // { task, assigneeName }
 
@@ -127,7 +127,8 @@ export default function App() {
 
   // Helper: Open Dedicated Project Details Page
   const handleOpenProjectDetails = (projectId) => {
-    setSelectedProjectId(projectId);
+    const id = typeof projectId === 'object' && projectId !== null ? (projectId.id || projectId.name) : projectId;
+    setSelectedProjectId(id);
     setCurrentPage('project_details');
     setIsUrgentDrawerOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -455,8 +456,8 @@ export default function App() {
     const curId = (currentUser?.username || '').toLowerCase();
 
     return projects.filter(p => {
-      const matchSearch = !searchTerm || 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      const matchSearch = !searchTerm ||
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (p.owner && p.owner.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (p.company && p.company.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -504,7 +505,7 @@ export default function App() {
     return { total, completed, inProgress, notStarted, allTasksCount, compTasksCount, overallProgress };
   }, [projects]);
 
-  
+
   // Authentication Gate: Render LoginPage if user is not authenticated
   if (!currentUser) {
     return (
@@ -519,14 +520,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 antialiased font-sans pb-16">
-      
+
       {/* Toast Notification */}
       {notification && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl backdrop-blur-md transition-all transform animate-bounce ${
-          notification.type === 'error' ? 'bg-rose-600/95 text-white' :
-          notification.type === 'warning' ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white ring-2 ring-rose-400' :
-          'bg-indigo-600/95 text-white'
-        }`}>
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl backdrop-blur-md transition-all transform animate-bounce ${notification.type === 'error' ? 'bg-rose-600/95 text-white' :
+            notification.type === 'warning' ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white ring-2 ring-rose-400' :
+              'bg-indigo-600/95 text-white'
+          }`}>
           <span className="text-lg">
             {notification.type === 'error' ? '⚠️' : notification.type === 'warning' ? '🚨' : '✅'}
           </span>
@@ -574,7 +574,7 @@ export default function App() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
-            
+
             {/* Brand Logo & View Switcher */}
             <div className="flex items-center gap-3 sm:gap-3.5 cursor-pointer group" onClick={() => setCurrentPage('projects_list')} title="Return to Projects Overview">
               <div className="h-10 sm:h-11 px-2.5 py-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs flex items-center justify-center shrink-0 group-hover:border-indigo-400 transition-all">
@@ -627,11 +627,10 @@ export default function App() {
               {/* Urgent Notifications Bell Button */}
               <button
                 onClick={() => setIsUrgentDrawerOpen(true)}
-                className={`relative p-2 rounded-xl border transition-all flex items-center justify-center ${
-                  urgentTasks.length > 0
+                className={`relative p-2 rounded-xl border transition-all flex items-center justify-center ${urgentTasks.length > 0
                     ? 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/60 dark:border-rose-800 dark:text-rose-400 hover:bg-rose-100 ring-2 ring-rose-500/30'
                     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
-                }`}
+                  }`}
                 title="Urgent Task Reminders Center"
               >
                 <span className="text-base">🔔</span>
@@ -732,7 +731,7 @@ export default function App() {
         ) : (
           /* VIEW 2: PROJECT LIST PAGE (40 PROJECTS WITH LOAD MORE) */
           <div className="space-y-6">
-            
+
             {/* 🚨 URGENT TASKS DAILY REMINDER BANNER */}
             {urgentTasks.length > 0 && (
               <div className="bg-gradient-to-r from-rose-500/15 via-amber-500/10 to-transparent dark:from-rose-950/40 dark:via-amber-950/20 border border-rose-300 dark:border-rose-800 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 animate-fade-in">
@@ -741,41 +740,39 @@ export default function App() {
                     📧
                   </div>
                   <div>
-                                      {/* Particular User vs All Projects Scope Filter */}
-                  {currentUser && (
-                    <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserScopeFilter('All');
-                          setVisibleCount(10);
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          userScopeFilter === 'All'
-                            ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                        }`}
-                      >
-                        All ({projects.length})
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserScopeFilter('My');
-                          setVisibleCount(10);
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                          userScopeFilter === 'My'
-                            ? 'bg-indigo-600 text-white shadow-xs'
-                            : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
-                        }`}
-                      >
-                        <span>?? My Work</span>
-                      </button>
-                    </div>
-                  )}
+                    {/* Particular User vs All Projects Scope Filter */}
+                    {currentUser && (
+                      <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserScopeFilter('All');
+                            setVisibleCount(10);
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${userScopeFilter === 'All'
+                              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                            }`}
+                        >
+                          All ({projects.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserScopeFilter('My');
+                            setVisibleCount(10);
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${userScopeFilter === 'My'
+                              ? 'bg-indigo-600 text-white shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+                            }`}
+                        >
+                          <span>?? My Work</span>
+                        </button>
+                      </div>
+                    )}
 
-                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <h3 className="text-sm sm:text-base font-black text-rose-950 dark:text-rose-200">
                         {urgentTasks.length} Active Open/Working Urgent Tasks
                       </h3>
@@ -815,7 +812,7 @@ export default function App() {
 
             {/* Global Executive Metric Banner */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-              
+
               <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs">
                 <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
                   <span>Total Projects</span>
@@ -893,7 +890,7 @@ export default function App() {
             {/* Filter & Search Bar */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xs space-y-3">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                
+
                 <div className="relative flex-1 min-w-[240px]">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">🔍</span>
                   <input
@@ -920,11 +917,10 @@ export default function App() {
                         setUserScopeFilter('All');
                         setVisibleCount(10);
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        userScopeFilter === 'All'
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${userScopeFilter === 'All'
                           ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs'
                           : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
+                        }`}
                     >
                       All ({projects.length})
                     </button>
@@ -934,11 +930,10 @@ export default function App() {
                         setUserScopeFilter('My');
                         setVisibleCount(10);
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                        userScopeFilter === 'My'
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${userScopeFilter === 'My'
                           ? 'bg-indigo-600 text-white shadow-xs'
                           : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
-                      }`}
+                        }`}
                     >
                       <span>?? My Work</span>
                     </button>

@@ -70,8 +70,9 @@ frappe.pages['project-cockpit'].on_page_load = function(wrapper) {
     loadData();
 
     function loadData() {
+        // Dual-endpoint loader: tries project_management_adv.api first, falls back to page method
         frappe.call({
-            method: 'project_cockpit.project_cockpit.get_project_dashboard_data',
+            method: 'project_management_adv.api.get_project_dashboard_data',
             args: {
                 status_filter: currentStatus,
                 search_term: searchTerm
@@ -84,46 +85,63 @@ frappe.pages['project-cockpit'].on_page_load = function(wrapper) {
                     renderKPIs(dashboardData.kpi);
                     renderView();
                 }
+            },
+            error: function() {
+                frappe.call({
+                    method: 'project_cockpit.project_cockpit.get_project_dashboard_data',
+                    args: {
+                        status_filter: currentStatus,
+                        search_term: searchTerm
+                    },
+                    callback: function(r2) {
+                        if (r2 && r2.message) {
+                            dashboardData = r2.message;
+                            renderKPIs(dashboardData.kpi);
+                            renderView();
+                        }
+                    }
+                });
             }
         });
     }
 
     function renderKPIs(kpi) {
+        if (!kpi) return;
         const $kpiContainer = $container.find('#pc-kpis');
         $kpiContainer.html(`
             <div class="pc-kpi-card">
                 <div class="pc-kpi-icon blue">📁</div>
                 <div class="pc-kpi-info">
                     <h4>Total Projects</h4>
-                    <div class="pc-kpi-val">${kpi.total_projects}</div>
+                    <div class="pc-kpi-val">${kpi.total_projects || 0}</div>
                 </div>
             </div>
             <div class="pc-kpi-card">
                 <div class="pc-kpi-icon amber">⚡</div>
                 <div class="pc-kpi-info">
                     <h4>Active Projects</h4>
-                    <div class="pc-kpi-val">${kpi.active_projects}</div>
+                    <div class="pc-kpi-val">${kpi.active_projects || 0}</div>
                 </div>
             </div>
             <div class="pc-kpi-card">
                 <div class="pc-kpi-icon green">📈</div>
                 <div class="pc-kpi-info">
                     <h4>Overall Progress</h4>
-                    <div class="pc-kpi-val">${kpi.overall_progress}%</div>
+                    <div class="pc-kpi-val">${kpi.overall_progress || 0}%</div>
                 </div>
             </div>
             <div class="pc-kpi-card">
                 <div class="pc-kpi-icon purple">✓</div>
                 <div class="pc-kpi-info">
                     <h4>Completed Tasks</h4>
-                    <div class="pc-kpi-val">${kpi.completed_tasks} / ${kpi.total_tasks}</div>
+                    <div class="pc-kpi-val">${kpi.completed_tasks || 0} / ${kpi.total_tasks || 0}</div>
                 </div>
             </div>
             <div class="pc-kpi-card">
                 <div class="pc-kpi-icon red">⚠️</div>
                 <div class="pc-kpi-info">
                     <h4>Overdue Tasks</h4>
-                    <div class="pc-kpi-val">${kpi.overdue_tasks}</div>
+                    <div class="pc-kpi-val">${kpi.overdue_tasks || 0}</div>
                 </div>
             </div>
         `);
@@ -132,8 +150,8 @@ frappe.pages['project-cockpit'].on_page_load = function(wrapper) {
     function renderView() {
         if (!dashboardData) return;
 
-        const filteredProjects = dashboardData.projects.filter(p => {
-            return !searchTerm || p.project_name.toLowerCase().includes(searchTerm) || p.name.toLowerCase().includes(searchTerm);
+        const filteredProjects = (dashboardData.projects || []).filter(p => {
+            return !searchTerm || (p.project_name && p.project_name.toLowerCase().includes(searchTerm)) || (p.name && p.name.toLowerCase().includes(searchTerm));
         });
 
         const $content = $container.find('#pc-main-content');
@@ -168,6 +186,9 @@ frappe.pages['project-cockpit'].on_page_load = function(wrapper) {
                             </div>
                         </div>
                         <div class="pc-proj-right">
+                            <button class="btn btn-xs btn-default pc-btn-proj-details" data-project="${project.name}" style="font-weight:600; font-size:0.75rem; border-radius:6px; margin-right:0.75rem; padding:3px 8px; cursor:pointer;">
+                                📋 Project Details
+                            </button>
                             <div class="pc-task-counts">
                                 <span>Tasks: <strong>${project.completed_tasks}/${project.total_tasks}</strong></span>
                                 ${project.overdue_tasks > 0 ? `<span style="color:#dc2626;">(${project.overdue_tasks} Overdue)</span>` : ''}
@@ -188,8 +209,14 @@ frappe.pages['project-cockpit'].on_page_load = function(wrapper) {
 
             // Toggle Expand / Collapse
             $projCard.find('.pc-project-header').on('click', function(e) {
-                if ($(e.target).is('a') || $(e.target).closest('a').length) return;
+                if ($(e.target).is('a') || $(e.target).closest('a').length || $(e.target).is('button') || $(e.target).closest('button').length) return;
                 $projCard.toggleClass('expanded');
+            });
+
+            // Bind Project Details Modal
+            $projCard.find('.pc-btn-proj-details').on('click', function(e) {
+                e.stopPropagation();
+                showProjectDetailsModal(project);
             });
 
             // Bind Quick Task Status Updater
@@ -303,20 +330,102 @@ frappe.pages['project-cockpit'].on_page_load = function(wrapper) {
 
     function quickUpdateTask(taskName, newStatus) {
         frappe.call({
-            method: 'project_cockpit.project_cockpit.update_task_status_quick',
+            method: 'project_management_adv.api.update_task_status_quick',
             args: {
                 task_name: taskName,
                 new_status: newStatus
             },
             callback: function(r) {
-                if (r.message && r.message.status === 'success') {
+                if (r.message && (r.message.status === 'success' || r.message.success)) {
                     frappe.show_alert({
                         message: __('Task and Project status updated successfully'),
                         indicator: 'green'
                     }, 3);
                     loadData();
                 }
+            },
+            error: function() {
+                frappe.call({
+                    method: 'project_cockpit.project_cockpit.update_task_status_quick',
+                    args: {
+                        task_name: taskName,
+                        new_status: newStatus
+                    },
+                    callback: function(r2) {
+                        if (r2 && r2.message) {
+                            frappe.show_alert({
+                                message: __('Task and Project status updated successfully'),
+                                indicator: 'green'
+                            }, 3);
+                            loadData();
+                        }
+                    }
+                });
             }
         });
+    }
+
+    function showProjectDetailsModal(project) {
+        const catMetrics = project.category_metrics || {};
+        const catHtml = Object.keys(catMetrics).map(cat => {
+            const m = catMetrics[cat];
+            return `
+                <div style="margin-bottom: 0.5rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:2px;">
+                        <span><strong>${cat}</strong> (${m.completed}/${m.total})</span>
+                        <span>${m.progress}%</span>
+                    </div>
+                    <div style="height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden;">
+                        <div style="height:100%; width:${m.progress}%; background:#3b82f6; border-radius:999px;"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const usersHtml = (project.assigned_users || []).map(u => `
+            <span class="pc-badge open" style="margin-right:4px; margin-bottom:4px; display:inline-block;">
+                👤 ${frappe.utils.escape_html(u.name || u.email)}
+            </span>
+        `).join('') || '<span style="color:#9ca3af; font-size:0.85rem;">No users assigned</span>';
+
+        const d = new frappe.ui.Dialog({
+            title: `📋 ${__('Project Details')}: ${frappe.utils.escape_html(project.project_name)}`,
+            fields: [
+                {
+                    fieldtype: 'HTML',
+                    fieldname: 'details_html',
+                    options: `
+                        <div style="padding: 0.5rem 0; font-family: var(--font-stack, sans-serif);">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-bottom:1.25rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0; font-size:0.85rem;">
+                                <div><strong>ID:</strong> <span style="font-family:monospace;">${project.name}</span></div>
+                                <div><strong>Status:</strong> <span class="pc-badge ${(project.status || 'open').toLowerCase().replace(/\s+/g, '-')}">${project.status}</span></div>
+                                <div><strong>Priority:</strong> ${project.priority}</div>
+                                <div><strong>Company:</strong> ${frappe.utils.escape_html(project.company || '-')}</div>
+                                <div><strong>Start Date:</strong> ${project.expected_start_date || '-'}</div>
+                                <div><strong>Due Date:</strong> ${project.expected_end_date || '-'}</div>
+                                <div><strong>Overall Progress:</strong> <strong>${project.percent_completed}%</strong></div>
+                                <div><strong>Tasks:</strong> ${project.completed_tasks} / ${project.total_tasks} completed ${project.overdue_tasks > 0 ? `<span style="color:#dc2626;">(${project.overdue_tasks} overdue)</span>` : ''}</div>
+                            </div>
+
+                            <div style="margin-bottom:1.25rem;">
+                                <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.75rem; text-transform:uppercase; color:#6b7280;">Workstream Progress</h4>
+                                ${catHtml}
+                            </div>
+
+                            <div style="margin-bottom:0.5rem;">
+                                <h4 style="font-size:0.85rem; font-weight:700; margin-bottom:0.5rem; text-transform:uppercase; color:#6b7280;">Assigned Team Members</h4>
+                                <div>${usersHtml}</div>
+                            </div>
+                        </div>
+                    `
+                }
+            ],
+            primary_action_label: __('Open Project Desk Form'),
+            primary_action: () => {
+                frappe.set_route('Form', 'Project', project.name);
+                d.hide();
+            }
+        });
+        d.show();
     }
 };

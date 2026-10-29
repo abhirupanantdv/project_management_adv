@@ -56,7 +56,13 @@ export const KNOWN_USERS = [
 ];
 
 export default function LoginPage({ onLogin, apiConfig = {}, darkMode = false, setDarkMode = () => {} }) {
-  const [username, setUsername] = useState('tanuja');
+  const [username, setUsername] = useState(() => {
+    try {
+      return localStorage.getItem('erp_last_username') || '';
+    } catch (e) {
+      return '';
+    }
+  });
   const [password, setPassword] = useState('');
   const [serverUrl, setServerUrl] = useState(apiConfig?.baseUrl || 'http://192.168.101.175');
   const [showPassword, setShowPassword] = useState(false);
@@ -132,6 +138,9 @@ export default function LoginPage({ onLogin, apiConfig = {}, darkMode = false, s
             loggedInAt: new Date().toISOString(),
             isLiveSession: true
           };
+          try {
+            localStorage.setItem('erp_last_username', cleanUser);
+          } catch (e) {}
           onLogin(authUser, rememberMe);
           authenticated = true;
           return;

@@ -9,25 +9,21 @@ app_version = "0.0.1"
 # Includes in <head>
 # ------------------
 # include js, css files in header of desk.html
-# app_include_css = "/assets/adv_project/css/adv_project.css"
-# app_include_js = "/assets/adv_project/js/adv_project.js"
+app_include_css = [
+    "/assets/adv_project/css/project_cockpit.css",
+    "/assets/adv_project/css/project_tracker.css"
+]
+app_include_js = [
+    "/assets/adv_project/js/project_cockpit.js",
+    "/assets/adv_project/js/project_tracker.js"
+]
 
 # Website Routes
 # --------------
-# www/adv-project.html is automatically served at /adv-project
-# www/adv-login.html is automatically served at /adv-login
 website_route_rules = [
     {"from_route": "/adv-project", "to_route": "adv-project"},
     {"from_route": "/adv-login", "to_route": "adv-login"}
 ]
-
-# Website Context
-# ---------------
-# update_website_context = "adv_project.website.update_website_context"
-
-# Application Home Page
-# ---------------------
-# home_page = "adv-project"
 
 # User Data Protection
 # --------------------

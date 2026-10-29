@@ -56,8 +56,12 @@ export default function ProjectCard({
           </span>
         </div>
 
-        {/* Project Name (Inert - No click action) */}
-        <h3 className="text-base font-bold font-display text-slate-900 dark:text-white line-clamp-2 select-text cursor-default">
+        {/* Project Name (Clickable to open project details) */}
+        <h3
+          onClick={() => onOpenProject && onOpenProject(project.id, 'details')}
+          className="text-base font-bold font-display text-slate-900 dark:text-white line-clamp-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          title="Open Project Details"
+        >
           {project.name}
         </h3>
 
